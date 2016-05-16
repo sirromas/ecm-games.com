@@ -1,0 +1,15 @@
+#AuthType Basic   
+#AuthName "Private zone. Only for administrator!" 
+#AuthUserFile  /var/www/users/pisarenko/ecm-games.com/public_html/.htpasswd   
+#require valid-user
+
+php_value include_path "/var/www/users/pisarenko/ecm-games.com/public_html/:/var/www/users/base/"
+
+<IfModule mod_rewrite.c>
+    Options +FollowSymLinks
+    RewriteEngine on
+
+    #send all request to index.php
+    RewriteCond $1 !^(index\.php|prototype|template|robots\.txt)
+    RewriteRule ^(.*)$ /index.php/$1 [L]
+</IfModule>

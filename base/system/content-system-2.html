@@ -1,0 +1,1142 @@
+<?  
+    class CContent {
+        var $currentLevel   = 0;
+        var $arFileNames    = array();
+        var $arIDs          = array();
+        var $arTitles       = array();
+        var $mainMenuParam  = array();
+        var $bWelcome       = false;
+        var $bError         = false;
+        
+        var $bRedirect      = false;
+        var $redirectURL    = "";
+        var $allowRedirect  = true;
+        
+        var $_welcomeID     = -1;
+        var $_mainMenuID    = -1;
+        var $_footerMenuID  = -1;
+
+        var $AdminView      = false;
+        
+    
+        function CContent() 
+        {
+            global $db;
+            global $mainMenuParam;
+            global $welcomeID;
+            global $mainMenuID;
+            global $footerMenuID;
+            global $websiteLanguageID;
+            
+            $websiteLanguage = isset($websiteLanguageID) ? $websiteLanguageID : 1;
+            
+            $this->mainMenuParam = array();
+            
+            $this->_welcomeID = (isset($welcomeID) ? $welcomeID : 21);
+            $this->_mainMenuID = (isset($mainMenuID) ? $mainMenuID : 100);
+            $this->_footerMenuID = (isset($footerMenuID) ? $footerMenuID : 300);
+        }
+        
+        
+        function setContent($url = "") 
+        {
+            global $page, $cntID, $db, $websiteLanguageID, $ajax, $websiteAJAX;
+
+            $this->AdminView = $_GET['adminView'] != '' && md5($url . CONFIGURATION_DB_PASSWORD) == $_GET['adminView'];
+            
+            $websiteLanguage = isset($websiteLanguageID) ? $websiteLanguageID : 1;
+            
+            if ($url == "")
+            {
+                $cntID = $this->_welcomeID;
+                $page = getPage($cntID);
+                $this->bError = false;
+                $this->bWelcome = true;
+                return;
+            }
+            
+            $sPath = preg_replace("/".preg_quote(defined('URL_SHORT_VERSION') && constant('URL_SHORT_VERSION') ? constant('URL_SHORT_EXTENSION') : '.html')."$/", "", $url);
+            
+            $this->arIDs        = array();
+            $this->arTitles     = array();
+            $this->currentLevel = 0;
+            
+            $this->bWelcome = false;
+            $this->bError   = false;
+            
+            $bFound = true;
+            
+            if (
+                defined('URL_SHORT_VERSION') 
+                && 
+                constant('URL_SHORT_VERSION') 
+                && 
+                !preg_match('/\//', $sPath)
+            ) {
+                $curentItems = $items = $db->select("SELECT
+                        cntID, cntTitle, cntParentID, cntFileName,
+                        cntIsURL, cntURL,
+                        UNIX_TIMESTAMP(cntLastUpdate) AS setLastUpdate
+            
+                    FROM
+                        content
+                
+                    WHERE
+                        cntLanguageID = $websiteLanguage
+                        AND
+                        cntFileName = '".$db->escape($sPath)."'
+
+                        ".(!$this->AdminView ? "
+                        
+                        AND
+                        cntVisible = 1
+                        
+                        " : "")."
+                ");
+
+                if (count($items))
+                {
+                    do {
+                        $cntParentID = $items[0]['cntParentID'];
+                        array_unshift($this->arFileNames, $items[0]['cntFileName']);
+                        array_unshift($this->arIDs, $items[0]['cntID']);
+                        array_unshift($this->arTitles, htmlspecialchars($items[0]['cntTitle']));
+                        $this->currentLevel++;
+
+                        $items = $item = $db->select("
+                            SELECT
+                                cntID, cntTitle, cntParentID, cntFileName
+
+                            FROM
+                                content
+
+                            WHERE
+                                cntID = $cntParentID
+                                AND
+                                cntLanguageID = $websiteLanguage
+
+                                ".(!$this->AdminView ? "
+
+                                AND
+                                cntVisible = 1
+
+                                " : "")."
+                        ");
+
+                        if (!count($items) && $cntParentID > 0)
+                        {
+                            $bFound = false;
+                            break;
+                        }
+
+                    } while(count($items) && $items[0]['cntParentID']);
+
+                    $items = $curentItems;
+
+                } else {
+
+                    $bFound = false;
+                }
+
+            } else {
+
+                $items = $db->select("SELECT
+                        cntID
+                
+                    FROM
+                        content
+                
+                    WHERE
+                        cntParentID = 0
+                        AND
+                        cntLanguageID = $websiteLanguage
+                ");
+                
+                $listParentID = $items[0]['cntID'];
+                for ($i = 1; $i < count($items); $i++)
+                {
+                    $listParentID .= ",".$items[$i]['cntID'];
+                }
+                
+                $this->arFileNames  = split("\/", $sPath);
+                for ($i = 0; $i < count($this->arFileNames); $i++)
+                {
+                    $items = $db->select("SELECT
+                            cntID, cntTitle,
+                            cntIsURL, cntURL,
+                            UNIX_TIMESTAMP(cntLastUpdate) AS setLastUpdate
+                
+                        FROM
+                            content
+                    
+                        WHERE
+                            cntLanguageID = $websiteLanguage
+                            AND
+                            cntParentID IN ($listParentID)
+                            AND
+                            cntFileName = '".addslashes($this->arFileNames[$i])."'
+                    ");
+                    
+
+                    if (count($items) == 0)
+                    {
+                        $bFound = false;
+                        break;
+                    }
+                    
+                    $listParentID = $items[0]['cntID'];
+                    array_push($this->arIDs, $items[0]['cntID']);
+                    array_push($this->arTitles, htmlspecialchars($items[0]['cntTitle']));
+                    $this->currentLevel++;
+                }
+            }
+
+            $cntID = -1;
+            $page = null;
+            $this->bError = true;
+            
+            $this->bRedirect = false;
+            $this->redirectURL = "";
+            
+            if ($bFound)
+            {
+                if ($items[0]["cntIsURL"] == 1)
+                {
+                    $this->bRedirect = true;
+                    $this->redirectURL = $items[0]["cntURL"];
+                }
+                
+                $cntID = $items[0]['cntID'];
+                $page = getPage($items[0]['cntID']);
+                $this->bError = false;
+
+                if ($cntID == $this->_welcomeID)
+                {
+                    $this->bWelcome = true;
+                }
+                
+                if ($page['cntChildContent'] != 0 && $this->allowRedirect)
+                {
+                    $item = $db->select("SELECT
+                            cntID, cntParentID, cntFileName
+                        
+                        FROM
+                            content
+                        
+                        WHERE
+                            cntID = ".$page['cntChildContent']."
+                            AND
+                            cntLanguageID = $websiteLanguage
+                    ");
+                    
+
+                    if (count($item) == 1)
+                    {
+                        if (defined('URL_SHORT_VERSION') && constant('URL_SHORT_VERSION'))
+                        {
+                            $sPath = '/'.$item[0]['cntFileName'].constant('URL_SHORT_EXTENSION');
+                        } else {
+                            $sPath = '/'.$sPath.'/'.$item[0]['cntFileName'].'.html';                              
+                        }
+
+                        header("Location: $sPath".($websiteAJAX && $ajax ? '?ajax=true' : ''));
+                        header("Status: 301", true, 301);
+                        exit;
+                        
+                    } else {
+
+                        $this->bError = true;
+                    }
+                }
+            }
+        }
+        
+        function setWelcomePage()
+        {
+            $this->setContent();
+        }
+        
+        function isWelcomePage() {
+            return $this->bWelcome;
+        }
+        
+        function getMainMenuID() {
+            return $this->_mainMenuID;
+        }
+        
+        function getFooterMenuID() {
+            return $this->_footerMenuID;
+        }
+    }
+    
+    $content = new CContent();
+    
+    unset($mainMenuParam);
+    unset($welcomeID);
+    unset($mainMenuID);
+    unset($footerMenuID);
+    
+    
+
+    //  
+    // Generate Menu Tree function
+    //
+    
+    function generateMenuTree($iID, $hrefPrefix, $ignoreIDs = false, $_generatedMenuTree = false, $ulClass = "", $treeStyle = "full", $maxDeepLevel = 1000, $maxItemLength = 0) 
+    {
+
+        global $db, $content, $websiteLanguageID, $websiteProcessExternalLinks,
+            $websiteReplaceFirstMenuItem;
+        
+
+        $treeID_List = "";
+        $maxDeepLevel --;
+        
+        if (count($content->arIDs) == 0 && count($content->arFileNames) > 0)
+        {
+            $treeID_List = "0";
+        }
+        
+        if ($treeStyle == "short")
+        {
+            for ($i = 0; $i < count($content->arIDs); $i++)
+            {
+                $treeID_List .= ($treeID_List > "" ? "," : "").$content->arIDs[$i];
+            }
+        }
+        
+        
+        $websiteLanguage = isset($websiteLanguageID) ? $websiteLanguageID : 1;
+        
+        
+        if (!$_generatedMenuTree)
+        {
+            $cache_id = md5($iID.'|'.$websiteLanguage.'|'.$hrefPrefix.'|'.($ignoreIDs ?  $ignoreIDs : 'false').'|'.implode('|', $content->arIDs));
+            $data = cache_get($cache_id, 'func_generateMenuTree');
+        
+            if ($data[0])
+            {
+                return $data[1];
+            } 
+        }
+        
+    
+        $items = $db->select("SELECT
+                ".(
+                    ($websiteReplaceFirstMenuItem != "" && $content->_welcomeID > 0) ?
+                        "IF(cntID = ".$content->_welcomeID.", '".addslashes($websiteReplaceFirstMenuItem)."', cntTitle) AS "
+                        :
+                        ""
+                )."
+                cntTitle, cntFileName, cntID, cntIsURL, cntURL
+            
+            FROM
+                content
+                
+            WHERE
+                cntParentID = '$iID'
+                AND
+                cntLanguageID = $websiteLanguage
+                AND
+                cntVisible = 1
+
+                ".($ignoreIDs === false ? "" : "AND cntID NOT IN ($ignoreIDs)")."
+            
+            ORDER BY
+                cntOrder
+        ");
+
+        
+        $data = '';
+        
+        
+        if (count($items) > 0)
+        {
+            $data .= "\n<UL".($ulClass != "" ? " class='$ulClass'" : "").">\n";
+
+
+            for ($i = 0; $i < count($items); $i++)
+            {
+                if (in_array($items[$i]['cntID'], $content->arIDs)) {
+                    $class = " class='selectedMenuItem' style='font-weight: bold;'";
+                    
+                    if ($i == count($items) - 1) {
+                        $classLi = " class='selectedMenuItemLi latestMenuItemLi'";
+                    } else {
+                        $classLi = " class='selectedMenuItemLi'";
+                    }
+                    
+                } else {
+                    $class = "";
+                    
+                    if ($i == count($items) - 1) {
+                        $classLi = " class='latestMenuItemLi'";
+                    } else {
+                        $classLi = "";
+                    }
+                    
+                }
+                
+                if ($items[$i]['cntIsURL'])
+                {
+                    $link_href = $items[$i]['cntURL'];
+
+                } else {
+
+                    if (defined('URL_SHORT_VERSION') && constant('URL_SHORT_VERSION'))
+                    {
+                        $link_href = '/'.($items[$i]['cntFileName'] == "index" ? "" : $items[$i]['cntFileName']).constant('URL_SHORT_EXTENSION');
+
+                    } else {
+
+                        $link_href = $hrefPrefix.'/'.($items[$i]['cntFileName'] == "index" ? "" : $items[$i]['cntFileName'].($items[$i]['cntFileName'] != "" ? ".html" : ""));
+                    }
+                }
+
+                
+                $link_titl_html = safe_htmlspecialchars($items[$i]['cntTitle']);
+
+                $link_titl = $maxItemLength ?
+                    TrimText($link_titl_html, $maxItemLength)
+                    :
+                    $link_titl_html;
+                
+                
+                if ($items[$i]['cntFileName'] == "index" && strlen($link_titl) > 50) 
+                {
+                    $link_titl = "Home";
+                }
+                
+
+                $data .= "\n<LI".$classLi."><A ".$class.' hRef="'.$link_href.'"><span'.(
+                    $link_titl_html != $link_titl ? ' title="'.$link_titl_html.'"' : ''
+                ).'>'.$link_titl."</span></A>\n";
+                
+
+                $item = $db->select("SELECT
+                        cntID
+                        
+                    FROM
+                        content
+                        
+                    WHERE
+                        cntParentID = ".$items[$i]['cntID']."
+                        AND
+                        cntLanguageID = $websiteLanguage
+                        AND
+                        cntVisible = 1
+
+                        ".($treeID_List != "" ? "AND cntParentID IN ($treeID_List)" : "")."
+                ");
+                
+
+                if (
+                    (count($item) > 0)
+                    &&
+                    ($maxDeepLevel > 0)
+                ) {
+                    $data .= generateMenuTree($items[$i]['cntID'], $hrefPrefix."/".$items[$i]['cntFileName'], $ignoreIDs, true, $ulClass, $treeStyle, $maxDeepLevel);
+                }
+                
+                $data .= "</li>\n";
+            }
+    
+
+            $data .= "\n</UL>\n";
+
+
+            if ($websiteProcessExternalLinks) 
+            {
+                $data = externallinks_Process($data);
+            }
+        }
+        
+
+        if (!$_generatedMenuTree) 
+        {
+            cache_save($cache_id, $data, 'func_generateMenuTree');
+        } 
+        
+        return $data;
+        
+    }
+    
+    // End function Generate Menu Tree
+    
+    
+    //  
+    // Generate Menu Tree function v2.1
+    //
+    
+    function generateMenuTree2($iID, $hrefPrefix = false, $ignoreIDs = false, $_generatedMenuTree = false,
+            $ulClass = "", $treeStyle = "short", $maxDeepLevel = 1000, $hintTitle = false, $iLimitAmountOfItems = -1, $tabs = "") 
+    {
+
+        global $db, $content, $websiteLanguageID, $websiteProcessExternalLinks,
+            $websiteReplaceFirstMenuItem, $websiteContentCustomOrder, $websiteContentIncludeID, $websiteXHTML;
+        
+
+        $treeID_List = "";
+        $maxDeepLevel --;
+
+        require_once file_translate("common/shop-system.html");
+        $ssCategory = isset($GLOBALS['ssCategory']) ? $GLOBALS['ssCategory'] : new cssCategory();
+        
+        if (!$websiteXHTML && count($content->arIDs) == 0 && count($content->arFileNames) > 0) 
+        {
+            $treeID_List = "0";
+        }
+        
+        if ($treeStyle == "short") 
+        {
+            for ($i = 0; $i < count($content->arIDs); $i++) 
+            {
+                $treeID_List .= ($treeID_List > "" ? "," : "").$content->arIDs[$i];
+            }
+        }
+        
+        $websiteLanguage = isset($websiteLanguageID) ? $websiteLanguageID : 1;
+        
+        if (!$_generatedMenuTree) 
+        {
+            $cache_id = md5($iID.'|'.$websiteLanguage.'|'.$hrefPrefix.'|'.($ignoreIDs ?  $ignoreIDs : 'false').'|'.implode('|', $content->arIDs).'|'.$iLimitAmountOfItems);
+            $data = cache_get($cache_id, 'func_generateMenuTree2');
+        
+            if ($data[0]) 
+            {
+                return $data[1];
+            } 
+        }
+        
+    
+        $items = $db->select("SELECT
+                ".(
+                    ($websiteReplaceFirstMenuItem != "" && $content->_welcomeID > 0) ?
+                        "IF(cntID = ".$content->_welcomeID.", '".addslashes($websiteReplaceFirstMenuItem)."', cntTitle) AS "
+                        :
+                        ""
+                )."
+                cntTitle, cntFileName, cntID, cntIsURL, cntURL, cntMETADescription, cntNoFollow
+            
+            FROM
+                content
+                
+            WHERE
+                cntParentID = '$iID'
+                AND
+                cntLanguageID = $websiteLanguage
+                AND
+                cntVisible = 1
+                ".($ignoreIDs === false ? "" : "AND cntID NOT IN ($ignoreIDs)")."
+            
+            ORDER BY
+                ".($websiteContentCustomOrder ? $websiteContentCustomOrder : 'cntOrder')."
+
+            ".($iLimitAmountOfItems != -1 ? " LIMIT $iLimitAmountOfItems " : "")."
+        ");
+
+        
+        $data = '';
+        
+        
+        if (count($items) > 0) 
+        {
+            $data .= ($tabs ? "\n$tabs" : '')."<ul".($ulClass != "" ? " class='$ulClass'" : "").">";
+
+
+            for ($i = 0; $i < count($items); $i++) 
+            {
+                $externaltag = "";
+                $class = '';
+
+                if (!$tabs && !$i)
+                {
+                    $class .= ($class ? ' ' : '').'listFirst';
+                }
+
+                if (!$tabs && $i == count($items)-1)
+                {
+                    $class .= ($class ? ' ' : '').'listLast';
+                }
+
+                if (in_array($items[$i]['cntID'], $content->arIDs)) 
+                {
+                    if ($items[$i]['cntID'] == $content->arIDs[count($content->arIDs)-1] && $items[$i]['cntID'] != 3077) 
+                    {
+                        $class .= ($class ? ' ' : '')."listNow";
+                        $externaltag = "strong";
+
+                    } else {
+
+                        $class .= ($class ? ' ' : '')."listParent";
+                        $externaltag = "em";
+                    }
+                }
+
+                if (!$externaltag && defined('URL_SHORT_VERSION') && constant('URL_SHORT_VERSION') && $items[$i]["cntIsURL"])
+                {
+                    if (preg_match('/'.preg_quote($items[$i]["cntURL"], '/').'($|\?)/i', $_SERVER['REQUEST_URI']))
+                    {
+                        $class .= ($class ? ' ' : '')."listNow";
+                        $externaltag = "strong";
+
+                    } elseif($ssCategory->level) {
+
+                        foreach ($ssCategory->ar as $arMenuCategory)
+                        {
+                            if ($items[$i]["cntURL"] == '/'.$arMenuCategory['catFolderName'])
+                            {
+                                $class .= ($class ? ' ' : '')."listNow";
+                                $externaltag = "strong";
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if ($items[$i]['cntIsURL']) 
+                {
+                    $link_href = $items[$i]['cntURL'];
+
+                } elseif (defined('URL_SHORT_VERSION') && constant('URL_SHORT_VERSION')) {
+                    
+                    $link_href = '/'.($items[$i]['cntFileName'] == "index" ? "" : $items[$i]['cntFileName']).constant('URL_SHORT_EXTENSION');
+
+                } elseif ($hrefPrefix !== false) {
+
+                    $link_href = $hrefPrefix.'/'.($items[$i]['cntFileName'] == "index" ? "" : $items[$i]['cntFileName'].($items[$i]['cntFileName'] != "" ? ".html" : ""));
+
+                } else {
+
+                    $link_href = contentGetPageURL($items[$i]['cntID']);
+                    $hrefPrefix = preg_replace('/^(.*)\/.+/', '\\1', $link_href);
+                }
+
+                
+                $link_titl = safe_htmlspecialchars($items[$i]['cntTitle']);
+                
+                
+                if ($items[$i]['cntFileName'] == "index" && strlen($link_titl) > 50) {
+                    $link_titl = "Home";
+                }
+                
+
+                $item = $db->select("SELECT
+                        cntID
+                        
+                    FROM
+                        content
+                        
+                    WHERE
+                        cntParentID = ".$items[$i]['cntID']."
+                        AND
+                        cntLanguageID = $websiteLanguage
+                        AND
+                        cntVisible = 1
+                        ".($treeID_List != "" ? "AND cntParentID IN ($treeID_List)" : "")."
+                ");
+                
+                
+                $class = $class != '' ? " class='$class'" : '';
+
+                $link_titl = WordsBreak($link_titl, 10);
+                
+                $data .= "\n\t$tabs<li$class".($websiteContentIncludeID ? ' id="cnt'.$items[$i]['cntID'].'"' : '')."><span>".($externaltag != '' ? "<$externaltag>" : "")."<a href=\"$link_href\"".
+                    ($hintTitle === true && $items[$i]["cntMETADescription"] != '' ? ' title="'.$items[$i]["cntMETADescription"].'"' : '')
+                    .($items[$i]["cntNoFollow"] == 1 ? ' rel="nofollow"' : '')
+                    .">$link_titl</a>".($externaltag != '' ? "</$externaltag>" : "")."</span>";
+
+                
+                if (
+                    (count($item) > 0)
+                    &&
+                    ($maxDeepLevel > 0)
+                ) {
+                    $data .= generateMenuTree2($items[$i]['cntID'], $hrefPrefix."/".$items[$i]['cntFileName'], $ignoreIDs, true, $ulClass, $treeStyle, $maxDeepLevel, $hintTitle, $iLimitAmountOfItems, "$tabs\t\t");
+                }
+
+                $data .= "</li>";
+            }
+    
+
+            $data .= "\n$tabs</ul>\n".substr($tabs, 0, -1);
+
+
+            if ($websiteProcessExternalLinks) {
+                $data = externallinks_Process($data);
+            }
+        }
+        
+
+        if (!$_generatedMenuTree) {
+            cache_save($cache_id, $data, 'func_generateMenuTree2');
+        } 
+        
+        return $data;
+        
+    }
+    
+    // End function Generate Menu Tree v2
+
+
+    //  
+    // Generate Menu Site-Map Tree function
+    //
+    
+    function generateMenuSiteMapTree($iID, $hrefPrefix, $ignoreIDs = false, $_generatedMenuTree = false,
+            $ulClass = "", $treeStyle = "full", $maxDeepLevel = 1000, $hintTitle = false, $iLimitAmountOfItems = -1, $ignoreCatIDs = false,
+            $hideContentLinksIDs = false, $hideCategoriesLinksIDs = false)
+    {
+        global $db, $content, $websiteLanguageID, $websiteProcessExternalLinks,$websiteShopInstalled,
+            $websiteReplaceFirstMenuItem, $websiteSiteMap2ShowCategories, $websiteSiteMap2ShowProducts,
+            $ssCategory;
+        
+
+        $treeID_List = "";
+        $maxDeepLevel --;
+        
+        
+        if (count($content->arIDs) == 0 && count($content->arFileNames) > 0) 
+        {
+            $treeID_List = "0";
+        }
+        
+
+        if ($treeStyle == "short") 
+        {
+            for ($i = 0; $i < count($content->arIDs); $i++) 
+            {
+                $treeID_List .= ($treeID_List > "" ? "," : "").$content->arIDs[$i];
+            }
+        }
+        
+        
+        $websiteLanguage = isset($websiteLanguageID) ? $websiteLanguageID : 1;
+        
+        
+        if (!$_generatedMenuTree) 
+        {
+            $cache_id = md5($iID.'|'.$websiteLanguage.'|'.$hrefPrefix.'|'.($ignoreIDs ?  $ignoreIDs : 'false').'|'.implode('|', $content->arIDs).'|'.$iLimitAmountOfItems);
+            $data = cache_get($cache_id, 'func_generateMenuSiteMapTree');
+        
+            if ($data[0]) 
+            {
+                return $data[1];
+            } 
+        }
+    
+        $items = $db->select("SELECT
+                ".(
+                    ($websiteReplaceFirstMenuItem != "" && $content->_welcomeID > 0) ?
+                        "IF(cntID = ".$content->_welcomeID.", '".addslashes($websiteReplaceFirstMenuItem)."', cntTitle) AS "
+                        :
+                        ""
+                )."
+                cntTitle, cntFileName, cntID, cntIsURL, cntURL, cntMETADescription, cntNoFollow
+            
+            FROM
+                content
+                
+            WHERE
+                cntParentID = '$iID'
+                AND
+                cntLanguageID = $websiteLanguage
+                AND
+                cntVisible = 1
+                ".($ignoreIDs === false ? "" : "AND cntID NOT IN ($ignoreIDs)")."
+            
+            ORDER BY
+                cntOrder
+
+            ".($iLimitAmountOfItems != -1 ? " LIMIT $iLimitAmountOfItems " : "")."
+        ");
+
+        
+        $data = '';
+        
+        
+        if (count($items) > 0) 
+        {
+            $data .= "<ul".($ulClass != "" ? " class='$ulClass'" : "").">";
+
+
+            for ($i = 0; $i < count($items); $i++) 
+            {
+                $class = "";
+                $externaltag = "";
+
+
+                if (in_array($items[$i]['cntID'], $content->arIDs)) 
+                {
+                    if ($items[$i]['cntID'] == $content->arIDs[count($content->arIDs) - 1]) 
+                    {
+                        $class = "listNow";
+                        $externaltag = "strong";
+                    } else {
+                        $class = "listParent";
+                        $externaltag = "em";
+                    }
+                }
+
+
+                if ($i == count($items) - 1) 
+                {
+                    $class .= $class == '' ? '' : ' ';
+                    //$class .= "listEnd";
+                }
+                
+
+                if ($items[$i]['cntIsURL']) 
+                {
+                    $link_href = $items[$i]['cntURL'];
+
+                } else {
+                    $link_href = contentGetPageURL($items[$i]['cntID']);
+                }
+
+                
+                $link_titl = safe_htmlspecialchars($items[$i]['cntTitle']);
+                
+                
+                if ($items[$i]['cntFileName'] == "index" && strlen($link_titl) > 50) 
+                {
+                    $link_titl = "Home";
+                }
+                
+
+                $item = $db->select("SELECT
+                        cntID
+                        
+                    FROM
+                        content
+                        
+                    WHERE
+                        cntParentID = ".$items[$i]['cntID']."
+                        AND
+                        cntLanguageID = $websiteLanguage
+                        AND
+                        cntVisible = 1
+                        ".($treeID_List != "" ? "AND cntParentID IN ($treeID_List)" : "")."
+                ");
+                
+                
+                $class = $class != '' ? " class='$class'" : '';
+
+                $link_titl = WordsBreak($link_titl, 10);
+
+                $data .= "\n\t<li$class><span>".($externaltag != '' ? "<$externaltag>" : "").
+                    ($hideContentLinksIDs && in_array($items[$i]['cntID'], $hideContentLinksIDs) ? '' : "<a href=\"$link_href\"".
+                    ($hintTitle === true && $items[$i]["cntMETADescription"] != '' ? ' title="'.$items[$i]["cntMETADescription"].'"' : '')
+                    .($items[$i]["cntNoFollow"] == 1 ? ' rel="nofollow"' : '').">"
+                        ).
+                    "$link_titl".
+                    ($hideContentLinksIDs && in_array($items[$i]['cntID'], $hideContentLinksIDs) ? '' : "</a>")
+                    .($externaltag != '' ? "</$externaltag>" : "")."</span>";
+
+                if ($items[$i]['cntID'] == 2)
+                {
+                    if ($websiteShopInstalled)
+                    {
+                        if ($websiteSiteMap2ShowCategories)
+                        {
+                            $categories = $ssCategory->getChildCategory();
+
+                            if (count($categories) > 0)
+                            {
+                                $data.="\n\t\t<ul class=\"sitemapCatalog\">";
+                            
+                                foreach ($categories as $categoryID)
+                                {
+                                    if (defined('URL_SHORT_VERSION') && constant('URL_SHORT_VERSION'))
+                                    {
+                                        $categoryID = $categoryID['id'];
+                                    }
+
+                                    if ($ignoreCatIDs
+                                        &&
+                                        in_array($categoryID, $ignoreCatIDs)
+                                    ) {
+                                        continue;
+                                    }
+                                    
+                                    $data .= getTreeForCat($categoryID, null, '', $hideCategoriesLinksIDs);
+
+                                    if ($websiteSiteMap2ShowProducts)
+                                    {
+//                                      $data.="<li> List of Products</li>";
+                                    }
+                                }
+    
+                                $data.="\n\t\t</ul>\n\t";
+                            }
+
+                        }
+                    
+                    } // end $websiteSiteMap2ShowCategories
+                
+                } // end $websiteShopInstalled
+
+                
+                if (
+                    (count($item) > 0)
+                    &&
+                    ($maxDeepLevel > 0)
+                ) {
+                    $data .= generateMenuTree2($items[$i]['cntID'], $hrefPrefix."/".$items[$i]['cntFileName'], $ignoreIDs, true, $ulClass, $treeStyle, $maxDeepLevel, $hintTitle, -1, "\t\t");
+                    $data .= "";
+                }
+
+                $data .= "</li>";
+            }
+    
+
+            $data .= "\n</ul>\n";
+
+
+            if ($websiteProcessExternalLinks) 
+            {
+                $data = externallinks_Process($data);
+            }
+        }
+        
+
+        if (!$_generatedMenuTree) 
+        {
+            cache_save($cache_id, $data, 'func_generateMenuSiteMapTree');
+        }
+        
+        return $data;
+    }
+    
+    function getTreeForCat($categoryID, $curCat = null, $aliases = '', $hideCategoriesLinksIDs = false)
+    {
+        global $db, $ssCategory;
+
+        if (is_null($curCat))
+        {
+            $curCat = $_GET['curCat'];
+
+            if (preg_match('/^\d+(,\d+)*$/', $curCat))
+            {
+                $curCat = explode(',', $curCat);
+            } else {
+                $curCat = array();
+
+            }
+        }
+
+        $category = $db -> select("
+            SELECT 
+                catName 
+
+            FROM
+                categories
+
+            WHERE
+                catID = ".$categoryID."
+        ");
+        
+        // print link to this category
+
+        $class = $class != '' ? " class='$class'" : '';
+        $link_titl = WordsBreak($link_titl, 10);
+        $listCategories = $ssCategory->getChildArray("catID", $categoryID);
+        $childCategories = $ssCategory->getChildCategory($categoryID);
+
+        if (defined('URL_SHORT_VERSION') && constant('URL_SHORT_VERSION'))
+        {
+            if (count($childCategories) && $childCategories[0]['id'])
+            {
+                $childCategoriesAlias = array_reduce(
+                    $childCategories, 
+                    function($res, $el) 
+                    { 
+                        $res[$el['id']] = $el['realID']; 
+                        return $res; 
+                    }, 
+                    array());
+
+                $childCategories = array_map(
+                    function($el)
+                    { 
+                        return $el['id']; 
+                    }, 
+                    $childCategories
+                );
+
+            } else {
+
+                $childCategoriesAlias = $childCategories = array();
+            }
+        }
+
+        if ($childCategories[0] == -1) unset($childCategories);
+
+        $data .= '
+            <li><span>';
+
+        if (count($childCategories))
+        {
+            $isSelected = count($curCat) && in_array($curCat[0], $listCategories);
+            $plusID = $aliases.($aliases ? ',' : '').$categoryID;
+            $plusHREF = urlAddParam($_SERVER['REQUEST_URI'], 'curCat', $plusID);
+            $plusID = 'cat'.str_replace(',', '_', $plusID);
+
+            $data .= '<a href="'.$plusHREF.'#'.$plusID.'" id="'.$plusID.'"><img src="/images/common/'.($isSelected ? 'minus.gif" alt="Close"' : 'plus.gif" alt="Open"').' /></a>';
+        }
+
+        $catURL = $ssCategory->getCategoryURL($categoryID);
+        $data .= ($hideCategoriesLinksIDs && in_array($categoryID, $hideCategoriesLinksIDs) ? '' : '<a href="'.$catURL.'"'.($aliases ? ' data-category="'.$aliases.'"' : '').'>').
+            safe_htmlspecialchars($category[0]['catName']).
+            ($hideCategoriesLinksIDs && in_array($categoryID, $hideCategoriesLinksIDs) ? '' : '</a>');
+        
+        $data .= '</span>';
+
+        if (
+            count($childCategories)
+            && 
+            $childCategories[0]
+            && 
+            count($curCat)
+            &&
+            in_array($curCat[0], $listCategories)
+        ) {
+            if ($curCat[0] == $categoryID)
+            {
+                array_shift($curCat);
+            }
+
+            $data .= '<ul>';
+
+            foreach($childCategories as $childCatID)
+            {
+                if ($childCatID > 0)
+                {
+                    $nextAliases = $aliases;
+                    if ($childCategoriesAlias[$childCatID] != $childCatID)
+                    {
+                        if ($curCat[0] == $childCategoriesAlias[$childCatID])
+                        {
+                            array_shift($curCat);
+                        }
+
+                        $nextAliases .= $nextAliases ? ',' : '';
+                        $nextAliases .= $childCategoriesAlias[$childCatID];
+                    }
+
+                    
+                    $data .= getTreeForCat($childCatID, $curCat, $nextAliases);
+                }
+            }
+            $data .= '</ul>';
+        }
+        
+        return $data.'</li>';
+    }
+                            
+    
+    // End function Generate Menu Site-Map Tree 
+    
+    // function contentHasChildPages
+    
+    function contentHasChildPages($iID) 
+    {
+        global $db, $websiteLanguageID;
+        
+        $websiteLanguage = isset($websiteLanguageID) ? $websiteLanguageID : 1;
+        
+        $items = $db->select("SELECT
+                COUNT(*) AS counter
+            
+            FROM
+                content
+                
+            WHERE
+                
+                cntParentID = '$iID'
+                AND
+                cntLanguageID = $websiteLanguage
+                AND
+                cntVisible = 1
+        ");
+
+        return $items[0]["counter"] > 0;
+    }
+    
+    
+    //  function content Get Page URL
+
+    function contentGetPageURL($page, $bAbsolutePath = false, $bVisibleOnly = true) 
+    {
+        global $db;
+        
+        $url = "";
+
+        if (!is_numeric($page))
+        {
+            if (defined('URL_SHORT_VERSION') && constant('URL_SHORT_VERSION'))
+            {
+                $url = $page . constant('URL_SHORT_EXTENSION');
+            } else {
+                $url = $page . '.html';
+            }
+
+        } else {
+
+            $id = $page;
+            
+            do {
+                $item = $db->select("
+                    SELECT
+                        cntID, cntParentID, cntIsGroup, cntFileName, cntIsURL, cntURL
+                    
+                    FROM
+                        content
+                    
+                    WHERE
+                        cntID = '$id'
+                        ".($bVisibleOnly
+                        ?
+                        "
+                        AND
+                        cntVisible = 1"
+                        :
+                        ''
+                        )."
+                ");         
+                
+                if (count($item) == 0)
+                {
+                    $url = "";
+                    break;
+                }
+
+                $item = $item[0];
+                if ($item["cntIsURL"] == '1')
+                {
+                    return $item["cntURL"];
+                }
+
+                if ($item["cntIsGroup"] == '1')
+                {
+                    break;
+                }
+                
+                if (defined('URL_SHORT_VERSION') && constant('URL_SHORT_VERSION'))
+                {
+                    $url = $item["cntFileName"] == 'index' ? '' : $item["cntFileName"].constant('URL_SHORT_EXTENSION');
+                    break;
+                }
+
+                $url = $item["cntFileName"].($url == "" ? ".html" : "/$url");
+                $id = $item["cntParentID"];
+                
+            } while ($id != '0');
+        }
+        
+        $url = preg_replace('/^\//', '', $url);
+        $url = preg_replace('/^index(\.html)?/', '', $url);
+        $url = ($bAbsolutePath ? "http://".$_SERVER["HTTP_HOST"] : "")."/$url";
+
+        return $url;
+    }
