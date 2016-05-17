@@ -6,7 +6,7 @@
     <meta name="description" content="" />
     <meta name="keywords" content="" />
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-    <link rel="stylesheet" type="text/css" href="/template/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="/games/assets/css/style.css" />
     <script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script>
 
     <!-- Latest compiled and minified CSS -->
