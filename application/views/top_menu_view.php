@@ -24,14 +24,15 @@
         </div>  
         <div id="menu">
             <ul>
-                <li><a href="/ru/index" title="Главная">Главная</a></li>
-                <li><a href="/ru/novosti" title="Новости">Новости</a></li>
-                <li><a href="/ru/kak-kupit" title="Как купить">Как купить</a></li>
-                <li><a href="/ru/uslugi-garanta" title="Услуги Гаранта">Услуги Гаранта</a></li>
-                <li><a href="/ru/postavshchikam-igrovoy-valuty" title="Поставщикам">Поставщикам</a></li>
-                <li><a href="/ru/garantii" title="Гарантии">Гарантии</a></li>
-                <li><a href="/ru/contact-us" title="Контакты">Контакты</a></li>
-                <li><a href="/ru/about-us" title="О нас">О нас</a></li>
+                <li style="min-width: 11.1%;"><a href="/ru/index" title="Главная">Главная</a></li>
+                <li style="min-width: 11.1%;"><a href="/ru/novosti" title="Новости" style="padding-right: 2px;">Новости</a></li>
+                <li style="min-width: 11.1%;"><a href="/ru/kak-kupit" title="Как купить">Как купить</a></li>
+                <li style="min-width: 11.1%;"><a href="/ru/uslugi-garanta" title="Услуги Гаранта">Услуги Гаранта</a></li>
+                <li style="min-width: 11.1%;"><a href="/ru/postavshchikam-igrovoy-valuty" title="Поставщикам">Поставщикам</a></li>
+                <li style="min-width: 11.1%;"><a href="/ru/garantii" title="Гарантии">Гарантии</a></li>
+                <li style="min-width: 11.1%;"><a href="/ru/contact-us" title="Контакты">Контакты</a></li>
+                <li style="min-width: 11.1%;"><a href="/ru/about-us" title="О нас">О нас</a></li>
+                <li style="min-width: 11.1%;"><a href="/index.php/login" title="О нас">Вход</a></li>
             </ul>
         </div>
     </header>
