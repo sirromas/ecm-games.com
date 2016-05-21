@@ -32,7 +32,7 @@
                 <li style="min-width: 11.1%;"><a href="/ru/garantii" title="Гарантии">Гарантии</a></li>
                 <li style="min-width: 11.1%;"><a href="/ru/contact-us" title="Контакты">Контакты</a></li>
                 <li style="min-width: 11.1%;"><a href="/ru/about-us" title="О нас">О нас</a></li>
-                <li style="min-width: 11.1%;"><a href="/index.php/login" title="О нас">Вход</a></li>
+                <li style="min-width: 11.1%;"><a href="/games/index.php/login" title="Вход">Вход</a></li>
             </ul>
         </div>
     </header>
