@@ -16,7 +16,13 @@ class Actions {
     }
 
     function is_email_exists($email) {
-        $query = "select * from users where email='$email'";                
+        $query = "select * from users where email='$email'";        
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function is_valid_user($email, $pwd) {
+        $query = "select * from users where email='$email' and pwd='$pwd'";
         $num = $this->db->numrows($query);
         return $num;
     }

@@ -79,7 +79,28 @@ $(document).ready(function () {
 
     });
 
-
+    $('#login').click(function () {
+        var username = $('#username').val();
+        var pwd = $('#pwd').val();
+        if (username != '' && pwd != '') {
+            var url = "/games/ajax/validate_user.php";
+            $.post(url, {email: username, pwd: pwd}).done(function (data) {
+                if (data == 0) {
+                    $('#login_err').html('Логин или пароль неверны.');
+                } // end if data==0
+                else {
+                    $('#login_err').html('');
+                    $('#login_form').submit();
+                } // end else
+            }).fail(function (data) {
+                console.log('Server response: ' + data);
+                event.preventDefault();
+            });
+        } // end if username!='' && pwd!=''
+        else {
+            $('#login_err').html('Пожалуйста укажите обязательные поля');
+        } // end else 
+    });
 
 }); // ocument).ready(function ()
 
