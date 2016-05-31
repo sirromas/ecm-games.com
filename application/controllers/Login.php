@@ -52,9 +52,36 @@ class Login extends CI_Controller {
         $user->addr = $this->input->post('addr');
         $user->icq = $this->input->post('icq');
         $user->skype = $this->input->post('skype');
-        $page=$this->login_model->add_user($user);
+        $page = $this->login_model->add_user($user);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
 
-        $common_data = $this->get_common_elements();        
+    public function restore() {
+        $email = $this->input->post('email');
+        $page = $this->login_model->forgot($email);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function restorepwd() {
+        $id = $this->uri->segment(3);
+        $page = $this->login_model->get_restore_pwd_form($id);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function restoredone() {
+        $pwd = $this->input->post('pwd1');
+        $userid = $this->input->post('userid');
+        $page = $this->login_model->update_user_pwd($userid, $pwd);
+        $common_data = $this->get_common_elements();
         $method_data = array('page' => $page);
         $data = array_merge($common_data, $method_data);
         $this->load->view('page_view', $data);

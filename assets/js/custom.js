@@ -45,6 +45,41 @@ $(document).ready(function () {
         } // end else
     }); // end of form signup
 
+    $('#restore_btn').click(function () {
+        var email = $('#email').val();
+        if (email != '') {
+            if (validateEmail(email)) {
+                $('#forgot_err').html('');
+                $('#restore_pwd').submit();
+            } // end if validateEmail()
+            else {
+                $('#forgot_err').html('Пожалуйста укажите правильный Email');
+            }
+        } // end if email!=''
+        else {
+            $('#forgot_err').html('Пожалуйста укажите Email');
+        }
+    });
+
+    $('#restore_btn_done').click(function () {
+        var pwd1 = $('#pwd1').val();
+        var pwd2 = $('#pwd2').val();
+        if (pwd1 != '' && pwd2 != '') {
+            if (pwd1 != pwd2) {
+                $('#forgot_err').html('Пароли не совпадают');
+            } // end if pwd1!=pwd2 
+            else {
+                $('#forgot_err').html('');
+                $('#restore_pwd').submit();
+            }
+        } // end if pwd1!='' && pwd2!=''
+        else {
+            $('#forgot_err').html('Пожалуйста укажите обязательные поля');
+        } // end else 
+
+    });
+
+
 
 }); // ocument).ready(function ()
 

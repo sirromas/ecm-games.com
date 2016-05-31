@@ -24,8 +24,8 @@ class login_model extends CI_Model {
         $list.="</tr>";
         $list.="<tr>";
         $list.="<td></td><td><span class='2'><button class='calc_order_send' type='submit'>OK</button></span></td></tr>";
-        $list.="<tr><td></td><td><a href='http://" . $_SERVER['SERVER_NAME'] . "/games/index.php/login/forgot' style='color: #000000;font-size: 14px;text-decoration: none;'>Забыл пароль</a></span></td></tr>";
-        $list.="<tr><td></td><td><a href='http://" . $_SERVER['SERVER_NAME'] . "/games/index.php/login/signup' style='color: #000000;font-size: 14px;text-decoration: none;'>Зарегистрироваться</a></td></tr>";
+        $list.="<tr><td></td><td><a href='" . $this->config->item('base_url') . "index.php/login/forgot' style='color: #000000;font-size: 14px;text-decoration: none;'>Забыл пароль</a></span></td></tr>";
+        $list.="<tr><td></td><td><a href='" . $this->config->item('base_url') . "index.php/login/signup' style='color: #000000;font-size: 14px;text-decoration: none;'>Зарегистрироваться</a></td></tr>";
         $list.="</table><br><br><br><br>";
         $list.="</form>";
         $list.="</div>";
@@ -35,7 +35,7 @@ class login_model extends CI_Model {
     public function get_forgot_password_page() {
         $list = "";
         $list.="<br/><div class='calc'>";
-        $list.="<form class='calc_form' >";
+        $list.="<form class='calc_form' method='post' id='restore_pwd' action='" . $this->config->item('base_url') . "index.php/login/restore/'>";
         $list.= "<br><br>";
         $list.= "<table align='center' border='0'>";
         $list.="<tr><td colspan='2' align='center'>Пожалуйста укажите Email</td></tr>";
@@ -44,17 +44,83 @@ class login_model extends CI_Model {
         $list.="<td><span class='2'><input type='text' id='email' name='email'></span></td>";
         $list.="</tr>";
         $list.="<tr>";
-        $list.="<td></td><td><span class='2'><button class='calc_order_send' type='submit'>OK</button></span></td></tr>";
-
+        $list.="<td></td><td><span class='2'><button class='calc_order_send' type='button' id='restore_btn'>OK</button></span></td></tr>";
         $list.="</table><br><br>";
-        $list.="<div style='text-align:center;' id='forgot_result'></div>";
+        $list.="<div style='text-align:center;' id='forgot_err'></div>";
         $list.="</form>";
         $list.="</div>";
         return $list;
     }
 
-    public function forgot_process() {
-        
+    public function get_restore_pwd_form($id) {
+        $list = "";
+        $list.="<br/><div class='calc'>";
+        $list.="<form class='calc_form' method='post' id='restore_pwd' action='" . $this->config->item('base_url') . "index.php/login/restoredone'>";
+        $list.= "<br><br>";
+        $list.= "<input type='hidden' id='userid' name='userid' value='$id'>";
+        $list.= "<table align='center' border='0'>";
+        $list.="<tr><td colspan='2' align='center'>Пожалуйста введите новый пароль</td></tr>";
+
+        $list.= "<tr>";
+        $list.="<td><span class='2'>Новый пароль*:</span></td>";
+        $list.="<td><span class='2'><input type='password' id='pwd1' name='pwd1'></span></td>";
+        $list.="</tr>";
+
+        $list.= "<tr>";
+        $list.="<td><span class='2'>Новый пароль(повтор)*:</span></td>";
+        $list.="<td><span class='2'><input type='password' id='pwd2' name='pwd'></span></td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td></td><td><span class='2'><button class='calc_order_send' type='button' id='restore_btn_done'>OK</button></span></td></tr>";
+        $list.="</table><br><br>";
+        $list.="<div style='text-align:center;' id='forgot_err'></div>";
+        $list.="</form>";
+        $list.="</div>";
+        return $list;
+    }
+
+    public function send_restore_pwd_link($user) {
+        $url = $this->config->item('base_url') . "index.php/login/restorepwd/$user->id";
+        $msg = "<html>";
+        $msg.="<body>";
+        $msg.="<p align='center'>Уважаемый(я) $user->firstname $user->lastname!</p>";
+        $msg.="<p align='center'>Вы запросили смену пароля для вашей учетной записи на сайте eсm-games.com.</p>";
+        $msg.="<p align='center'>Если это были не Вы, проигнорируйте это письмо.</p>";
+        $msg.="<p align='center'>Пожалуйста перейдите по этой <a href='$url' target='_blank'>ссылке</a> для смены пароля.</p>";
+        $msg.="<p align='center'>Если Вам нужна помощь, свяжитесь с нами по email " . $this->config->item('smtp_user') . "</p>";
+        $msg.="<p align='center'>С уважением,<br> Администрация сайта.</p>";
+        $msg.="</body>";
+        $msg.="</html>";
+        $this->email->from($this->config->item('smtp_user'), 'ECM-GAMES');
+        $this->email->to($user->email);
+        $this->email->subject('ECM-GAMES Запрос на смену пароля');
+        $this->email->message($msg);
+        $this->email->send();
+    }
+
+    public function forgot($email) {
+        $list = "";
+        $query = "select * from users where email='$email'";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $user = new stdClass();
+                $user->id = $row->id;
+                $user->firstname = $row->firstname;
+                $user->lastname = $row->lastname;
+                $user->email = $row->email;
+            }
+            $this->send_restore_pwd_link($user);
+        } // end if $num>0
+        $list.="<br/><div class='calc'>";
+        $list.="<form class='calc_form' >";
+        $list.= "<br>";
+        $list.="<p align='center'>Если Вы правильно указали Email, Вы должны получить письмо с инструкциями.</p>";
+        $list.="<p align='center'>Спасибо за обращение, <br> С уважением, администрация сайта.</p>";
+        $list.="</form>";
+        $list.="</div>";
+        return $list;
     }
 
     function get_password($length = 8) {
@@ -64,7 +130,7 @@ class login_model extends CI_Model {
     public function get_signup_page() {
         $list = "";
         $list.="<br/><div class='calc'>";
-        $list.="<form class='calc_form' id='signup_form' action='http://" . $_SERVER['SERVER_NAME'] . "/games/index.php/login/signupdone' method='post'>";
+        $list.="<form class='calc_form' id='signup_form' action='" . $this->config->item('base_url') . "index.php/login/signupdone' method='post'>";
         $list.= "<br><br>";
         $list.= "<table align='center' border='0'>";
 
@@ -103,8 +169,7 @@ class login_model extends CI_Model {
         $list.="<td><span class='2'><input type='text' id='skype' name='skype'></span></td>";
         $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td></td><td><span class='2'><button class='calc_order_send' type='button' id='signup'>OK</button></span></td></tr>";
+        $list.="<tr><td></td><td><span class='2'><button class='calc_order_send' type='button' id='signup'>OK</button></span></td></tr>";
 
         $list.="</table><br><br>";
         $list.="<div style='text-align:center;' id='signup_err'></div>";
@@ -163,6 +228,49 @@ class login_model extends CI_Model {
         $list.="<form class='calc_form' >";
         $list.= "<br>";
         $list.="<p align='center'>Спасибо за регистрацию. Мы отправили Вам письмо на $user->email.</p>";
+        $list.="</form>";
+        $list.="</div>";
+        return $list;
+    }
+
+    function send_pwd_confirmation($user) {
+        $user->email = 'sirromas@gmail.com'; // temp workaround
+        $msg = "<html>";
+        $msg.="<body>";
+        $msg.="<p align='center'>Уважаемый(я) $user->firstname $user->lastname!</p>";
+        $msg.="<p align='center'>Ваш пароль успешно обновлен.</p>";
+        $msg.="<p align='center'>Ваш логин: $user->email</p>";
+        $msg.="<p align='center'>Ваш пароль: $user->pwd</p>";
+        $msg.="<p align='center'>Если Вам нужна помощь свяжитесь с нами по email " . $this->config->item('smtp_user') . "</p>";
+        $msg.="<p align='center'>С уважением,<br> Администрация сайта.</p>";
+        $msg.="</body>";
+        $msg.="</html>";
+        $this->email->from($this->config->item('smtp_user'), 'ECM-GAMES');
+        $this->email->to($user->email);
+        $this->email->subject('ECM-GAMES Смена пароля');
+        $this->email->message($msg);
+        $this->email->send();
+    }
+
+    public function update_user_pwd($userid, $pwd) {
+        $list = "";
+        $query = "select * from users where id=$userid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $user = new stdClass();
+            $user->id = $row->id;
+            $user->pwd = $pwd;
+            $user->firstname = $row->firstname;
+            $user->lastname = $row->lastname;
+            $user->email = $row->email;
+        }
+        $query2 = "update users set pwd='$pwd' where id=$userid";
+        $this->db->query($query2);
+        $this->send_pwd_confirmation($user);
+        $list.="<br/><div class='calc'>";
+        $list.="<form class='calc_form' >";
+        $list.= "<br>";
+        $list.="<p align='center'>Пароль успешно обновлен. Мы отправили Вам письмо на $user->email.</p>";
         $list.="</form>";
         $list.="</div>";
         return $list;
