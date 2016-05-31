@@ -26,4 +26,38 @@ class Login extends CI_Controller {
         $this->load->view('page_view', $data);
     }
 
+    public function forgot() {
+        $common_data = $this->get_common_elements();
+        $page = $this->login_model->get_forgot_password_page();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function signup() {
+        $common_data = $this->get_common_elements();
+        $page = $this->login_model->get_signup_page();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function signupdone() {
+        $user = new stdClass();
+        $user->firstname = $this->input->post('firstname');
+        $user->lastname = $this->input->post('lastname');
+        $user->email = $this->input->post('email');
+        $user->pwd = $this->login_model->get_password();
+        $user->phone = $this->input->post('phone');
+        $user->addr = $this->input->post('addr');
+        $user->icq = $this->input->post('icq');
+        $user->skype = $this->input->post('skype');
+        $page=$this->login_model->add_user($user);
+
+        $common_data = $this->get_common_elements();        
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
 }
