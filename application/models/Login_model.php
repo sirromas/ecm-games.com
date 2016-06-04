@@ -46,6 +46,7 @@ class login_model extends CI_Model {
         $list.="</tr>";
         $list.="<tr>";
         $list.="<td></td><td><span class='2'><button class='calc_order_send' type='button' id='restore_btn'>OK</button></span></td></tr>";
+        $list.="<td></td><td><span class='2'><a href='".$this->config->item('base_url')."index.php/login/signup' target='_blank' style='color: #000000;font-size: 14px;text-decoration: none;'>Зарегистрироваться</a></span></td></tr>";
         $list.="</table><br><br>";
         $list.="<div style='text-align:center;' id='forgot_err'></div>";
         $list.="</form>";
@@ -171,7 +172,8 @@ class login_model extends CI_Model {
         $list.="</tr>";
 
         $list.="<tr><td></td><td><span class='2'><button class='calc_order_send' type='button' id='signup'>OK</button></span></td></tr>";
-
+        $list.="<tr><td></td><td><span class='2'><a target='_blank' href='" . $this->config->item('base_url') . "index.php/login/forgot' style='color: #000000;font-size: 14px;text-decoration: none;'>Забыл пароль</a></span></td></tr>";
+        
         $list.="</table><br><br>";
         $list.="<div style='text-align:center;' id='signup_err'></div>";
         $list.="</form>";
