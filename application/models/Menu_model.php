@@ -5,6 +5,7 @@ class Menu_model extends CI_Model {
     public function __construct() {
         parent::__construct();
         $this->load->database();
+        $this->load->library('session');
     }
 
     public function get_menu_russian_name($name) {
@@ -34,7 +35,13 @@ class Menu_model extends CI_Model {
                 $item = 'О нас';
                 break;
             case 'login':
-                $item = 'Вход';
+                $status = $this->session->userdata('email');
+                if ($status == '') {
+                    $item = 'Вход';
+                } // end if $status==''
+                else {
+                    $item = 'Выход';
+                } // end else 
                 break;
         }
         return $item;
@@ -47,7 +54,18 @@ class Menu_model extends CI_Model {
         foreach ($result->result() as $row) {
             $menu_name = $this->get_menu_russian_name($row->name);
             if ($row->name != 'index') {
-                $link = $this->config->item('base_url') . "index.php/menu/page/" . $row->link . "";
+                if ($row->name != 'login') {
+                    $link = $this->config->item('base_url') . "index.php/menu/page/" . $row->link . "";
+                } // end if $row->name!=login
+                else {
+                    $status = $this->session->userdata('email');
+                    if ($status == '') {
+                        $link = $this->config->item('base_url') . "index.php/menu/page/" . $row->link . "";
+                    } // end if $stattus == ''
+                    else {
+                        $link = $this->config->item('base_url') . "index.php/user/logoutdone/";
+                    } // end else 
+                } // end else
             } // end if $row->name!='index'
             else {
                 $link = $this->config->item('base_url');

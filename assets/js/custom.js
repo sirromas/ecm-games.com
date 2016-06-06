@@ -8,7 +8,7 @@ $(document).ready(function () {
         return emailReg.test(email);
     }
 
-    // ********** Signup form submit ************//
+    /*************** Signup form submit ****************/
     $("#signup").click(function (event) {
         var firstname = $('#firstname').val();
         var lastname = $('#lastname').val();
@@ -45,6 +45,7 @@ $(document).ready(function () {
         } // end else
     }); // end of form signup
 
+    /***************** Restore link *******************/
     $('#restore_btn').click(function () {
         var email = $('#email').val();
         if (email != '') {
@@ -79,6 +80,7 @@ $(document).ready(function () {
 
     });
 
+    /********************** Login *************************/
     $('#login').click(function () {
         var username = $('#username').val();
         var pwd = $('#pwd').val();
@@ -101,6 +103,29 @@ $(document).ready(function () {
             $('#login_err').html('Пожалуйста укажите обязательные поля');
         } // end else 
     });
+
+    /*************************** Logout ***************************/
+    $("#other").change(function () {
+        var selected = $("#other").val();
+        if (selected == 'exit') {
+            var url = host + "/index.php/user/logout";
+        } // end if event.target.id=='exit'        
+        window.document.location = url;
+    });
+
+    /********************** Logout *****************************/
+    $('#logout').click(function () {
+        var url = host + "/index.php/user/logoutdone";
+        window.document.location = url;
+    });
+
+    $('#cancel_logout').click(function () {
+        var type=$('#type').val();
+        var url = host + "/index.php/user/page/"+type;
+        window.document.location = url;
+    });
+
+
 
 }); // ocument).ready(function ()
 

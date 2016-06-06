@@ -12,7 +12,7 @@ class login_model extends CI_Model {
     public function get_login_page() {
         $list = "";
         $list.="<br/><div class='calc'>";
-        $list.="<form class='calc_form' id='login_form' method='post' action='" . $this->config->item('base_url') . "index.php/user/login'>";
+        $list.="<form class='calc_form' id='login_form' method='post' action='" . $this->config->item('base_url') . "index.php/user/auth'>";
         $list.= "<br><br><br><br><br><br>";
         $list.= "<table align='center'>";
         $list.="<tr><td colspan='2' align='center'><span id='login_err'></span></td></tr>";
