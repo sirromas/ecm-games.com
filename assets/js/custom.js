@@ -120,11 +120,17 @@ $(document).ready(function () {
     });
 
     $('#cancel_logout').click(function () {
-        var type=$('#type').val();
-        var url = host + "/index.php/user/page/"+type;
+        var type = $('#type').val();
+        var url = host + "/index.php/user/page/" + type;
         window.document.location = url;
     });
 
+    /********************* Games edit block ***********************/
+    $('#games').change(function () {
+        var selected = $('#games').val();
+        var url = host + "/index.php/games/edit/" + selected;
+        window.document.location = url;
+    });
 
 
 }); // ocument).ready(function ()

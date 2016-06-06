@@ -4,8 +4,10 @@ class Games_model extends CI_Model {
 
     public function __construct() {
         parent::__construct();
-        $this->load->database();
-    }
+        $this->load->database();        
+        $this->load->library('session');
+        $this->load->helper('url');
+    }    
 
     public function get_games_left_list() {
         $list = "";
@@ -33,7 +35,8 @@ class Games_model extends CI_Model {
         return $list;
     }
 
-    public function game_block($gamID) {
+    public function edit($id) {
+        $list = "";
         
     }
 
