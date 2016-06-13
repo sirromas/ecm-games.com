@@ -51,5 +51,9 @@ class User extends CI_Controller {
     public function logoutdone() {
         $this->user_model->logout();
     }
+    
+    public function add_user () {
+        
+    }
 
 }

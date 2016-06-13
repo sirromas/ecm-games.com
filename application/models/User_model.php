@@ -47,15 +47,17 @@ class user_model extends CI_Model {
         if ($status) {
             if ($type == 3) {
                 $games = $this->get_games_list();
+                $servers = $this->get_servers_list();
                 $deals = $this->get_deals_list();
                 $users = $this->get_users_list();
                 $other = $this->get_others_list();
                 $list.="<br/><div class='calc'>";
-                $list.="<form class='calc_form' >";                
+                $list.="<form class='calc_form' >";
                 $list.= "<br><br>";
                 $list.= "<table align='center' border='0' style='width: 100%;'>";
                 $list.="<tr>";
                 $list.= "<td><span id='games_container'>$games</span><td>";
+                $list.= "<td><span id='servers_container'>$servers</span><td>";
                 $list.= "<td><span id='deals_container'>$deals</span><td>";
                 $list.= "<td><span id='user_container'>$users</span><td>";
                 $list.= "<td><span id='report_containers'>$other</span><td>";
@@ -118,10 +120,26 @@ class user_model extends CI_Model {
         return $list;
     }
 
+    public function get_servers_list() {
+        $list = "";
+        $list.="<select id='servers' style='width:95px;'>";
+        $list.="<option value='0' selected>Сервера</option>";
+        $query = "select * from gameservers order by gasName";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $list.="<option value='$row->gasID'>$row->gasName</option>";
+        }
+        $list.="</select>";
+        return $list;
+    }
+
     public function get_others_list() {
         $list = "";
         $list.="<select id='other' style='width:95px;'>";
         $list.="<option value='0' selected>Другое</option>";
+        $list.="<option value='add_game'><a href='" . $this->config->item('base_url') . "index.php/games/add_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить игру</a></option>";
+        $list.="<option value='add_server'><a href='" . $this->config->item('base_url') . "index.php/games/add_server' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить сервер</a></option>";
+        $list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";
         $list.="<option value='exit'><a href='" . $this->config->item('base_url') . "index.php/user/logout' style='color: #000000;font-size: 14px;text-decoration: none;'>Выход</a></option>";
         $list.="</select>";
         return $list;

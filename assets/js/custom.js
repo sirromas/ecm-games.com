@@ -2,6 +2,7 @@
 $(document).ready(function () {
 
     var host = 'http://mycodebusters.com/games';
+    var dialog_loaded;
 
     function validateEmail(email) {
         var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
@@ -104,12 +105,22 @@ $(document).ready(function () {
         } // end else 
     });
 
-    /*************************** Logout ***************************/
+    /*************************** Other dropdwon ***************************/
     $("#other").change(function () {
         var selected = $("#other").val();
+        console.log('Selected item: ' + selected);
         if (selected == 'exit') {
             var url = host + "/index.php/user/logout";
         } // end if event.target.id=='exit'        
+        if (selected == 'add_game') {
+            var url = host + "/index.php/games/add_game";
+        }
+        if (selected == 'add_server') {
+            var url = host + "/index.php/games/add_server";
+        }
+        if (selected == 'add_user') {
+            var url = host + "/index.php/user/add_user";
+        }
         window.document.location = url;
     });
 
@@ -132,6 +143,79 @@ $(document).ready(function () {
         window.document.location = url;
     });
 
+    /********************* Servers edit block ***********************/
+    $('#servers').change(function () {
+        var selected = $('#servers').val();
+        var url = host + "/index.php/servers/edit/" + selected;
+        window.document.location = url;
+    });
 
-}); // ocument).ready(function ()
+
+    $('#save_game_form').click(function () {
+        /*
+         var title = $('#title').val();
+         var body = $('#body').val();
+         var currency = $('#currency').val();
+         var minamount = $('#minamount').val();
+         if (title != '' && body != '' && currency != '' && $.isNumeric(minamount)) {
+         $('#game_err').html('');
+         $('#update_game').submit();
+         } // end if title!='' && body!='' && currency!='' && $.isNumeric(minamount)
+         else {
+         $('#game_err').html('Пожалуйста укажите обязательные поля');
+         } // end else
+         */
+    });
+
+    $("#update_game").submit(function (event) {
+        var title = $('#title').val();
+        var body = $('#body').val();
+        var currency = $('#currency').val();
+        var minamount = $('#minamount').val();
+        if (title != '' && body != '' && currency != '' && $.isNumeric(minamount)) {
+            $('#game_err').html('');
+        } // end if title!='' && body!='' && currency!='' && $.isNumeric(minamount)
+        else {
+            $('#game_err').html('Пожалуйста укажите обязательные поля');
+            event.preventDefault();
+        } // end else
+
+    });
+
+    function get_game_description_block(id) {
+        var url = host + "/index.php/games/get_game_modal_box/";
+        if (dialog_loaded !== true) {
+            $.post(url, {id: id}).done(function (data) {
+                dialog_loaded = true;
+                $("body").append(data);
+                $("#myModal").modal('show');
+            });
+        } // end if dialog_loaded !== true
+        else {
+            $("#myModal").modal('show');
+        }
+    }
+
+    $("body").click(function (event) {
+        console.log('Element clicked: ' + event.target.id);
+        if (event.target.id.indexOf("game_detailes") >= 0) {
+            var id = event.target.id.replace("game_detailes_id_", "");
+            get_game_description_block(id);
+        }
+
+        if (event.target.id == 'upd_game') {
+            var id = $('#id').val();
+            var body = CKEDITOR.instances.body.getData();
+            if (id > 0 && body != '') {
+                var url = host + "/index.php/games/update_game_content/";
+                $.post(url, {id: id, body: body}).done(function (data) {
+                    console.log('Server response: ' + data);
+                });
+            } // end if id>0 && body!=''
+        }
+
+
+    })
+
+}); // document).ready(function ()
 
