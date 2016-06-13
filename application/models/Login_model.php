@@ -182,7 +182,7 @@ class login_model extends CI_Model {
     }
 
     public function send_signup_confirmation_email($user) {
-        $user->email = 'sirromas@gmail.com'; // temp workaround
+        //$user->email = 'sirromas@gmail.com'; // temp workaround
         $msg = "<html>";
         $msg.="<body>";
         $msg.="<p align='center'>Уважаемый(я) $user->firstname $user->lastname!</p>";
@@ -237,7 +237,7 @@ class login_model extends CI_Model {
     }
 
     function send_pwd_confirmation($user) {
-        $user->email = 'sirromas@gmail.com'; // temp workaround
+        //$user->email = 'sirromas@gmail.com'; // temp workaround
         $msg = "<html>";
         $msg.="<body>";
         $msg.="<p align='center'>Уважаемый(я) $user->firstname $user->lastname!</p>";

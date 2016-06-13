@@ -47,7 +47,7 @@ class user_model extends CI_Model {
         if ($status) {
             if ($type == 3) {
                 $games = $this->get_games_list();
-                $servers = $this->get_servers_list();
+                //$servers = $this->get_servers_list();
                 $deals = $this->get_deals_list();
                 $users = $this->get_users_list();
                 $other = $this->get_others_list();
@@ -57,7 +57,7 @@ class user_model extends CI_Model {
                 $list.= "<table align='center' border='0' style='width: 100%;'>";
                 $list.="<tr>";
                 $list.= "<td><span id='games_container'>$games</span><td>";
-                $list.= "<td><span id='servers_container'>$servers</span><td>";
+                //$list.= "<td><span id='servers_container'>$servers</span><td>";
                 $list.= "<td><span id='deals_container'>$deals</span><td>";
                 $list.= "<td><span id='user_container'>$users</span><td>";
                 $list.= "<td><span id='report_containers'>$other</span><td>";
@@ -108,7 +108,7 @@ class user_model extends CI_Model {
         $list = "";
         $list.="<select id='users' style='width:95px;'>";
         $list.="<option value='0' selected>Пользователи</option>";
-        $query = "select * from users order by lastname ";
+        $query = "select * from users order by firstname ";
         $result = $this->db->query($query);
         $num = $result->num_rows();
         if ($num > 0) {
@@ -165,6 +165,147 @@ class user_model extends CI_Model {
     public function logout() {
         $this->session->sess_destroy();
         redirect(base_url());
+    }
+
+    public function get_user_types($type) {
+        $list = "";
+        $list.="<select id='type' name='type'>";
+        for ($i = 1; $i <= 3; $i++) {
+            if ($i == $type) {
+                $list.="<option value='$i' selected>$i</option>";
+            } // end if $i==type
+            else {
+                $list.="<option value='$i'>$i</option>";
+            } // end else
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_user_edit_block($id) {
+        $list = "";
+        $query = "select * from users where id=$id";
+        $result = $this->db->query($query);
+        $user = new stdClass();
+        foreach ($result->result() as $row) {
+            $user->id = $id;
+            $user->firstname = $row->firstname;
+            $user->lastname = $row->lastname;
+            $user->email = $row->email;
+            $user->pwd = $row->pwd;
+            $user->phone = $row->phone;
+            $user->addr = $row->addr;
+            $user->skype = $row->skype;
+            $user->icq = $row->icq;
+            $user->type = $row->type;
+        }
+        $type = $this->get_user_types($user->type);
+        $list.="<table style='' border='0' align='center'>";
+        $users = $this->get_users_list();
+        $list.="<tr>";
+        $list.="<input type='hidden' id='id' name='id' value='$user->id'>";
+        $list.="<td>Пользователи</td><td align='left'>$users</td><td><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Фамилия*</td><td><input type='text' id='lastname' name='lastname' value='$user->lastname'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Имя*</td><td><input type='text' id='firstname' name='firstname' value='$user->firstname'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Email*</td><td><input type='text' id='email' name='email' value='$user->email' disabled></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Пароль*</td><td><input type='text' id='pwd' name='pwd' value='$user->pwd'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Телефон*</td><td><input type='text' id='phone' name='phone' value='$user->phone'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Адрес*</td><td><input type='text' id='addr' name='addr' value='$user->addr'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Skype</td><td><input type='text' id='skype' name='skype' value='$user->skype'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>ICQ</td><td><input type='text' id='icq' name='icq' value='$user->icq'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Тип</td><td align='left'>$type</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='2'><span id='user_err'></span></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>&nbsp;</td><td><button>Ok</button></td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+        return $list;
+    }
+
+    public function get_edit_block($id) {
+        $list = "";
+        $status = $this->validate_user();
+        if ($status) {
+            $type = $this->session->userdata('type');
+            if ($type == 3) {
+                $user = $this->get_user_edit_block($id);
+                $list.="<br/><div class='calc' style='text-align:center;'>";
+                $list.="<form class='calc_form' id='update_user' method='post' action='" . $this->config->item('base_url') . "index.php/user/edit_done'>";
+                $list.= "<br><br>";
+                $list.= "<table align='center' border='0' style='width: 100%;'>";
+                $list.="<tr>";
+                $list.= "<td colspan='2'>$user<td>";
+                $list.= "</tr>";
+                $list.="</table><br><br>";
+                $list.="<div style='text-align:center;' id='user_err'></div>";
+                $list.="</form>";
+                $list.="</div>";
+                return $list;
+            } // end if $type==3
+        } // end of $status
+        else {
+            $this->session->sess_destroy();
+            redirect(base_url());
+        }
+    }
+
+    public function update_user($user) {
+        $list = "";
+        $query = "update users set "
+                . "firstname=" . $this->db->escape($user->firstname) . ", "
+                . "lastname=" . $this->db->escape($user->lastname) . ", "
+                . "pwd=" . $this->db->escape($user->pwd) . ", "
+                . "phone=" . $this->db->escape($user->phone) . ", "
+                . "addr=" . $this->db->escape($user->addr) . ", "
+                . "skype=" . $this->db->escape($user->skype) . ", "
+                . "icq=" . $this->db->escape($user->icq) . ", "
+                . "type=" . $this->db->escape($user->type) . " "
+                . "where id=$user->id";
+        $this->db->query($query);
+        $list.="<br/><div class=''>";
+        $list.="<form class='calc_form'>";
+        $list.= "<br>";
+        $list.= "<table align='center' border='0' style='width: 100%;'>";
+        $list.="<tr>";
+        $list.= "<td>&nbsp;&nbsp;<span>Данные пользователя успешно обнолены. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+        $list.= "</tr>";
+        $list.= "</table><br>";
+        $list.="</form>";
+        $list.="</div>";
+        return $list;
     }
 
 }

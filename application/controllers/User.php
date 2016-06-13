@@ -51,9 +51,38 @@ class User extends CI_Controller {
     public function logoutdone() {
         $this->user_model->logout();
     }
-    
-    public function add_user () {
+
+    public function add_user() {
         
+    }
+
+    public function edit() {
+        $id = $this->uri->segment(3);
+        $page = $this->user_model->get_edit_block($id);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function edit_done() {
+        //print_r($this->input->post());
+        //die();
+        $user = new stdClass();
+        $user->id = $this->input->post('id');
+        $user->firstname = $this->input->post('firstname');
+        $user->lastname = $this->input->post('lastname');
+        $user->pwd = $this->input->post('pwd');
+        $user->phone = $this->input->post('phone');
+        $user->addr = $this->input->post('addr');
+        $user->skype = $this->input->post('skype');
+        $user->icq = $this->input->post('icq');
+        $user->type = $this->input->post('type');
+        $page = $this->user_model->update_user($user);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
     }
 
 }
