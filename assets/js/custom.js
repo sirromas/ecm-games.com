@@ -116,7 +116,7 @@ $(document).ready(function () {
             var url = host + "/index.php/games/add_game";
         }
         if (selected == 'add_server') {
-            var url = host + "/index.php/games/add_server";
+            var url = host + "/index.php/servers/add_server";
         }
         if (selected == 'add_user') {
             var url = host + "/index.php/user/add_user";
@@ -143,28 +143,30 @@ $(document).ready(function () {
         window.document.location = url;
     });
 
-    /********************* Servers edit block ***********************/
-    $('#servers').change(function () {
-        var selected = $('#servers').val();
-        var url = host + "/index.php/servers/edit/" + selected;
+    /********************* Users edit block ***********************/
+    $('#users').change(function () {
+        var selected = $('#users').val();
+        var url = host + "/index.php/user/edit/" + selected;
         window.document.location = url;
     });
 
-
-    $('#save_game_form').click(function () {
-        /*
-         var title = $('#title').val();
-         var body = $('#body').val();
-         var currency = $('#currency').val();
-         var minamount = $('#minamount').val();
-         if (title != '' && body != '' && currency != '' && $.isNumeric(minamount)) {
-         $('#game_err').html('');
-         $('#update_game').submit();
-         } // end if title!='' && body!='' && currency!='' && $.isNumeric(minamount)
-         else {
-         $('#game_err').html('Пожалуйста укажите обязательные поля');
-         } // end else
-         */
+    $('#update_user').submit(function (event) {
+        var id = $('#id').val();
+        var lastname = $('#lastname').val();
+        var firstname = $('#firstname').val();
+        var pwd = $('#pwd').val();
+        var phone = $('#phone').val();
+        var addr = $('#addr').val();
+        var skype = $('#skype').val();
+        var icq = $('#icq').val();
+        var type = $('#icq').val();
+        if (id > 0 && lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '') {
+            $('#user_err').html('');
+        }
+        else {
+            $('#user_err').html('Пожалуйста укажите все обязательные поля');
+            event.preventDefault();
+        }
     });
 
     $("#update_game").submit(function (event) {
@@ -179,8 +181,21 @@ $(document).ready(function () {
             $('#game_err').html('Пожалуйста укажите обязательные поля');
             event.preventDefault();
         } // end else
-
     });
+
+    $("#add_server").submit(function (event) {
+        var name = $('#name').val();
+        var rate = $('#rate').val();
+        var game = $('#game').val();
+        if (name != '' && $.isNumeric(rate) && game> 0) {
+            $('#server_err').html('');
+        } // end if name!='' && rate!='' && game>0        
+        else {
+            $('#server_err').html('Пожалуйста укажите обязательные поля');
+            event.preventDefault();
+        } // end else
+    });
+
 
     function get_game_description_block(id) {
         var url = host + "/index.php/games/get_game_modal_box/";
@@ -196,8 +211,15 @@ $(document).ready(function () {
         }
     }
 
+    /********************************************************************
+     * 
+     *                  Events processing block
+     * 
+     ********************************************************************/
+
     $("body").click(function (event) {
         console.log('Element clicked: ' + event.target.id);
+
         if (event.target.id.indexOf("game_detailes") >= 0) {
             var id = event.target.id.replace("game_detailes_id_", "");
             get_game_description_block(id);
@@ -214,8 +236,33 @@ $(document).ready(function () {
             } // end if id>0 && body!=''
         }
 
+        if (event.target.id.indexOf("update_server_") >= 0) {
+            var id = event.target.id.replace("update_server_", "");
+            var server_name_id = '#name_' + id;
+            var server_rate_id = '#exchange_' + id;
+            var server_name = $(server_name_id).val();
+            var server_rate = $(server_rate_id).val();
+            if (id > 0 && server_name != '' && $.isNumeric(server_rate)) {
+                var url = host + "/index.php/servers/update_server/";
+                $.post(url, {id: id, name: server_name, rate: server_rate}).done(function (data) {
+                    alert('Сервер обвновлен.');
+                    console.log('Server response: ' + data);
+                });
+            } // end if id>0 && server_name!='' && $.isNumeric(server_rate)
+        }
 
-    })
+        if (event.target.id.indexOf("del_game_") >= 0) {
+            var id = event.target.id.replace("del_game_", "");
+            if (id > 0) {
+                if (confirm('Удалить игру?')) {
+
+                } // end if confirm
+            } // end if id>0
+        }
+
+
+
+    });  // end of $("body").click(function (event) {
 
 }); // document).ready(function ()
 
