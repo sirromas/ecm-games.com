@@ -25,7 +25,7 @@ class User extends CI_Controller {
         $type = $this->user_model->authorize($email, $pwd);
         if ($type > 0) {
             redirect("/user/page/$type");
-        } // end if $status
+        } // end if $type
         else {
             redirect("/menu/page/login");
         } // end else                      

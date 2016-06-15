@@ -7,6 +7,7 @@ class user_model extends CI_Model {
         $this->load->database();
         $this->load->library('session');
         $this->load->helper('url');
+        $this->load->model('games_model');
     }
 
     public function validate_user() {
@@ -41,13 +42,56 @@ class user_model extends CI_Model {
         }
     }
 
+    public function get_game_detailes($id) {
+        $content = $this->games_model->get_game_content($id);
+        $query = "select * from games where gamID=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $game = new stdClass();
+            $game->name = $row->gamName;
+            $game->currency = $row->gamMoney;
+            $game->minamount = $row->gamMinCount;
+            $game->icon = $this->config->item('base_url') . 'assets/icon/' . $row->icon;
+        }
+        $data = array('game' => $game, 'content' => $content);
+        return $data;
+    }
+
+    public function get_game_servers($id) {
+        $list = "";
+        $list.="<select id='server' name='server'>";
+        $list.="<option value='0' selected>Сервер</option>";
+        $servers = $this->games_model->get_game_servers($id);
+        if (count($servers) > 0) {
+            foreach ($servers as $server) {
+                $list.="<option value='$server->id'>$server->name</option>";
+            } // end foreach
+        } // end if count($servers)>0
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_payment_methods() {
+        $list = "";
+        $list.="<select id='ptype' name='ptype'>";
+        $list.="<option value='0' selected>Выберите способ оплаты</option>";
+        $query = "select * from payments where payActive=1 order by payName";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $list.="<option value='$row->payID'>$row->payName</option>";
+        }
+        $list.="</select>";
+        return $list;
+    }
+
     public function get_user_dashboard($type) {
         $list = "";
+        $id = $this->uri->segment(4);
         $status = $this->validate_user();
         if ($status) {
             if ($type == 3) {
+                // It is admin user
                 $games = $this->get_games_list();
-                //$servers = $this->get_servers_list();
                 $deals = $this->get_deals_list();
                 $users = $this->get_users_list();
                 $other = $this->get_others_list();
@@ -57,7 +101,6 @@ class user_model extends CI_Model {
                 $list.= "<table align='center' border='0' style='width: 100%;'>";
                 $list.="<tr>";
                 $list.= "<td><span id='games_container'>$games</span><td>";
-                //$list.= "<td><span id='servers_container'>$servers</span><td>";
                 $list.= "<td><span id='deals_container'>$deals</span><td>";
                 $list.= "<td><span id='user_container'>$users</span><td>";
                 $list.= "<td><span id='report_containers'>$other</span><td>";
@@ -68,16 +111,177 @@ class user_model extends CI_Model {
                 $list.="</div>";
             } // end if $type==3        
             else if ($type == 1) {
-                
+                // It is ordinary user
+                if ($id > 0) {
+                    $detailes = $this->get_game_detailes($id); // array
+                    $game = $detailes['game'];
+                    $content = $detailes['content'];
+                    $servers = $this->get_game_servers($id);
+                    $ptype=$this->get_payment_methods();
+                    $list.="<br/><div class=''>";
+                    $list.="<form class='calc_form' id='add_server'";
+                    $list.="<h2 class='title'></h2>"
+                            . "<div class='game-title'>
+                        <img src='$game->icon' title='Купить $game->currency $game->name' alt='Купить $game->currency $game->name'>
+                        <ul>              
+                            <li><a href='#description' title='Об игре'>Об игре $game->name</a></li>
+                            <li><a href='#video' title='Видео-обзор Lineage'>Видео-обзор $game->name</a></li>                                            
+                        </ul>
+                        </div>
+                            <div id='block1'>
+                            <select id='action' name='action'>    
+                            <option value='0' selected>Я хочу ....</option>
+                            <option value='1'>Купить $game->currency</option>
+                            <option value='2'>Продать $game->currency</option>
+                            </select> <br> 
+                            $servers <br>                            
+                            $ptype <br> 
+                                <table>
+                            <tbody><tr>
+                            <td id='calc_zoloto'>
+                                <span>Получу:</span><br>
+                                <input type='text' id='currency' name='currency' value='' class='inputsBorder'>
+                            </td>
+                            <td id='calc_money'>
+                                <span>Стоимость:</span><br>
+                                <input type='text' id='money' name='imoney' value='' class='inputsBorder'>
+                            </td>
+                            </tr>
+                            </tbody></table>
+                            <div class='calc_min_sum_order'><small><strong>*Минимальная сумма заказа <span class='min_sum_order_js'>$game->minamount</span><span class='CURRENCY_NAME'>$</span></strong></small></div>
+
+                            <hr>
+                            <div id='change_kurs'>
+                            <div><strong>Цена:</strong></div>
+                            <div><span id='count_money' class='red'>0</span> <span id='CURRENCY_NAME'>грн</span></div>
+                            <div> за <span id='const_zoloto' class='red'>0</span> <span id='text_money'>$game->currency</span></div>
+                            </div>
+                            <hr>
+                            
+                                        
+                            <div class='contactField'>
+                            <label for='inp_phone'>Телефон:</label>
+                            <input type='text' class='optionalInput inputsBorder' name='inp_phone' id='inp_phone' value=''>
+                            </div>
+                            
+                            <div class='contactField'>
+                            <label for='inp_skype'>Skype:</label>
+                            <input type='text' class='optionalInput inputsBorder' name='inp_skype' id='inp_skype' value=''>
+                            </div>
+                            
+                            <div class='contactField'>
+                            <label for='inp_icq'>ICQ:</label>
+                            <input type='text' class='optionalInput inputsBorder' name='inp_icq' id='inp_icq' value=''>
+                            </div>
+                            
+                            <div>
+                            <div id='infoContact' class='calc_infoContact'>Можно заполнить одно поле из 3-х (телефон, skype или icq).</div>
+                            </div>                     
+                            
+                            <div class='swap delivery_select' data-id-server='502'>
+                            <select name='s_delivery' id='s_delivery' class='inputsBorder'>
+                            <option value=''>Выберите способ доставки</option>
+                            <option value='1'>Способ доставки на усмотрение оператора</option>
+                            <option value='2'>Игровая почта</option>
+                            </select>
+                            </div>
+                            
+                            <div>
+                                <div>
+                                    <label for='inp_email'>Email:</label>
+                                    <input type='email' required='required' id='inp_email' name='inp_email' value='' class='inputsBorder' data-validation='email'>
+                                </div>
+                                
+                                <div>
+                                    <label for='inp_nickname'>Ник:</label>
+                                    <input type='text' required='required' id='inp_nickname' name='inp_nickname' value='' class='inputsBorder' data-validation='required'>
+                                </div>
+                                
+                                <div>
+                                    <label for='ta_comment'>Комментарий:</label>
+                                    <textarea name='ta_comment' id='ta_comment' class='inputsBorder'></textarea>
+                                </div>
+
+                            </div>
+                                </div>                           
+                            
+                                <div class='calc_order'>
+                <button type='submit' class='calc_order_send'>Заказать</button>
+
+                <div class='popup_visibility_visible popup popup_name_agreement popup_theme_ededed popup_autoclosable_yes popup_adaptive_yes popup_animate_yes agreement i-bem agreement_js_inited popup_js_inited popup_to_right' onclick='return {&quot;popup&quot;:{&quot;directions&quot;:{&quot;to&quot;:&quot;right&quot;}},&quot;agreement&quot;:{}};' style=': -17px; left: -300px;'>
+                    <div class='popup__under'></div><i class='popup__tail' style='top: 24.98px;right:1px;'></i>
+                    <div class='popup__content'>
+                        Оформляя заказ, Вы принимаете <a target='_blank' style='color:#1D7485' href='/rules/'>условия соглашения</a>.
+                    </div>
+                </div>
+                        </div><br>                   
+
+                            <div id='block2'>
+                       <div class='swap'>$content->body</div>                       
+                       </div>";
+
+                    $list.= "<br>";
+                    $list.= "<table align='center' border='0' style='width: 100%;'>";
+                    $list.="<tr>";
+                    $list.= "<td align center><td>";
+                    $list.= "</tr>";
+                    $list.= "</table><br>";
+                    $list.="</form>";
+                    $list.="</div>";
+                } // end if $id>0
+                else {
+                    $list.="<br/><div class=''>";
+                    $list.="<form class='calc_form' id='add_server'";
+                    $list.= "<br>";
+                    $list.= "<table align='center' border='0' style='width: 100%;padding:25px;'>";
+                    $list.="<tr>";
+                    $list.= "<td align='right' style='padding:25px;'><button>Сделки</button></td><td align='left' style='padding:25px;'><button>Мои данные</button></td>";
+                    $list.= "</tr>";
+                    $list.= "</table><br>";
+                    $list.="</form>";
+                    $list.="</div>";
+                } // end else
             } // end if $type==1
             else if ($type == 2) {
-                
-            } // end if $type==2
-            return $list;
+                // It is partner
+            } // end if $type==2            
         } // end if $status
         else {
-            redirect(base_url());
+            if ($id > 0) {
+                $detailes = $this->get_game_detailes($id); // array
+                $game = $detailes['game'];
+                $content = $detailes['content'];
+                $list.="<br/><div class=''>";
+                $list.="<form class='calc_form' id='add_server'";
+                $list.="<h2 class='title'></h2>"
+                        . "<div class='game-title'>
+                        <img src='$game->icon' title='Купить $game->currency $game->name' alt='Купить $game->currency $game->name'>
+                        <ul>              
+                            <li><a href='#description' title='Об игре'>Об игре $game->name</a></li>
+                            <li><a href='#video' title='Видео-обзор Lineage'>Видео-обзор $game->name</a></li>                                            
+                        </ul>
+                        </div>"
+                        . "<div id='block1'>
+                       <div class='swap'><div class='game-title'><ul><li><a href='" . $this->config->item('base_url') . "index.php/menu/page/login'>Вход</a></li></ul></div></div>                       
+                       </div>"
+                        . "<div id='block2'>
+                       <div class='swap'>$content->body</div>                       
+                       </div>";
+
+                $list.= "<br>";
+                $list.= "<table align='center' border='0' style='width: 100%;'>";
+                $list.="<tr>";
+                $list.= "<td align center><td>";
+                $list.= "</tr>";
+                $list.= "</table><br>";
+                $list.="</form>";
+                $list.="</div>";
+            } // end if $id>0
+            else {
+                redirect(base_url());
+            }
         } // end else
+        return $list;
     }
 
     public function get_games_list() {
@@ -139,7 +343,7 @@ class user_model extends CI_Model {
         $list.="<option value='0' selected>Другое</option>";
         $list.="<option value='add_game'><a href='" . $this->config->item('base_url') . "index.php/games/add_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить игру</a></option>";
         $list.="<option value='add_server'><a href='" . $this->config->item('base_url') . "index.php/games/add_server' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить сервер</a></option>";
-        $list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";
+        //$list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";
         $list.="<option value='exit'><a href='" . $this->config->item('base_url') . "index.php/user/logout' style='color: #000000;font-size: 14px;text-decoration: none;'>Выход</a></option>";
         $list.="</select>";
         return $list;

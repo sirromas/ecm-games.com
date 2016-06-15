@@ -187,7 +187,7 @@ $(document).ready(function () {
         var name = $('#name').val();
         var rate = $('#rate').val();
         var game = $('#game').val();
-        if (name != '' && $.isNumeric(rate) && game> 0) {
+        if (name != '' && $.isNumeric(rate) && game > 0) {
             $('#server_err').html('');
         } // end if name!='' && rate!='' && game>0        
         else {
@@ -199,14 +199,17 @@ $(document).ready(function () {
 
     function get_game_description_block(id) {
         var url = host + "/index.php/games/get_game_modal_box/";
+        $('#game_container').fadeTo(0.33);
         if (dialog_loaded !== true) {
             $.post(url, {id: id}).done(function (data) {
                 dialog_loaded = true;
+                $('#game_container').fadeTo(1);
                 $("body").append(data);
                 $("#myModal").modal('show');
             });
         } // end if dialog_loaded !== true
         else {
+            $('#game_container').fadeTo(1);
             $("#myModal").modal('show');
         }
     }
@@ -255,12 +258,26 @@ $(document).ready(function () {
             var id = event.target.id.replace("del_game_", "");
             if (id > 0) {
                 if (confirm('Удалить игру?')) {
-
+                    var url = host + "/index.php/games/delete/" + id;
+                    window.document.location = url;
                 } // end if confirm
             } // end if id>0
         }
 
+        $("#add_game").submit(function (event) {
+            var file_data = $('#files').prop('files');
+            var name = $('#name').val();
+            var currency = $('#currency').val();
+            var min_amount = $('#min_amount').val();
 
+            if (file_data != '' && name != '' && currency != '' && $.isNumeric(min_amount)) {
+
+            } // end if file_data!=''
+            else {
+                $('#game_err').html('Пожалуйста укажите обязательные поля');
+                event.preventDefault();
+            }
+        });
 
     });  // end of $("body").click(function (event) {
 

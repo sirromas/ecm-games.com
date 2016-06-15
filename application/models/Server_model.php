@@ -7,6 +7,7 @@ class Server_model extends CI_Model {
         $this->load->database();
         $this->load->library('session');
         $this->load->helper('url');
+        $this->load->model('user_model');
     }
 
     public function update($server) {
@@ -19,7 +20,7 @@ class Server_model extends CI_Model {
 
     public function get_games_list() {
         $list = "";
-        $list.="<select  id='game' name='game' style='width:170px;'>";
+        $list.="<select id='game' name='game'  style='width:162px;'>";
         $list.="<option value='0' selected>Игра</option>";
         $query = "select * from games order by gamName";
         $result = $this->db->query($query);
@@ -32,30 +33,43 @@ class Server_model extends CI_Model {
 
     public function get_add_server_page() {
         $list = "";
-        $games = $this->get_games_list();
-        $list.="<table align='center' border='0'>";
+        $status = $this->user_model->validate_user();
+        if ($status) {
+            $type = $this->session->userdata('type');
+            if ($type == 3) {
+                $games = $this->get_games_list();
+                $list.="<table align='center' border='0'>";
 
-        $list.="<tr>";
-        $list.="<td>Имя сервера</td><td align='left'><input type='text' id='name' name='name'></td>";
-        $list.="</tr>";
+                $list.="<tr>";
+                $list.="<td>Имя сервера</td><td align='left'><input type='text' id='name' name='name'></td>";
+                $list.="<td><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></td>";
+                $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td>Курс сервера</td><td align='left'><input type='text' id='rate' name='rate'></td>";
-        $list.="</tr>";
+                $list.="<tr>";
+                $list.="<td>Курс сервера</td><td align='left'><input type='text' id='rate' name='rate'></td>";
+                $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td>Игра</td><td align='left'>$games</td>";
-        $list.="</tr>";
+                $list.="<tr>";
+                $list.="<td>Игра</td><td align='left'>$games</td>";
+                $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td colspan='2'><span id='server_err'></span></td>";
-        $list.="</tr>";
+                $list.="<tr>";
+                $list.="<td colspan='2'><span id='server_err'></span></td>";
+                $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td></td><td><button>Ok</button></td>";
-        $list.="</tr>";
+                $list.="<tr>";
+                $list.="<td></td><td><button>Ok</button></td>";
+                $list.="</tr>";
 
-        $list.="</table>";
+                $list.="</table>";
+            } // end if $type==3
+            else {
+                redirect(base_url());
+            }
+        } // end if $status
+        else {
+            redirect(base_url());
+        }
         return $list;
     }
 

@@ -167,12 +167,38 @@ class Games extends CI_Controller {
     public function update_game_content() {
         $game = new stdClass();
         $game->id = $this->input->post('id');
-        $game->body = $this->input->post('body');         
+        $game->body = $this->input->post('body');
         $this->games_model->update_game_content2($game);
     }
 
     public function add_game() {
-        
+        $page = $this->games_model->add_game();
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function game_added() {
+        $game = new stdClass();
+        $game->icon = $_FILES;
+        $game->name = $this->input->post('name');
+        $game->currency = $this->input->post('currency');
+        $game->min_amount = $this->input->post('min_amount');
+        $page = $this->games_model->game_added($game);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function delete() {
+        $game_id = $this->uri->segment(3);
+        $page = $this->games_model->delete_games($game_id);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
     }
 
 }
