@@ -1,6 +1,6 @@
-<?php
+<script src="http://mycodebusters.com/games/ckeditor/ckeditor.js"></script>
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
 
 class Menu extends CI_Controller {
 
@@ -32,6 +32,25 @@ class Menu extends CI_Controller {
         else {
             $page = $this->login_model->get_login_page();
         }
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function adminpage() {
+        $item = $this->uri->segment(3);
+        $common_data = $this->get_common_elements();
+        $page = $this->menu_model->get_admin_page($item);
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function update_page() {
+        $body = $this->input->post('body');
+        $id = $this->input->post('id');
+        $common_data = $this->get_common_elements();
+        $page = $this->menu_model->update_user_page($id, $body);
         $method_data = array('page' => $page);
         $data = array_merge($common_data, $method_data);
         $this->load->view('page_view', $data);

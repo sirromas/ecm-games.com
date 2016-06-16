@@ -109,17 +109,36 @@ $(document).ready(function () {
     $("#other").change(function () {
         var selected = $("#other").val();
         console.log('Selected item: ' + selected);
+        var url;
         if (selected == 'exit') {
-            var url = host + "/index.php/user/logout";
+            vurl = host + "/index.php/user/logout";
         } // end if event.target.id=='exit'        
         if (selected == 'add_game') {
-            var url = host + "/index.php/games/add_game";
+            url = host + "/index.php/games/add_game";
         }
         if (selected == 'add_server') {
-            var url = host + "/index.php/servers/add_server";
+            url = host + "/index.php/servers/add_server";
         }
-        if (selected == 'add_user') {
-            var url = host + "/index.php/user/add_user";
+        if (selected == 'news') {
+            url = host + "/index.php/menu/adminpage/9719147";
+        }
+        if (selected == 'buy') {
+            url = host + "/index.php/menu/adminpage/9719146";
+        }
+        if (selected == 'service') {
+            url = host + "/index.php/menu/adminpage/9719145";
+        }
+        if (selected == 'supplier') {
+            url = host + "/index.php/menu/adminpage/9719143";
+        }
+        if (selected == 'guarantee') {
+            url = host + "/index.php/menu/adminpage/9719144";
+        }
+        if (selected == 'contacts') {
+            url = host + "/index.php/menu/adminpage/3068";
+        }
+        if (selected == 'about') {
+            url = host + "/index.php/menu/adminpage/1";
         }
         window.document.location = url;
     });
@@ -128,6 +147,18 @@ $(document).ready(function () {
     $('#logout').click(function () {
         var url = host + "/index.php/user/logoutdone";
         window.document.location = url;
+    });
+
+
+    $('#user_page').submit(function (event) {
+        var body = CKEDITOR.instances.body.getData();
+        if (body != '') {
+            
+        } // end if body!=''
+        else {
+            event.preventDefault();
+        }
+
     });
 
     $('#cancel_logout').click(function () {
@@ -278,6 +309,8 @@ $(document).ready(function () {
                 event.preventDefault();
             }
         });
+
+
 
     });  // end of $("body").click(function (event) {
 

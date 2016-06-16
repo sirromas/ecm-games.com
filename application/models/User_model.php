@@ -117,7 +117,7 @@ class user_model extends CI_Model {
                     $game = $detailes['game'];
                     $content = $detailes['content'];
                     $servers = $this->get_game_servers($id);
-                    $ptype=$this->get_payment_methods();
+                    $ptype = $this->get_payment_methods();
                     $list.="<br/><div class=''>";
                     $list.="<form class='calc_form' id='add_server'";
                     $list.="<h2 class='title'></h2>"
@@ -343,7 +343,13 @@ class user_model extends CI_Model {
         $list.="<option value='0' selected>Другое</option>";
         $list.="<option value='add_game'><a href='" . $this->config->item('base_url') . "index.php/games/add_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить игру</a></option>";
         $list.="<option value='add_server'><a href='" . $this->config->item('base_url') . "index.php/games/add_server' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить сервер</a></option>";
-        //$list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";
+        $list.="<option value='news'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719147' style='color: #000000;font-size: 14px;text-decoration: none;'>Новости</a></option>";
+        $list.="<option value='buy'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719146' style='color: #000000;font-size: 14px;text-decoration: none;'>Как купить</a></option>";
+        $list.="<option value='service'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719145' style='color: #000000;font-size: 14px;text-decoration: none;'>Услуги Гаранта</a></option>";
+        $list.="<option value='supplier'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719143' style='color: #000000;font-size: 14px;text-decoration: none;'>Поставщикам</a></option>";
+        $list.="<option value='guarantee'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719144' style='color: #000000;font-size: 14px;text-decoration: none;'>Гарантии</a></option>";
+        $list.="<option value='contacts'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/3068' style='color: #000000;font-size: 14px;text-decoration: none;'>Контакты</a></option>";
+        $list.="<option value='about'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/1' style='color: #000000;font-size: 14px;text-decoration: none;'>О нас</a></option>";
         $list.="<option value='exit'><a href='" . $this->config->item('base_url') . "index.php/user/logout' style='color: #000000;font-size: 14px;text-decoration: none;'>Выход</a></option>";
         $list.="</select>";
         return $list;
