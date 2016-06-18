@@ -66,8 +66,6 @@ class User extends CI_Controller {
     }
 
     public function edit_done() {
-        //print_r($this->input->post());
-        //die();
         $user = new stdClass();
         $user->id = $this->input->post('id');
         $user->firstname = $this->input->post('firstname');
@@ -79,6 +77,14 @@ class User extends CI_Controller {
         $user->icq = $this->input->post('icq');
         $user->type = $this->input->post('type');
         $page = $this->user_model->update_user($user);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+    
+    public function report () {
+        $page = $this->user_model->report();
         $common_data = $this->get_common_elements();
         $method_data = array('page' => $page);
         $data = array_merge($common_data, $method_data);

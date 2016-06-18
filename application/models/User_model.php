@@ -235,7 +235,7 @@ class user_model extends CI_Model {
                     $list.= "<br>";
                     $list.= "<table align='center' border='0' style='width: 100%;padding:25px;'>";
                     $list.="<tr>";
-                    $list.= "<td align='right' style='padding:25px;'><button>Сделки</button></td><td align='left' style='padding:25px;'><button>Мои данные</button></td>";
+                    $list.= "<td align='right' style='padding:25px;'><a href='#' onClick='return false;' style='color: #000000;font-size: 14px;text-decoration: none;'>Сделки</a></td><td align='left' style='padding:25px;'><a href='#' onClick='return false;' style='color: #000000;font-size: 14px;text-decoration: none;'>Мои данные</a></td>";
                     $list.= "</tr>";
                     $list.= "</table><br>";
                     $list.="</form>";
@@ -343,6 +343,7 @@ class user_model extends CI_Model {
         $list.="<option value='0' selected>Другое</option>";
         $list.="<option value='add_game'><a href='" . $this->config->item('base_url') . "index.php/games/add_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить игру</a></option>";
         $list.="<option value='add_server'><a href='" . $this->config->item('base_url') . "index.php/games/add_server' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить сервер</a></option>";
+        //$list.="<option value='report'><a href='" . $this->config->item('base_url') . "index.php/user/report' style='color: #000000;font-size: 14px;text-decoration: none;'>Отчеты</a></option>";
         $list.="<option value='news'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719147' style='color: #000000;font-size: 14px;text-decoration: none;'>Новости</a></option>";
         $list.="<option value='buy'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719146' style='color: #000000;font-size: 14px;text-decoration: none;'>Как купить</a></option>";
         $list.="<option value='service'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719145' style='color: #000000;font-size: 14px;text-decoration: none;'>Услуги Гаранта</a></option>";
@@ -377,15 +378,37 @@ class user_model extends CI_Model {
         redirect(base_url());
     }
 
+    public function get_user_role_name($i) {
+        switch ($i) {
+            case 1:
+                $name = "Пользователь";
+                break;
+            case 2:
+                $name = "Менеджер";
+                break;
+            case 3:
+                $name = "Админ";
+                break;
+            case 4:
+                $name = "Модератор";
+                break;
+            case 5:
+                $name = "Кассир";
+                break;
+        }
+        return $name;
+    }
+
     public function get_user_types($type) {
         $list = "";
         $list.="<select id='type' name='type'>";
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 5; $i++) {
+            $name=$this->get_user_role_name($i);
             if ($i == $type) {
-                $list.="<option value='$i' selected>$i</option>";
+                $list.="<option value='$i' selected>$name</option>";
             } // end if $i==type
             else {
-                $list.="<option value='$i'>$i</option>";
+                $list.="<option value='$i'>$name</option>";
             } // end else
         }
         $list.="</select>";
@@ -510,7 +533,22 @@ class user_model extends CI_Model {
         $list.= "<br>";
         $list.= "<table align='center' border='0' style='width: 100%;'>";
         $list.="<tr>";
-        $list.= "<td>&nbsp;&nbsp;<span>Данные пользователя успешно обнолены. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+        $list.= "<td align='center'>&nbsp;&nbsp;<span>Данные пользователя успешно обнолены. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+        $list.= "</tr>";
+        $list.= "</table><br>";
+        $list.="</form>";
+        $list.="</div>";
+        return $list;
+    }
+
+    public function report() {
+        $list = "";
+        $list.="<br/><div class=''>";
+        $list.="<form class='calc_form'>";
+        $list.= "<br>";
+        $list.= "<table align='center' border='0' style='width: 100%;'>";
+        $list.="<tr>";
+        $list.= "<td align='center'><div id='report_container'></div><td>";
         $list.= "</tr>";
         $list.= "</table><br>";
         $list.="</form>";

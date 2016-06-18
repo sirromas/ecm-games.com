@@ -157,6 +157,8 @@ class Games extends CI_Controller {
         $game->video = $this->input->post('video');
         $game->currency = $this->input->post('currency');
         $game->minamount = $this->input->post('minamount');
+        $game->min_price=$this->input->post('min_price');
+        $game->max_price=$this->input->post('max_price');
         $page = $this->games_model->update_game_content($game);
         $common_data = $this->get_common_elements();
         $method_data = array('page' => $page);

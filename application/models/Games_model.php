@@ -63,6 +63,8 @@ class Games_model extends CI_Model {
             $game->name = $row->gamName;
             $game->currency = $row->gamMoney;
             $game->minamount = $row->gamMinCount;
+            $game->min=$row->min_price;
+            $game->max=$row->max_price;
         }
         $list.="<table border='0' align='center' style=''>";
 
@@ -71,7 +73,7 @@ class Games_model extends CI_Model {
         $list.="<tr>";
 
         $list.="<tr>";
-        $list.="<td align='left'>Название игры*</td><td align='left'><input type='text' id='title' name='title' value='$game->name'></td><td><a href='#' onClick='return false;' style='color: #000000;font-size: 14px;text-decoration: none;' id='game_detailes_id_$id'>Описание</a></span></td><td><a href='#' onClick='return false;' style='color: #000000;font-size: 14px;text-decoration: none;' id='del_game_$id'>Удалить</a></td>";
+        $list.="<td align='left'>Название игры*</td><td align='left'><input type='text' id='title' name='title' value='$game->name'></td><td><a href='#' onClick='return false;' style='color: #000000;font-size: 14px;text-decoration: none;' id='game_detailes_id_$id'>Описание</a></span></td><td>&nbsp;&nbsp;&nbsp;<a href='#' onClick='return false;' style='color: #000000;font-size: 14px;text-decoration: none;' id='del_game_$id'>Удалить</a></td>";
         $list.="<input type='hidden' id='id' name='id' value='$id'>";
         $list.="<tr>";        
 
@@ -82,12 +84,23 @@ class Games_model extends CI_Model {
         $list.="<tr>";
         $list.="<td align='left'>Мин заказ ($)*</td><td align='left'><input type='text' id='minamount' name='minamount' value='$game->minamount'></td><td></td>";
         $list.="<tr>";
-
+        
+        $list.="<tr>";
+        $list.="<td align='left'>Мин цена ($)*</td><td align='left'><input type='text' id='min_price' name='min_price' value='$game->min'></td><td></td>";
+        $list.="<tr>";
+        
+        $list.="<tr>";
+        $list.="<td align='left'>Макс цена ($)*</td><td align='left'><input type='text' id='max_price' name='max_price' value='$game->max'></td><td></td>";
+        $list.="<tr>";
+        /*
+         * 
         foreach ($servers as $server) {
             $list.="<tr>";
             $list.="<td align='left'>Сервер</td><td><input type='text' id='name_$server->id' value='$server->name'></td><td><input type='text' id='exchange_$server->id' value='$server->exchangerate' style='width:75px;'></td><td><a href='#' onClick='return false;' id='update_server_$server->id' style='color: #000000;font-size: 14px;text-decoration: none;'>Обновить</a></td>";
             $list.="</tr>";
         }
+         * 
+         */
 
         $list.="<tr>";
         $list.="<td></td><td align='left' id='save_game_form'><button>Ok</button></td>";
@@ -102,7 +115,9 @@ class Games_model extends CI_Model {
         $query = "update games "
                 . "set gamName=" . $this->db->escape($game->title) . ", 	"
                 . "gamMoney=" . $this->db->escape($game->currency) . ", "
-                . "gamMinCount=" . $this->db->escape($game->minamount) . " "
+                . "gamMinCount=" . $this->db->escape($game->minamount) . " , "
+                . "min_price='$game->min_price', "
+                . "max_price='$game->max_price' "
                 . "where gamID=$game->id";
         $this->db->query($query);
 
@@ -111,7 +126,7 @@ class Games_model extends CI_Model {
         $list.= "<br>";
         $list.= "<table align='center' border='0' style='width: 100%;'>";
         $list.="<tr>";
-        $list.= "<td>&nbsp;&nbsp;<span>Параметры игры успешно обнолены. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+        $list.= "<td align='center'>&nbsp;&nbsp;<span>Параметры игры успешно обнолены. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
         $list.= "</tr>";
         $list.= "</table><br>";
         $list.="</form>";
@@ -357,7 +372,7 @@ class Games_model extends CI_Model {
                 $list.= "<br>";
                 $list.= "<table align='center' border='0' style='width: 100%;'>";
                 $list.="<tr>";
-                $list.= "<td>&nbsp;&nbsp;<span>Игра успешно добавлена. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+                $list.= "<td align='center'>&nbsp;&nbsp;<span>Игра успешно добавлена. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
                 $list.= "</tr>";
                 $list.= "</table><br>";
                 $list.="</form>";
@@ -369,7 +384,7 @@ class Games_model extends CI_Model {
                 $list.= "<br>";
                 $list.= "<table align='center' border='0' style='width: 100%;'>";
                 $list.="<tr>";
-                $list.= "<td>&nbsp;&nbsp;<span>Ошибка загрузки. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+                $list.= "<td align='center'>&nbsp;&nbsp;<span>Ошибка загрузки. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
                 $list.= "</tr>";
                 $list.= "</table><br>";
                 $list.="</form>";
@@ -382,7 +397,7 @@ class Games_model extends CI_Model {
             $list.= "<br>";
             $list.= "<table align='center' border='0' style='width: 100%;'>";
             $list.="<tr>";
-            $list.= "<td>&nbsp;&nbsp;<span>Ошибка загрузки. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+            $list.= "<td align='center'>&nbsp;&nbsp;<span>Ошибка загрузки. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
             $list.= "</tr>";
             $list.= "</table><br>";
             $list.="</form>";
@@ -400,7 +415,7 @@ class Games_model extends CI_Model {
         $list.= "<br>";
         $list.= "<table align='center' border='0' style='width: 100%;'>";
         $list.="<tr>";
-        $list.= "<td>&nbsp;&nbsp;<span>Игра удалена. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+        $list.= "<td align='center'>&nbsp;&nbsp;<span>Игра удалена. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
         $list.= "</tr>";
         $list.= "</table><br>";
         $list.="</form>";
