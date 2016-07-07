@@ -53,7 +53,11 @@ class User extends CI_Controller {
     }
 
     public function add_user() {
-        
+        $page = $this->user_model->add_user();
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
     }
 
     public function edit() {
@@ -76,19 +80,50 @@ class User extends CI_Controller {
         $user->skype = $this->input->post('skype');
         $user->icq = $this->input->post('icq');
         $user->type = $this->input->post('type');
+        $user->games=$this->input->post('manager_games');
         $page = $this->user_model->update_user($user);
         $common_data = $this->get_common_elements();
         $method_data = array('page' => $page);
         $data = array_merge($common_data, $method_data);
         $this->load->view('page_view', $data);
     }
-    
-    public function report () {
+
+    public function report() {
         $page = $this->user_model->report();
         $common_data = $this->get_common_elements();
         $method_data = array('page' => $page);
         $data = array_merge($common_data, $method_data);
         $this->load->view('page_view', $data);
+    }
+
+    public function added_done() {
+        /*
+        print_r($_REQUEST);
+        echo "<br>";
+        die('Stopped ...');
+        */
+        
+        $user = new stdClass();
+        $user->firstname = $_REQUEST['firstname'];
+        $user->lastname = $_REQUEST['lastname'];
+        $user->email = $_REQUEST['email'];
+        $user->pwd = $_REQUEST['pwd'];
+        $user->phone = $_REQUEST['phone'];
+        $user->addr = $_REQUEST['address'];
+        $user->skype = $_REQUEST['skype'];
+        $user->icq = $_REQUEST['icq'];
+        $user->type = 2; // manager
+        $user->games = $_REQUEST['manager_games'];
+        $page = $this->user_model->user_added($user);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+    
+    public function del_user () {
+        $id=$_REQUEST['id'];
+        $this->user_model->del_user($id);
     }
 
 }

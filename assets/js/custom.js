@@ -63,6 +63,19 @@ $(document).ready(function () {
         }
     });
 
+    $('#del_user').click(function () {
+        var id = $('#id').val();
+        if (id > 0) {
+            if (confirm('Удалить текущего пользователя?')) {
+                var url = host + "/index.php/user/del_user/";
+                var menu_url=host + "/index.php/user/page/3";
+                $.post(url, {id: id}).done(function () {
+                    $('#user_container').html("Пользователь успешно удален &nbsp;&nbsp;<a href='"+menu_url+"' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a>");
+                });
+            } // end if confirm()
+        } // end if id>0
+    });
+
     $('#restore_btn_done').click(function () {
         var pwd1 = $('#pwd1').val();
         var pwd2 = $('#pwd2').val();
@@ -119,6 +132,11 @@ $(document).ready(function () {
         if (selected == 'add_server') {
             url = host + "/index.php/servers/add_server";
         }
+
+        if (selected == 'add_user') {
+            url = host + "/index.php/user/add_user";
+        }
+
         if (selected == 'news') {
             url = host + "/index.php/menu/adminpage/9719147";
         }
@@ -198,6 +216,34 @@ $(document).ready(function () {
         if (id > 0 && lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '') {
             $('#user_err').html('');
         }
+        else {
+            $('#user_err').html('Пожалуйста укажите все обязательные поля');
+            event.preventDefault();
+        }
+    });
+
+    $('#add_manager').submit(function (event) {
+        var lastname = $('#lastname').val();
+        var firstname = $('#firstname').val();
+        var email = $('#email').val();
+        var pwd = $('#pwd').val();
+        var phone = $('#phone').val();
+        var addr = $('#addr').val();
+        var skype = $('#skype').val();
+        var icq = $('#icq').val();
+        var games = $('#manager_games').val();
+        //var games_length=games.length;
+        console.log('Games: ' + games);
+        //event.preventDefault();
+        if (lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games != null) {
+            if (validateEmail(email)) {
+                $('#user_err').html('');
+            } // end if validateEmail(email)
+            else {
+                $('#user_err').html('Пожалуйста укажите правильный email');
+                event.preventDefault();
+            } // end else
+        } // end if lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games.length > 0
         else {
             $('#user_err').html('Пожалуйста укажите все обязательные поля');
             event.preventDefault();

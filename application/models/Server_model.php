@@ -41,16 +41,16 @@ class Server_model extends CI_Model {
                 $list.="<table align='center' border='0'>";
 
                 $list.="<tr>";
-                $list.="<td>Имя сервера</td><td align='left'><input type='text' id='name' name='name'></td>";
+                $list.="<td>Имя сервера*</td><td align='left'><input type='text' id='name' name='name'></td>";
                 $list.="<td><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></td>";
                 $list.="</tr>";
 
                 $list.="<tr>";
-                $list.="<td>Курс сервера</td><td align='left'><input type='text' id='rate' name='rate'></td>";
+                $list.="<td>Курс сервера*</td><td align='left'><input type='text' id='rate' name='rate'></td>";
                 $list.="</tr>";
 
                 $list.="<tr>";
-                $list.="<td>Игра</td><td align='left'>$games</td>";
+                $list.="<td>Игра*</td><td align='left'>$games</td>";
                 $list.="</tr>";
 
                 $list.="<tr>";

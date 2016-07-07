@@ -3,6 +3,7 @@
 class Games_model extends CI_Model {
 
     public $icon_path;
+    public $exchange_xml_path = "http://resources.finance.ua/ru/public/currency-cash.xml";
 
     public function __construct() {
         parent::__construct();
@@ -43,7 +44,7 @@ class Games_model extends CI_Model {
         $query = "SELECT * FROM `games` order by gamName";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $list.="<a href='".$this->config->item('base_url') . "index.php/user/page/0/$row->gamID' title='$row->gamName'><img src='" . $this->config->item('base_url') . "assets/icon/$row->icon' title='$row->gamName' alt='$row->gamName'/></a>";            
+            $list.="<a href='" . $this->config->item('base_url') . "index.php/user/page/0/$row->gamID' title='$row->gamName'><img src='" . $this->config->item('base_url') . "assets/icon/$row->icon' title='$row->gamName' alt='$row->gamName'/></a>";
         }
         $list.="</nav>";
         $list.="</div>";
@@ -63,8 +64,8 @@ class Games_model extends CI_Model {
             $game->name = $row->gamName;
             $game->currency = $row->gamMoney;
             $game->minamount = $row->gamMinCount;
-            $game->min=$row->min_price;
-            $game->max=$row->max_price;
+            $game->min = $row->min_price;
+            $game->max = $row->max_price;
         }
         $list.="<table border='0' align='center' style=''>";
 
@@ -75,7 +76,7 @@ class Games_model extends CI_Model {
         $list.="<tr>";
         $list.="<td align='left'>Название игры*</td><td align='left'><input type='text' id='title' name='title' value='$game->name'></td><td><a href='#' onClick='return false;' style='color: #000000;font-size: 14px;text-decoration: none;' id='game_detailes_id_$id'>Описание</a></span></td><td>&nbsp;&nbsp;&nbsp;<a href='#' onClick='return false;' style='color: #000000;font-size: 14px;text-decoration: none;' id='del_game_$id'>Удалить</a></td>";
         $list.="<input type='hidden' id='id' name='id' value='$id'>";
-        $list.="<tr>";        
+        $list.="<tr>";
 
         $list.="<tr>";
         $list.="<td align='left'>Валюта игры*</td><td align='left'><input type='text' id='currency' name='currency' value='$game->currency'></td><td></td>";
@@ -84,23 +85,20 @@ class Games_model extends CI_Model {
         $list.="<tr>";
         $list.="<td align='left'>Мин заказ ($)*</td><td align='left'><input type='text' id='minamount' name='minamount' value='$game->minamount'></td><td></td>";
         $list.="<tr>";
-        
+
         $list.="<tr>";
         $list.="<td align='left'>Мин цена ($)*</td><td align='left'><input type='text' id='min_price' name='min_price' value='$game->min'></td><td></td>";
         $list.="<tr>";
-        
+
         $list.="<tr>";
         $list.="<td align='left'>Макс цена ($)*</td><td align='left'><input type='text' id='max_price' name='max_price' value='$game->max'></td><td></td>";
         $list.="<tr>";
-        /*
-         * 
+
         foreach ($servers as $server) {
             $list.="<tr>";
             $list.="<td align='left'>Сервер</td><td><input type='text' id='name_$server->id' value='$server->name'></td><td><input type='text' id='exchange_$server->id' value='$server->exchangerate' style='width:75px;'></td><td><a href='#' onClick='return false;' id='update_server_$server->id' style='color: #000000;font-size: 14px;text-decoration: none;'>Обновить</a></td>";
             $list.="</tr>";
         }
-         * 
-         */
 
         $list.="<tr>";
         $list.="<td></td><td align='left' id='save_game_form'><button>Ok</button></td>";
@@ -420,6 +418,30 @@ class Games_model extends CI_Model {
         $list.= "</table><br>";
         $list.="</form>";
         $list.="</div>";
+        return $list;
+    }
+
+    public function get_nbu_course() {
+        
+    }
+
+    public function get_game_prices($id) {
+        $list = "";
+        $list.="<table border='0'>";
+        $list.="";
+        $list.="";
+        $list.="";
+        $list.="<tr>";
+        $list.="<th style='padding:5px;'>Сервер</th><th style='padding:5px;'>Стоимость</th>";
+        $list.="</tr>";
+        $query = "select * from gameservers where gasGameID=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $list.="<tr>";
+            $list.="<td align='left' style='padding:5px;'>$row->gasName</td><td align='left' style='padding:5px;'>$$row->gasKurs</td>";
+            $list.="</tr>";
+        } // end foreach
+        $list.="</table>";
         return $list;
     }
 
