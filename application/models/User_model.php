@@ -91,6 +91,77 @@ class user_model extends CI_Model {
         return $list;
     }
 
+    function get_manager_games_list($email) {
+        $list = "";
+        $games = array();
+        $list.="<select id='games' style='width:95px;'>";
+        $list.="<option value='0' selected>Мои игры</option>";
+        $query = "select * from users where email='$email'";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $userid = $row->id;
+        }
+
+        $query = "select * from manager2game where userid=$userid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $game_data = $this->get_game_detailes2($row->gameid);
+            $gameobj = new stdClass();
+            $gameobj->id = $row->gameid;
+            $gameobj->name = $game_data->name;
+            $games[$game_data->name] = $gameobj;
+        }
+        ksort($games);
+        foreach ($games as $game) {
+            $list.="<option value='$game->id'>$game->name</option>";
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_manager_orders($email, $status) {
+        $list = "";
+
+        if ($status == 1) {
+            $list.="<select id='pending_orders' style='width:95px;'>";
+            $list.="<option values='0' selected>Необработанные заказы</option>";
+        }
+
+        if ($status == 2) {
+            $list.="<select id='processed_orders' style='width:95px;'>";
+            $list.="<option values='0' selected>Обработанные заказы</option>";
+        }
+
+        $games_arr = array();
+        $query = "select * from users where email='$email'";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $userid = $row->id;
+        }
+
+        $query = "select * from manager2game where userid=$userid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $games_arr[] = $row->gameid;
+        }
+
+        $games_list = implode(',', $games_arr);
+        $query = "select * from orders "
+                . "where gameid in ($games_list) "
+                . "and status=$status order by added desc";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $date = date('d-m-Y h:i:s', $row->added);
+                $game = $this->get_game_detailes2($row->gameid);
+                $list.="<option value='$row->id'>$row->nick $game->name $date</option>";
+            } // end foreach
+        } // end if $num > 0
+        $list.="</select>";
+        return $list;
+    }
+
     public function get_user_dashboard($type) {
         $list = "";
         $id = $this->uri->segment(4);
@@ -118,10 +189,35 @@ class user_model extends CI_Model {
                 $list.="</div>";
             } // end if $type==3        
             else if ($type == 1) {
-                // It is partner user
+                // It is partner
             } // end if $type==1
             else if ($type == 2) {
                 // It is manager
+                $email = $this->session->userdata('email');
+                $firstname = $this->session->userdata('firstname');
+                $lastname = $this->session->userdata('lastname');
+                $pending_orders = $this->get_manager_orders($email, 1);
+                $processed_orders = $this->get_manager_orders($email, 2);
+                $games_list = $this->get_manager_games_list($email);
+                $list.="<br/><div class='calc'>";
+                $list.="<form class='calc_form' >";
+                $list.= "<br><br>";
+                $list.= "<table align='center' border='0' style='width: 100%;'>";
+
+                $list.="<tr>";
+                $list.= "<td align='center' colspan='4'><br>Добро пожаловать $firstname $lastname!<br><br><br></td>";
+                $list.= "</tr>";
+
+                $list.="<tr>";
+                $list.= "<td>$pending_orders</td>";
+                $list.= "<td>$processed_orders</td>";
+                $list.= "<td><td>$games_list<td>";
+                $list.= "</tr>";
+
+                $list.="</table><br><br>";
+                $list.="<div style='text-align:center;' id='forgot_err'></div>";
+                $list.="</form>";
+                $list.="</div>";
             } // end if $type==2            
         } // end if $status
         else {
@@ -157,7 +253,7 @@ class user_model extends CI_Model {
                                 <input type='text' id='currency' name='currency' value='' class='inputsBorder' disabled>
                             </td>
                             <td id='calc_money'>
-                                <span>Стоимость:</span><br>
+                                <span>Стоимость($):</span><br>
                                 <input type='text' id='amount' name='amount' value='' class='inputsBorder' disabled>
                             </td>
                             </tr>
@@ -225,7 +321,7 @@ class user_model extends CI_Model {
                 <div class='popup_visibility_visible popup popup_name_agreement popup_theme_ededed popup_autoclosable_yes popup_adaptive_yes popup_animate_yes agreement i-bem agreement_js_inited popup_js_inited popup_to_right' onclick='return {&quot;popup&quot;:{&quot;directions&quot;:{&quot;to&quot;:&quot;right&quot;}},&quot;agreement&quot;:{}};' style=': -17px; left: -300px;'>
                     <div class='popup__under'></div><i class='popup__tail' style='top: 24.98px;right:1px;'></i>
                     <div class='popup__content'>
-                        Оформляя заказ, Вы принимаете <a target='_blank' style='color:#1D7485' href='/rules/'>условия соглашения</a>.
+                        Оформляя заказ, Вы принимаете <a target='_blank' href='/rules/' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>условия соглашения</a>.
                     </div>
                 </div>
                         </div></form><br>                   
