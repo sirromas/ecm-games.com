@@ -3,6 +3,17 @@ $(document).ready(function () {
 
     var host = 'http://mycodebusters.com/games';
     var dialog_loaded;
+    var eur_s;
+    var rub_s;
+    var usd_s;
+    var url = host + "/index.php/currency/rate/";
+    $.post(url, {id: 1}, function (data) {
+        var currency = $.parseJSON(data);
+        eur_s = currency.euro_s;
+        rub_s = currency.rub_s;
+        usd_s = currency.usd_s;
+    });
+
 
     function validateEmail(email) {
         var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
@@ -62,20 +73,18 @@ $(document).ready(function () {
             $('#forgot_err').html('Пожалуйста укажите Email');
         }
     });
-
     $('#del_user').click(function () {
         var id = $('#id').val();
         if (id > 0) {
             if (confirm('Удалить текущего пользователя?')) {
                 var url = host + "/index.php/user/del_user/";
-                var menu_url=host + "/index.php/user/page/3";
+                var menu_url = host + "/index.php/user/page/3";
                 $.post(url, {id: id}).done(function () {
-                    $('#user_container').html("Пользователь успешно удален &nbsp;&nbsp;<a href='"+menu_url+"' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a>");
+                    $('#user_container').html("Пользователь успешно удален &nbsp;&nbsp;<a href='" + menu_url + "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a>");
                 });
             } // end if confirm()
         } // end if id>0
     });
-
     $('#restore_btn_done').click(function () {
         var pwd1 = $('#pwd1').val();
         var pwd2 = $('#pwd2').val();
@@ -93,7 +102,6 @@ $(document).ready(function () {
         } // end else 
 
     });
-
     /********************** Login *************************/
     $('#login').click(function () {
         var username = $('#username').val();
@@ -117,7 +125,6 @@ $(document).ready(function () {
             $('#login_err').html('Пожалуйста укажите обязательные поля');
         } // end else 
     });
-
     /*************************** Other dropdwon ***************************/
     $("#other").change(function () {
         var selected = $("#other").val();
@@ -164,14 +171,11 @@ $(document).ready(function () {
         }
         window.document.location = url;
     });
-
     /********************** Logout *****************************/
     $('#logout').click(function () {
         var url = host + "/index.php/user/logoutdone";
         window.document.location = url;
     });
-
-
     $('#user_page').submit(function (event) {
         var body = CKEDITOR.instances.body.getData();
         if (body != '') {
@@ -182,27 +186,23 @@ $(document).ready(function () {
         }
 
     });
-
     $('#cancel_logout').click(function () {
         var type = $('#type').val();
         var url = host + "/index.php/user/page/" + type;
         window.document.location = url;
     });
-
     /********************* Games edit block ***********************/
     $('#games').change(function () {
         var selected = $('#games').val();
         var url = host + "/index.php/games/edit/" + selected;
         window.document.location = url;
     });
-
     /********************* Users edit block ***********************/
     $('#users').change(function () {
         var selected = $('#users').val();
         var url = host + "/index.php/user/edit/" + selected;
         window.document.location = url;
     });
-
     $('#update_user').submit(function (event) {
         var id = $('#id').val();
         var lastname = $('#lastname').val();
@@ -221,7 +221,6 @@ $(document).ready(function () {
             event.preventDefault();
         }
     });
-
     $('#add_manager').submit(function (event) {
         var lastname = $('#lastname').val();
         var firstname = $('#firstname').val();
@@ -249,7 +248,6 @@ $(document).ready(function () {
             event.preventDefault();
         }
     });
-
     $("#update_game").submit(function (event) {
         var title = $('#title').val();
         var body = $('#body').val();
@@ -265,7 +263,6 @@ $(document).ready(function () {
             event.preventDefault();
         } // end else
     });
-
     $("#add_server").submit(function (event) {
         var name = $('#name').val();
         var rate = $('#rate').val();
@@ -278,8 +275,6 @@ $(document).ready(function () {
             event.preventDefault();
         } // end else
     });
-
-
     function get_game_description_block(id) {
         var url = host + "/index.php/games/get_game_modal_box/";
         $('#game_container').fadeTo(0.33);
@@ -303,9 +298,109 @@ $(document).ready(function () {
      * 
      ********************************************************************/
 
-    $("body").click(function (event) {
-        console.log('Element clicked: ' + event.target.id);
+    $("#make_order").one('click', function () {
+        var game_amount = $('#currency').val();
+        var amount = $('#count_money').html();
+        var usd_amount = $('#amount').val();
+        var currency = $('#CURRENCY_NAME').html();
+        var phone = $('#inp_phone').val();
+        var skype = $('#inp_skype').val();
+        var icq = $('#inp_icq').val();
+        var delivery_way = $('#s_delivery').val();
+        var email = $('#inp_email').val();
+        var nick = $('#inp_nickname').val();
+        var comment = $('#ta_comment').val();
+        var min_amount = $('.min_sum_order_js').html();
+        var gameid = $('#gameid').val();
+        console.log("Game id: " + gameid);
+        console.log('Usd amount: ' + usd_amount);
+        if (amount > 0 && phone != '' && email != '' && nick != '' && currency != 0) {
+            if (!validateEmail(email)) {
+                $('#order_err').html('Пожалуйста укажите правильный email');
+            }
+            else {
+                if ((usd_amount - min_amount) > 0) {
+                    $('#add_order').fadeTo("slow", 0.3);
+                    $('#order_err').html('');
+                    var order = {gameid: gameid,
+                        game_amount: game_amount,
+                        amount: amount,
+                        usd_amount: usd_amount,
+                        currency: currency,
+                        nick: nick,
+                        email: email,
+                        phone: phone,
+                        skype: skype,
+                        icq: icq,
+                        delivery_way: delivery_way,
+                        comment: comment};
+                    var url = host + "/index.php/user/add_order";
+                    $.post(url, {order: order}).done(function (data) {
+                        $('#add_order').css("opacity", "1");
+                        $('#add_order').html(data);
+                    });
+                } // end if usd_amount - min_amount
+                else {
+                    $('#order_err').html('Вы не сделали заказ на минимальную сумму');
+                } // end else
+            } // end else
+        } // end if amount>0 && phone!='' && email!='' && nick!=''
+        else {
+            $('#order_err').html('Пожалуйста укажите все обязатяельные поля');
+        }
+    });
 
+    $('#server').change(function () {
+        $('#ptype').prop("disabled", false);
+    });
+
+    $('#ptype').change(function () {
+        $('#currency').prop("disabled", false);
+        var currency = $('#ptype').val();
+        $('#CURRENCY_NAME').html(currency);
+    });
+
+    $("#currency").blur(function () {
+        var rate;
+        var server_rate = $('#server').val();
+        var amount = $('#currency').val();
+        var currency = $('#ptype').val();
+        if (amount != "" && $.isNumeric(amount)) {
+            // Set USD value
+            var usd_amount = amount * server_rate;
+            $('#amount').val(usd_amount.toFixed(2));
+            $('#const_zoloto').html(amount);
+
+            // Set selected currency value
+            switch (currency) {
+                case 'eur':
+                    rate = (eur_s / usd_s).toFixed(3);
+                    break;
+
+                case 'rur':
+                    rate = (rub_s / usd_s).toFixed(3);
+                    break;
+
+                case 'usd':
+                    rate = 1;
+                    break;
+
+                case 'uah':
+                    rate = (1 / usd_s).toFixed(3);
+                    break;
+            }
+            var total_amount = usd_amount / rate;
+            $('#count_money').html(total_amount.toFixed(2));
+
+        } // end if amount != "" && $.isNumeric(amount)
+        else {
+            $('#amount').val('');
+        }
+    });
+
+
+    $("body").click(function (event) {
+        //console.log('Element clicked: ' + event.target.id);
         if (event.target.id.indexOf("game_detailes") >= 0) {
             var id = event.target.id.replace("game_detailes_id_", "");
             get_game_description_block(id);
@@ -352,7 +447,6 @@ $(document).ready(function () {
             var name = $('#name').val();
             var currency = $('#currency').val();
             var min_amount = $('#min_amount').val();
-
             if (file_data != '' && name != '' && currency != '' && $.isNumeric(min_amount)) {
 
             } // end if file_data!=''
@@ -362,77 +456,7 @@ $(document).ready(function () {
             }
         });
 
-        /*
-         $(function () {
-         $('#report_container').highcharts({
-         chart: {
-         type: 'column'
-         },
-         title: {
-         text: 'Monthly Average Rainfall'
-         },
-         subtitle: {
-         text: 'Source: WorldClimate.com'
-         },
-         xAxis: {
-         categories: [
-         'Jan',
-         'Feb',
-         'Mar',
-         'Apr',
-         'May',
-         'Jun',
-         'Jul',
-         'Aug',
-         'Sep',
-         'Oct',
-         'Nov',
-         'Dec'
-         ],
-         crosshair: true
-         },
-         yAxis: {
-         min: 0,
-         title: {
-         text: 'Rainfall (mm)'
-         }
-         },
-         tooltip: {
-         headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-         pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-         '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
-         footerFormat: '</table>',
-         shared: true,
-         useHTML: true
-         },
-         plotOptions: {
-         column: {
-         pointPadding: 0.2,
-         borderWidth: 0
-         }
-         },
-         series: [{
-         name: 'Tokyo',
-         data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
-         
-         }, {
-         name: 'New York',
-         data: [83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3]
-         
-         }, {
-         name: 'London',
-         data: [48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3, 51.2]
-         
-         }, {
-         name: 'Berlin',
-         data: [42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1]
-         
-         }]
-         });
-         });
-         */
-
-    });  // end of $("body").click(function (event) {
+    }); // end of $("body").click(function (event) {
 
 }); // document).ready(function ()
 

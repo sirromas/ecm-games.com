@@ -157,8 +157,8 @@ class Games extends CI_Controller {
         $game->video = $this->input->post('video');
         $game->currency = $this->input->post('currency');
         $game->minamount = $this->input->post('minamount');
-        $game->min_price=$this->input->post('min_price');
-        $game->max_price=$this->input->post('max_price');
+        $game->min_price = $this->input->post('min_price');
+        $game->max_price = $this->input->post('max_price');
         $page = $this->games_model->update_game_content($game);
         $common_data = $this->get_common_elements();
         $method_data = array('page' => $page);
@@ -202,5 +202,11 @@ class Games extends CI_Controller {
         $data = array_merge($common_data, $method_data);
         $this->load->view('page_view', $data);
     }
+
+    public function rate() {
+        $currency = $this->games_model->get_rate();
+        echo $currency;
+    }   
+    
 
 }

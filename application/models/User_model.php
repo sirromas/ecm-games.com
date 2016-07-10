@@ -8,6 +8,8 @@ class user_model extends CI_Model {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->model('games_model');
+        $this->config->load('email');
+        $this->load->library('email');
     }
 
     public function validate_user() {
@@ -64,7 +66,7 @@ class user_model extends CI_Model {
         $servers = $this->games_model->get_game_servers($id);
         if (count($servers) > 0) {
             foreach ($servers as $server) {
-                $list.="<option value='$server->id'>$server->name</option>";
+                $list.="<option value='$server->exchangerate'>$server->name</option>";
             } // end foreach
         } // end if count($servers)>0
         $list.="</select>";
@@ -78,12 +80,12 @@ class user_model extends CI_Model {
 
     public function get_payment_methods() {
         $list = "";
-        $list.="<select id='ptype' name='ptype'>";
+        $list.="<select id='ptype' name='ptype' disabled>";
         $list.="<option value='0' selected>Выберите способ оплаты</option>";
         $query = "select * from payments where payActive=1 order by payName";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $list.="<option value='$row->payID'>$row->payName</option>";
+            $list.="<option value='$row->payVal'>$row->payName</option>";
         }
         $list.="</select>";
         return $list;
@@ -131,7 +133,8 @@ class user_model extends CI_Model {
                 $ptype = $this->get_payment_methods();
                 $prices = $this->get_game_prices($id);
                 $list.="<br/><div class=''>";
-                $list.="<form class='calc_form' id='add_server'";
+                $list.="<div class='calc_form' id='add_order'>";
+                $list.="<input type='hidden' id='gameid' value='$id'>";
                 $list.="<h2 class='title'></h2>"
                         . "<div class='game-title'>
                         <img src='$game->icon' title='Купить $game->currency $game->name' alt='Купить $game->currency $game->name'>
@@ -140,8 +143,7 @@ class user_model extends CI_Model {
                             <li><a href='#video' title='Видео-обзор Lineage'>Видео-обзор $game->name</a></li>                                            
                         </ul>
                         </div>
-                            <div id='block1'>
-                            $prices<br>
+                            <div id='block1'>                            
                             <select id='action' name='action'>    
                             <option value='0' selected>Я хочу ....</option>
                             <option value='1' selected>Купить $game->currency</option>                            
@@ -152,15 +154,15 @@ class user_model extends CI_Model {
                             <tbody><tr>
                             <td id='calc_zoloto'>
                                 <span>Получу:</span><br>
-                                <input type='text' id='currency' name='currency' value='' class='inputsBorder'>
+                                <input type='text' id='currency' name='currency' value='' class='inputsBorder' disabled>
                             </td>
                             <td id='calc_money'>
                                 <span>Стоимость:</span><br>
-                                <input type='text' id='money' name='imoney' value='' class='inputsBorder'>
+                                <input type='text' id='amount' name='amount' value='' class='inputsBorder' disabled>
                             </td>
                             </tr>
                             </tbody></table>
-                            <div class='calc_min_sum_order'><small><strong>*Минимальная сумма заказа <span class='min_sum_order_js'>$game->minamount</span><span class='CURRENCY_NAME'>$</span></strong></small></div>
+                            <div class='calc_min_sum_order'><small><strong>*Минимальная сумма заказа $<span class='min_sum_order_js'>$game->minamount</span><span class='CURRENCY_NAME'></span></strong></small></div>
 
                             <hr>
                             <div id='change_kurs'>
@@ -172,8 +174,8 @@ class user_model extends CI_Model {
                             
                                         
                             <div class='contactField'>
-                            <label for='inp_phone'>Телефон:</label>
-                            <input type='text' class='optionalInput inputsBorder' name='inp_phone' id='inp_phone' value=''>
+                            <label for='inp_phone'>Телефон*:</label>
+                            <input type='text' class='optionalInput' required='required' inputsBorder' name='inp_phone' id='inp_phone' value='' data-validation='required'>
                             </div>
                             
                             <div class='contactField'>
@@ -187,38 +189,38 @@ class user_model extends CI_Model {
                             </div>
                             
                             <div>
-                            <div id='infoContact' class='calc_infoContact'>Можно заполнить одно поле из 3-х (телефон, skype или icq).</div>
+                            <div id='infoContact' class='calc_infoContact'>Можно заполнить одно поле из 2-х (skype или icq).</div>
                             </div>                     
                             
                             <div class='swap delivery_select' data-id-server='502'>
                             <select name='s_delivery' id='s_delivery' class='inputsBorder'>
                             <option value=''>Выберите способ доставки</option>
-                            <option value='1'>Способ доставки на усмотрение оператора</option>
+                            <option value='1' selected>Способ доставки на усмотрение оператора</option>
                             <option value='2'>Игровая почта</option>
                             </select>
                             </div>
                             
                             <div>
                                 <div>
-                                    <label for='inp_email'>Email:</label>
+                                    <label for='inp_email'>Email*:</label>
                                     <input type='email' required='required' id='inp_email' name='inp_email' value='' class='inputsBorder' data-validation='email'>
                                 </div>
                                 
                                 <div>
-                                    <label for='inp_nickname'>Ник:</label>
+                                    <label for='inp_nickname'>Ник*:</label>
                                     <input type='text' required='required' id='inp_nickname' name='inp_nickname' value='' class='inputsBorder' data-validation='required'>
                                 </div>
                                 
                                 <div>
-                                    <label for='ta_comment'>Комментарий:</label>
+                                    <label for='ta_comment' style='color:red;'>Комментарий:</label>
                                     <textarea name='ta_comment' id='ta_comment' class='inputsBorder'></textarea>
                                 </div>
 
                             </div>
                                 </div>                           
-                            
+                                <div id='order_err'></div>
                                 <div class='calc_order'>
-                <button type='submit' class='calc_order_send'>Заказать</button>
+                <button type='submit' class='calc_order_send' id='make_order'>Заказать</button>
 
                 <div class='popup_visibility_visible popup popup_name_agreement popup_theme_ededed popup_autoclosable_yes popup_adaptive_yes popup_animate_yes agreement i-bem agreement_js_inited popup_js_inited popup_to_right' onclick='return {&quot;popup&quot;:{&quot;directions&quot;:{&quot;to&quot;:&quot;right&quot;}},&quot;agreement&quot;:{}};' style=': -17px; left: -300px;'>
                     <div class='popup__under'></div><i class='popup__tail' style='top: 24.98px;right:1px;'></i>
@@ -226,8 +228,8 @@ class user_model extends CI_Model {
                         Оформляя заказ, Вы принимаете <a target='_blank' style='color:#1D7485' href='/rules/'>условия соглашения</a>.
                     </div>
                 </div>
-                        </div><br>                   
-
+                        </div></form><br>                   
+                        <div style='text-align:center;width:80%;margin:0 auto;'>$prices</div><br>
                             <div id='block2'>
                        <div class='swap'>$content->body</div>                       
                        </div>";
@@ -238,7 +240,7 @@ class user_model extends CI_Model {
                 $list.= "<td align center><td>";
                 $list.= "</tr>";
                 $list.= "</table><br>";
-                $list.="</form>";
+                $list.="</div>";
                 $list.="</div>";
             } // end if $id>0
             else {
@@ -684,7 +686,7 @@ class user_model extends CI_Model {
         $list.= "<br>";
         $list.= "<table align='center' border='0' style='width: 100%;'>";
         $list.="<tr>";
-        $list.= "<td align='center'>&nbsp;&nbsp;<span>Новый менеджер усрешно добавлен. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+        $list.= "<td align='center'>&nbsp;&nbsp;<span>Новый менеджер успешно добавлен. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
         $list.= "</tr>";
         $list.= "</table><br>";
         $list.="</form>";
@@ -698,6 +700,117 @@ class user_model extends CI_Model {
 
         $query = "delete from manager2game where userid=$id";
         $this->db->query($query);
+    }
+
+    public function add_order($order) {
+        $now = time();
+        $query = "insert into orders "
+                . "(gameid, nick, game_amount, email,"
+                . "amount,"
+                . "usd_amount,"
+                . "currency,"
+                . "phone,"
+                . "skype,"
+                . "icq,"
+                . "delivery_way,"
+                . "comment,"
+                . "status,"
+                . "added) "
+                . "values('" . $order['gameid'] . "', "
+                . "'" . $order['nick'] . "', "
+                . "'" . $order['game_amount'] . "', "
+                . "'" . $order['email'] . "',"
+                . "'" . $order['amount'] . "',"
+                . "'" . $order['usd_amount'] . "',"
+                . "'" . $order['currency'] . "',"
+                . "'" . $order['phone'] . "',"
+                . "'" . $order['skype'] . "',"
+                . "'" . $order['icq'] . "',"
+                . "'" . $order['delivery_way'] . "',"
+                . "'" . $order['comment'] . "',"
+                . "'1',"
+                . "'" . $now . "')";
+        $this->db->query($query);
+        $this->send_order_confirmation($order);
+
+        $list = "";
+        $list.= "<br><p>&nbsp;&nbsp;<span>Ваш заказ принят. Наш менеджер скоро с Вами свяжится.</span></p><br>";
+        return $list;
+    }
+
+    public function get_game_detailes2($id) {
+        $query = "select * from games where gamID=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $game = new stdClass();
+            $game->id = $row->gamID;
+            $game->name = $row->gamName;
+            $game->currency = $row->gamMoneys;
+        }
+        return $game;
+    }
+
+    function get_delivery_method($id) {
+        switch ($id) {
+            case 1:
+                $method = "Способ доставки на усмотрение оператора";
+                break;
+            case 2:
+                $method = "Игровая почта";
+                break;
+        }
+        return $method;
+    }
+
+    public function send_order_confirmation($order) {
+        $game = $this->get_game_detailes2($order['gameid']);
+        $method = $this->get_delivery_method($order['delivery_way']);
+        $msg = "";
+        $msg.= "<html>";
+        $msg.="<body>";
+        $msg.="<p align='center'>Уважаемый(я) " . $order['nick'] . "!</p>";
+        $msg.="<p align='center'>Ваш заказ принят в обработку. Наш менеджер скоро с Вами свяжится</p>";
+
+        $msg.="<table border='0' align='center'>";
+
+        $msg.="<tr>";
+        $msg.="<td>Название игры</td><td>$game->name</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td>Кол-во игровой валюты</td><td>" . $order['game_amount'] . " " . $game->currency . "</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td>Сумма к оплате</td><td>" . $order['amount'] . " " . $order['currency'] . "</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td>Способ доставки</td><td>$method</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td>Коментарий</td><td>" . $order['comment'] . "</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td colspan='2'><br><br>Если Вам нужна помощь, свяжитесь с нами по email <href='mailto:" . $this->config->item('smtp_user') . "'>" . $this->config->item('smtp_user') . "</a></td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td colspan='2'><br>С уважением,<br> Администрация сайта.</td>";
+        $msg.="</tr>";
+
+        $msg.="</table>";
+
+        $msg.="</body>";
+        $msg.="</html>";
+
+        $this->email->from($this->config->item('smtp_user'), 'ECM-GAMES');
+        $this->email->to($order['email']);
+        $this->email->subject('ECM-GAMES Подтверждение заказа');
+        $this->email->message($msg);
+        $this->email->send();
     }
 
 }

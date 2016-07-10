@@ -80,7 +80,7 @@ class User extends CI_Controller {
         $user->skype = $this->input->post('skype');
         $user->icq = $this->input->post('icq');
         $user->type = $this->input->post('type');
-        $user->games=$this->input->post('manager_games');
+        $user->games = $this->input->post('manager_games');
         $page = $this->user_model->update_user($user);
         $common_data = $this->get_common_elements();
         $method_data = array('page' => $page);
@@ -98,11 +98,11 @@ class User extends CI_Controller {
 
     public function added_done() {
         /*
-        print_r($_REQUEST);
-        echo "<br>";
-        die('Stopped ...');
-        */
-        
+          print_r($_REQUEST);
+          echo "<br>";
+          die('Stopped ...');
+         */
+
         $user = new stdClass();
         $user->firstname = $_REQUEST['firstname'];
         $user->lastname = $_REQUEST['lastname'];
@@ -120,10 +120,16 @@ class User extends CI_Controller {
         $data = array_merge($common_data, $method_data);
         $this->load->view('page_view', $data);
     }
-    
-    public function del_user () {
-        $id=$_REQUEST['id'];
+
+    public function del_user() {
+        $id = $_REQUEST['id'];
         $this->user_model->del_user($id);
+    }
+
+    public function add_order() {
+        $order = $_REQUEST['order'];
+        $list = $this->user_model->add_order($order);
+        echo $list;
     }
 
 }
