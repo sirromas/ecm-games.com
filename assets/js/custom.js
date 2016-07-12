@@ -231,22 +231,41 @@ $(document).ready(function () {
         var skype = $('#skype').val();
         var icq = $('#icq').val();
         var games = $('#manager_games').val();
+        var type = $('#user_type').val();
         //var games_length=games.length;
-        console.log('Games: ' + games);
+        //console.log('Games: ' + games);
         //event.preventDefault();
-        if (lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games != null) {
-            if (validateEmail(email)) {
-                $('#user_err').html('');
-            } // end if validateEmail(email)
+        if (type == 2) {
+            // It is manager
+            if (lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games != null) {
+                if (validateEmail(email)) {
+                    $('#user_err').html('');
+                } // end if validateEmail(email)
+                else {
+                    $('#user_err').html('Пожалуйста укажите правильный email');
+                    event.preventDefault();
+                } // end else
+            } // end if lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games.length > 0
             else {
-                $('#user_err').html('Пожалуйста укажите правильный email');
+                $('#user_err').html('Пожалуйста укажите все обязательные поля');
                 event.preventDefault();
-            } // end else
-        } // end if lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games.length > 0
+            }
+        } // end if type == 2
         else {
-            $('#user_err').html('Пожалуйста укажите все обязательные поля');
-            event.preventDefault();
-        }
+            if (lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '') {
+                if (validateEmail(email)) {
+                    $('#user_err').html('');
+                } // end if validateEmail(email)
+                else {
+                    $('#user_err').html('Пожалуйста укажите правильный email');
+                    event.preventDefault();
+                } // end else
+            } // end if lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games.length > 0
+            else {
+                $('#user_err').html('Пожалуйста укажите все обязательные поля');
+                event.preventDefault();
+            }
+        } // end else
     });
     $("#update_game").submit(function (event) {
         var title = $('#title').val();
@@ -397,6 +416,68 @@ $(document).ready(function () {
             $('#amount').val('');
         }
     });
+
+    $("#pending_orders").change(function () {
+        var id = $('#pending_orders').val();
+        if (id > 0) {
+            var url = host + "/index.php/user/get_order_details/";
+            $.post(url, {id: id, status: 1}).done(function (data) {
+                $('#dashboard_container').html(data);
+            });
+        } // end if id > 0
+
+    });
+
+    $("#processed_orders").change(function () {
+        var id = $('#processed_orders').val();
+        if (id > 0) {
+            var url = host + "/index.php/user/get_order_details/";
+            $.post(url, {id: id, status: 2}).done(function (data) {
+                $('#dashboard_container').html(data);
+            });
+        } // end if id > 0
+
+    });
+
+    $("#user_type").change(function () {
+        var id = $('#user_type').val();
+        if (id == 2) {
+            $('#manager_games').show();
+        }
+        else {
+            $('#manager_games').hide();
+        }
+    });
+
+    $(document).on('change', '#order_status', function () {
+        var id = $('#order_id').val();
+        var status = $('#order_status').val();
+        var notes = $('#notes').val();
+        if (notes != '') {
+            if (confirm('Изменить статус заказа?')) {
+                $('#notes_err').html('');
+                var url = host + "/index.php/user/set_order_status/";
+                $.post(url, {id: id, status: status}).done(function (data) {
+                    console.log(data);
+                    document.location.reload();
+                });
+            } // end if confirm
+        } // end if notes!=''
+        else {
+            $('#notes_err').html('Пожалуйста оставьте коментарии к заказу');
+        }
+    });
+
+    $(document).on('blur', '#notes', function () {
+        console.log('Notes blur event ...');
+        var id = $('#order_id').val();
+        var notes = $('#notes').val();
+        var url = host + "/index.php/user/update_order_notes/";
+        $.post(url, {id: id, notes: notes}).done(function (data) {
+            console.log(data);
+        });
+    });
+
 
 
     $("body").click(function (event) {

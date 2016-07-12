@@ -112,8 +112,13 @@ class User extends CI_Controller {
         $user->addr = $_REQUEST['address'];
         $user->skype = $_REQUEST['skype'];
         $user->icq = $_REQUEST['icq'];
-        $user->type = 2; // manager
-        $user->games = $_REQUEST['manager_games'];
+        $user->type = $_REQUEST['user_type'];
+        if ($user->type == 2) {
+            $user->games = $_REQUEST['manager_games'];
+        } // end if $user->type == 2
+        else {
+            $user->games = '';
+        }
         $page = $this->user_model->user_added($user);
         $common_data = $this->get_common_elements();
         $method_data = array('page' => $page);
@@ -129,6 +134,27 @@ class User extends CI_Controller {
     public function add_order() {
         $order = $_REQUEST['order'];
         $list = $this->user_model->add_order($order);
+        echo $list;
+    }
+
+    public function get_order_details() {
+        $id = $_REQUEST['id'];
+        $status = $_REQUEST['status'];
+        $list = $this->user_model->get_order_details($id, $status);
+        echo $list;
+    }
+
+    public function update_order_notes() {
+        $id = $_REQUEST['id'];
+        $notes = $_REQUEST['notes'];
+        $list = $this->user_model->updta_order_notes($id, $notes);
+        echo $list;
+    }
+
+    public function set_order_status() {
+        $id = $_REQUEST['id'];
+        $status = $_REQUEST['status'];
+        $list = $this->user_model->set_order_status($id, $status);
         echo $list;
     }
 

@@ -199,23 +199,23 @@ class user_model extends CI_Model {
                 $pending_orders = $this->get_manager_orders($email, 1);
                 $processed_orders = $this->get_manager_orders($email, 2);
                 $games_list = $this->get_manager_games_list($email);
-                $list.="<br/><div class='calc'>";
-                $list.="<form class='calc_form' >";
-                $list.= "<br><br>";
-                $list.= "<table align='center' border='0' style='width: 100%;'>";
 
-                $list.="<tr>";
-                $list.= "<td align='center' colspan='4'><br>Добро пожаловать $firstname $lastname!<br><br><br></td>";
-                $list.= "</tr>";
+                $list.="<br/><div class=''>";
+                $list.="<form class='calc_form'>";
+                $list.= "<br>";
+                $list.= "<table align='center' border='0' style='width: 100%;'>";
 
                 $list.="<tr>";
                 $list.= "<td>$pending_orders</td>";
                 $list.= "<td>$processed_orders</td>";
-                $list.= "<td><td>$games_list<td>";
+                $list.= "<td>$games_list</td>";
                 $list.= "</tr>";
 
-                $list.="</table><br><br>";
-                $list.="<div style='text-align:center;' id='forgot_err'></div>";
+                $list.="<tr>";
+                $list.= "<td align='center' colspan='3'><span id='dashboard_container'></span></td>";
+                $list.= "</tr>";
+
+                $list.= "</table><br>";
                 $list.="</form>";
                 $list.="</div>";
             } // end if $type==2            
@@ -420,7 +420,7 @@ class user_model extends CI_Model {
         $list.="<option value='0' selected>Другое</option>";
         $list.="<option value='add_game'><a href='" . $this->config->item('base_url') . "index.php/games/add_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить игру</a></option>";
         $list.="<option value='add_server'><a href='" . $this->config->item('base_url') . "index.php/games/add_server' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить сервер</a></option>";
-        $list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить менеджера</a></option>";
+        $list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";
         $list.="<option value='report'><a href='" . $this->config->item('base_url') . "index.php/user/report' style='color: #000000;font-size: 14px;text-decoration: none;'>Отчеты</a></option>";
         $list.="<option value='news'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719147' style='color: #000000;font-size: 14px;text-decoration: none;'>Новости</a></option>";
         $list.="<option value='buy'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719146' style='color: #000000;font-size: 14px;text-decoration: none;'>Как купить</a></option>";
@@ -685,8 +685,51 @@ class user_model extends CI_Model {
         return $list;
     }
 
+    public function get_user_types2() {
+        $list = "";
+        $list.="<select id='user_type' name='user_type' style='width:195px;'>";
+        for ($i = 1; $i <= 5; $i++) {
+            switch ($i) {
+                case 1:
+                    $list.="<option value='$i' selected>Партнер</option>";
+                    break;
+                case 2:
+                    $list.="<option value='$i'>Менеджер</option>";
+                    break;
+                case 4:
+                    $list.="<option value='$i'>Модератор</option>";
+                    break;
+                case 5:
+                    $list.="<option value='$i'>Касир</option>";
+                    break;
+            }
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_user_type_name($i) {
+        $list = "";
+        switch ($i) {
+            case 1:
+                $list.="Партнер";
+                break;
+            case 2:
+                $list.="Менеджер";
+                break;
+            case 4:
+                $list.="Модератор";
+                break;
+            case 5:
+                $list.="Касир";
+                break;
+        }
+        return $list;
+    }
+
     public function add_user() {
         $games = $this->get_games_list2();
+        $types = $this->get_user_types2();
         $list = "";
         $list.="<br/><div class=''>";
         $list.="<form class='calc_form' id='add_manager'  method='post' action='" . $this->config->item('base_url') . "index.php/user/added_done'>";
@@ -694,8 +737,12 @@ class user_model extends CI_Model {
         $list.= "<table align='center' border='0' >";
 
         $list.="<tr>";
-        $list.="<td align='left' style='padding:15px;'>Добавить менеджера</td><td><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></td>";
+        $list.="<td align='left' style='padding:15px;'>Добавить пользователя</td><td><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></td>";
         $list.="<tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='left' style='padding:15px;'>Тип пользователя</td><td align='left'>$types</td>";
+        $list.= "</tr>";
 
         $list.="<tr>";
         $list.= "<td align='left' style='padding:15px;'>Имя*</td><td align='left'><input type='text' id='firstname' name='firstname' style='width:195px;'></td>";
@@ -729,7 +776,7 @@ class user_model extends CI_Model {
         $list.= "<td align='left' style='padding:15px;'>ICQ</td><td align='left'><input type='text' id='icq' name='icq' style='width:195px;'></td>";
         $list.= "</tr>";
 
-        $list.="<tr>";
+        $list.="<tr id='manager_games' style='display:none;'>";
         $list.= "<td align='left' style='padding:15px;'>Игры*</td><td align='left'>$games</td>";
         $list.= "</tr>";
 
@@ -772,17 +819,20 @@ class user_model extends CI_Model {
         $this->db->query($query);
         $id = $this->db->insert_id();
 
-        foreach ($user->games as $gameid) {
-            $query = "insert into manager2game (userid, gameid) "
-                    . "values($id,$gameid)";
-            $this->db->query($query);
-        } // end foreach
+        if ($user->type == 2) {
+            foreach ($user->games as $gameid) {
+                $query = "insert into manager2game (userid, gameid) "
+                        . "values($id,$gameid)";
+                $this->db->query($query);
+            } // end foreach
+        } // end if $user->type==2
+        $type_name = $this->get_user_type_name($user->type);
         $list.="<br/><div class=''>";
         $list.="<form class='calc_form'>";
         $list.= "<br>";
         $list.= "<table align='center' border='0' style='width: 100%;'>";
         $list.="<tr>";
-        $list.= "<td align='center'>&nbsp;&nbsp;<span>Новый менеджер успешно добавлен. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
+        $list.= "<td align='center'>&nbsp;&nbsp;<span>Новый $type_name успешно добавлен. &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span><td>";
         $list.= "</tr>";
         $list.= "</table><br>";
         $list.="</form>";
@@ -907,6 +957,139 @@ class user_model extends CI_Model {
         $this->email->subject('ECM-GAMES Подтверждение заказа');
         $this->email->message($msg);
         $this->email->send();
+    }
+
+    public function get_status_dropdown($status) {
+        $list = "";
+        $list.="<select id='order_status'>";
+        if ($status == 1) {
+            $list.="<option value='1' selected>Необработанный</option>";
+            $list.="<option value='2' >Обработанный</option>";
+        } // end if $status==1
+        if ($status == 2) {
+            $list.="<option value='1'>Необработанный</option>";
+            $list.="<option value='2' selected>Обработанный</option>";
+        } // end i $status==2
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_order_details($id, $status) {
+        $list = "";
+        $order_status = $this->get_status_dropdown($status);
+        $query = "select * from orders where id=$id and status=$status";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $game = $this->get_game_detailes2($row->gameid);
+            $nick = $row->nick;
+            $email = $row->email;
+            $game_amount = $row->game_amount;
+            $amount = $row->amount;
+            $usd_amount = $row->usd_amount;
+            $currency = $row->currency;
+            $method = $this->get_delivery_method($row->delivery_way);
+            $phone = $row->phone;
+            $skype = $row->skype;
+            $icq = $row->icq;
+            $comment = $row->comment;
+            $added = date('d-m-Y h:i:s', $row->added);
+            $userid = $row->userid;
+            $notes = $row->notes;
+            $order_db_status = $row->status;
+        } // end foreach
+        if ($userid == 0) {
+            $managerid = $this->session->userdata('id');
+            $query = "update orders set userid=$managerid where id=$id";
+            $this->db->query($query);
+        } // end if $userid==0
+
+        if ($order_db_status == 1) {
+            $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Необработанные заказы</p>";
+        }
+
+        if ($order_db_status == 2) {
+            $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Обработанные заказы</p>";
+        }
+
+        $list.="<p align='center' style='font-weight:bold;'>Детали заказа</p>";
+
+        $list.="<br><table border='1' align='center' >";
+
+        $list.="<input type='hidden' value='$id' id='order_id'>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Название игры</td><td style='padding: 15px;'>$game->name</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Ник заказчика</td><td style='padding: 15px;'>$nick</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Email заказчика</td><td style='padding: 15px;'>$email</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Телефон заказчика</td><td style='padding: 15px;'>$phone</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>ICQ заказчика</td><td style='padding: 15px;'>$icq</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Skype заказчика</td><td style='padding: 15px;'>$skype</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Кол-во игровой валюты</td><td style='padding: 15px;'>" . $game_amount . " " . $game->currency . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Сумма к оплате</td><td style='padding: 15px;'>" . $amount . " " . $currency . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Сумма в долларах</td><td style='padding: 15px;'>" . $usd_amount . "USD</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Способ доставки</td><td style='padding: 15px;'>$method</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Коментарий</td><td style='padding: 15px;'>" . $comment . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Дата заказа</td><td style='padding: 15px;'>" . $added . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Приметки менеджера:</td><td style='padding: 15px;'><textarea rows='4' id='notes' cols='35'>$notes</textarea><br><span id='notes_err'></span></td>";
+        $list.="</tr>";
+
+        if ($order_db_status == 1) {
+            $list.="<tr>";
+            $list.="<td style='padding: 15px;'>Статус заказа</td><td style='padding: 15px;'>$order_status</td>";
+            $list.="</tr>";
+        } // end if $order_db_status==1
+
+        return $list;
+    }
+
+    public function updta_order_notes($id, $notes) {
+        $query = "update orders set notes='$notes' where id=$id";
+        $this->db->query($query);
+        $list = 'ok';
+        return $list;
+    }
+
+    public function set_order_status($id, $status) {
+        $query = "update orders set status=$status where id=$id";
+        $this->db->query($query);
+        $list = 'ok';
+        return $list;
     }
 
 }
