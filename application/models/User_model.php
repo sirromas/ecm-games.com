@@ -162,6 +162,15 @@ class user_model extends CI_Model {
         return $list;
     }
 
+    public function get_cashier_orders() {
+        $list = "";
+        $list.="<select id='orders' style='width:100px;'>";
+        $list.="<option selected value='1'>Неоплаченные</option>";
+        $list.="<option  value='2'>Оплаченные</option>";
+        $list.="</select>";
+        return $list;
+    }
+
     public function get_user_dashboard($type) {
         $list = "";
         $id = $this->uri->segment(4);
@@ -219,6 +228,30 @@ class user_model extends CI_Model {
                 $list.="</form>";
                 $list.="</div>";
             } // end if $type==2            
+            else if ($type == 5) {
+                // Cashier
+                $orders = $this->get_cashier_orders();
+                $list.="<br/><div class=''>";
+                $list.="<form class='calc_form'>";
+                $list.= "<br>";
+                $list.= "<table align='center' border='0' style='width: 100%;'>";
+
+                $list.="<tr>";
+                $list.="<td>$orders</td><td>Дата:*</td><td><input type='text' style='width:75px;' id='start'></td><td>Дата:*</td><td><input type='text' style='width:75px;' id='end'></td><td align='left'><a href='#' id='get_cashier_orders' style='color:black' onClick='return false;'>OK</a></td>";
+                $list.= "</tr>";
+
+                $list.="<tr>";
+                $list.= "<td align='center' colspan='4'><span id='dashboard_container'></span></td>";
+                $list.= "</tr>";
+
+                $list.="<tr>";
+                $list.= "<td align='center' colspan='4'><span id='orders_err'></span></td>";
+                $list.= "</tr>";
+
+                $list.= "</table><br>";
+                $list.="</form>";
+                $list.="</div>";
+            } // end if 
         } // end if $status
         else {
             if ($id > 0) {
@@ -1339,6 +1372,12 @@ class user_model extends CI_Model {
         $result = $this->db->query($query);
         $num = $result->num_rows();
         return $num;
+    }
+
+    public function get_cashier_orders_detailes($orders, $start, $end) {
+        $list = "";
+        $query="select * from ";
+        return $list;
     }
 
 }

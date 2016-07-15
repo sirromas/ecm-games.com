@@ -186,6 +186,23 @@ $(document).ready(function () {
         }
 
     });
+
+    $('#get_cashier_orders').click(function () {
+        var orders = $('#orders').val();
+        var start = $('#start').val();
+        var end = $('#end').val();
+        if (orders > 0 && start != '' && end != '') {
+            $('#orders_err').html('');
+            var url = host + "/index.php/user/get_cashier_orders";
+            $.post(url, {orders: orders, start: start, end: end}).done(function (data) {
+                $('#dashboard_container').html(data);
+            });
+        }
+        else {
+            $('#orders_err').html('Пожалуйста выберите период');
+        }
+    });
+
     $('#cancel_logout').click(function () {
         var type = $('#type').val();
         var url = host + "/index.php/user/page/" + type;
@@ -416,6 +433,8 @@ $(document).ready(function () {
             $('#amount').val('');
         }
     });
+
+
 
     $("#pending_orders").change(function () {
         var id = $('#pending_orders').val();

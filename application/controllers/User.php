@@ -174,10 +174,18 @@ class User extends CI_Controller {
         $list = $this->user_model->add_payment($id, $amount, $comment, $ptype);
         echo $list;
     }
-    
-    public function get_order_client_payments () {
+
+    public function get_order_client_payments() {
         $id = $_REQUEST['id'];
         $list = $this->user_model->get_order_client_payment($id);
+        echo $list;
+    }
+
+    public function get_cashier_orders() {
+        $orders = $_REQUEST['orders'];
+        $start = $_REQUEST['start'];
+        $end = $_REQUEST['end'];
+        $list = $this->user_model->get_cashier_orders_detailes($orders, $start, $end);
         echo $list;
     }
 
