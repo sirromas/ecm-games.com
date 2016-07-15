@@ -974,6 +974,98 @@ class user_model extends CI_Model {
         return $list;
     }
 
+    public function get_payment_type_name($type) {
+        $query = "select * from payment_types where id=$type";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $name = $row->type;
+        }
+        return $name;
+    }
+
+    public function get_order_status($id) {
+        $query = "select * from orders where id=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $status = $row->status;
+        }
+        return $status;
+    }
+
+    public function get_client_payments_block($id) {
+        $list = "";
+        $status = $this->get_order_status($id);
+        if ($status == 1) {
+            $list.="<p align='center'><a onClick='return false;' id='addPayment' style='color:black;cursor:pointer;'>Добавить платеж</a></p>";
+        } // end if $status==1
+        $payments = array();
+        $query = "select * from client_payments where order_id=$id";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $payment_id = $row->payment_id;
+            } // end foreach
+
+            $query = "select * from client_order_payments "
+                    . "where id=$payment_id";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $payment = new stdClass();
+                $payment->user_data = $row->user_data;
+                $payment->amount = $row->amount;
+                $payment->currency = $row->currency;
+                $payment->usd_amount = $row->usd_amount;
+                $payment->currency = $row->currency;
+                $payment->ptype = $row->ptype;
+                $payment->comment = $row->comment;
+                $payment->pdate = $row->pdate;
+                $payments[] = $payment;
+            } // end foreach
+            foreach ($payments as $payment) {
+                $payment_type = $this->get_payment_type_name($payment->ptype);
+                $date = date('Y-m-d h:i:s', $payment->pdate);
+                $list.="<table align='center' border='0'>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Имя клиента</td><td style='padding:5px;'>$payment->user_data</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Способ оплаты</td><td style='padding:5px;'>$payment_type</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Оплаченная сумма</td><td style='padding:5px;'>$payment->amount ($payment->currency)</td>";
+                $list.="</tr>";
+
+                /*
+                 * 
+                  $list.="<tr>";
+                  $list.="<td>Оплаченная сумма в USD</td><td>$payment->usd_amount</td>";
+                  $list.="</tr>";
+                 * 
+                 */
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Дополнительно</td><td style='padding:5px;'>$payment->comment</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Дата платежа</td><td style='padding:5px;'>$date</td>";
+                $list.="</tr>";
+
+                $list.="</table>";
+
+                $list.="<br><hr><br>";
+            } // end foreach
+        } // end if $num > 0
+        else {
+            $list.="<p align='center'>Нет оплаты</p>";
+        }
+        return $list;
+    }
+
     public function get_order_details($id, $status) {
         $list = "";
         $order_status = $this->get_status_dropdown($status);
@@ -998,10 +1090,13 @@ class user_model extends CI_Model {
             $order_db_status = $row->status;
         } // end foreach
         if ($userid == 0) {
+            // Assign order to manager
             $managerid = $this->session->userdata('id');
             $query = "update orders set userid=$managerid where id=$id";
             $this->db->query($query);
         } // end if $userid==0
+
+        $payments = $this->get_client_payments_block($id);
 
         if ($order_db_status == 1) {
             $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Необработанные заказы</p>";
@@ -1058,6 +1153,10 @@ class user_model extends CI_Model {
         $list.="</tr>";
 
         $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Оплаты клиента</td><td style='padding: 15px;'><span id='client_payments'>$payments</span></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
         $list.="<td style='padding: 15px;'>Коментарий</td><td style='padding: 15px;'>" . $comment . "</td>";
         $list.="</tr>";
 
@@ -1090,6 +1189,156 @@ class user_model extends CI_Model {
         $this->db->query($query);
         $list = 'ok';
         return $list;
+    }
+
+    public function get_payment_types() {
+        $list = "";
+        $list.="<select id='ptype' style='width:175px;'>";
+        $query = "select * from payment_types order by type";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            if ($row->id == 1) {
+                $list.="<option value='$row->id' selected>$row->type</option>";
+            } // end if $row->id==1
+            else {
+                $list.="<option value='$row->id'>$row->type</option>";
+            } // end else
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_add_payment_modal_box($id) {
+        $list = "";
+        $query = "select * from orders where id=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $currency = $row->currency;
+        }
+
+        $ptype = $this->get_payment_types();
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>                
+                <h4 class='modal-title'>Добавить оплату</h4>
+                </div>                
+                <div class='modal-body'>                                
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <input type='hidden' id='id' value='$id'>          
+                
+                <table align='center'>
+                
+                <tr>
+                <td style='padding:15px;'>Способ оплаты</span><td style='padding:15px;'>$ptype</td>
+                </tr>
+
+                <tr>
+                <td style='padding:15px;'>Cумма ($currency)*</td><td style='padding:15px;'><input type='text' id='amount' style='width:175px;'></td>
+                </tr>
+                
+                <tr>
+                <td style='padding:15px;'>Коментарий</td><td style='padding:15px;'><textarea id='payment_comment'></textarea></td>
+                </tr>
+                
+                <tr>
+                <td colspan='2' style='padding:15px;'><span style='text-align:center' id='amount_err'></span></td>
+                </tr>
+                
+                </table>               
+                                
+                </div>
+                
+                <div class='modal-footer'>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel_add_payment'>Отмена</button></span>
+                <span align='center'><button type='button' class='btn btn-primary'  id='add_payment_btn'>Ок</button></span>
+                </div>
+        </div>
+        </div>
+        </div>";
+
+        return $list;
+    }
+
+    public function get_order_details2($id) {
+        $query = "select * from orders where id=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $order = new stdClass();
+            $order->id = $id;
+            $order->nick = $row->nick;
+            $order->currency = $row->currency;
+            // Do other stuff ...
+        }
+        return $order;
+    }
+
+    public function get_usd_amount($amount, $currency) {
+        $query = "select * from exchange_rate";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $rates = new stdClass();
+            $rates->eur = $row->eur_rate;
+            $rates->rur = $row->rur_rate;
+            $rates->usd = $row->usd_rate;
+        }
+        switch ($currency) {
+            case 'eur':
+                $rate = round(($rates->eur / $rates->usd), 2);
+                break;
+            case 'rur':
+                $rate = round(($rates->rur / $rates->usd), 2);
+                break;
+            case 'usd':
+                $rate = 1;
+                break;
+            case 'uah':
+                $rate = round((1 / $rates->usd), 2);
+                break;
+        }
+        $usd_amount = round(($amount) * $rate, 2);
+        return $usd_amount;
+    }
+
+    public function add_payment($id, $amount, $comment, $ptype) {
+        $list = "";
+        $order = $this->get_order_details2($id);
+        $usd_amount = $this->get_usd_amount($amount, $order->currency);
+        $now = time();
+        $query = "insert into client_order_payments "
+                . "(orderid,"
+                . "user_data,"
+                . "amount,"
+                . "usd_amount,"
+                . "currency,"
+                . "ptype,"
+                . "comment,"
+                . "pdate) "
+                . "values($id,"
+                . "'$order->nick',"
+                . "'$amount',"
+                . "'$usd_amount',"
+                . "'$order->currency',"
+                . "'$ptype', "
+                . "'$comment',"
+                . "'$now')";
+        $this->db->query($query);
+        $paymentid = $this->db->insert_id();
+
+        $query = "insert into client_payments (order_id,payment_id) "
+                . "values($id, $paymentid)";
+        $this->db->query($query);
+
+        $list.=$this->get_client_payments_block($id);
+        return $list;
+    }
+
+    public function get_order_client_payment($id) {
+        $query = "select * from client_payments where order_id=$id";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        return $num;
     }
 
 }

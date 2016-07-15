@@ -449,23 +449,51 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on('click', '#addPayment', function () {
+        var id = $('#order_id').val();
+        var url = host + "/index.php/user/get_add_payment_modal_box/";
+        if (dialog_loaded !== true) {
+            $.post(url, {id: id}).done(function (data) {
+                dialog_loaded = true;
+                $("body").append(data);
+                $("#myModal").modal('show');
+            });
+        } // end if dialog_loaded !== true
+        else {
+            $("#myModal").modal('show');
+        }
+    });
+
+    $(document).on('click', '#cancel_add_payment', function () {
+        console.log('cancel_add_payment. ...');
+        $('#myModal').data('modal', null);
+        dialog_loaded = false;
+    });
+
     $(document).on('change', '#order_status', function () {
         var id = $('#order_id').val();
         var status = $('#order_status').val();
-        var notes = $('#notes').val();
-        if (notes != '') {
-            if (confirm('Изменить статус заказа?')) {
-                $('#notes_err').html('');
-                var url = host + "/index.php/user/set_order_status/";
-                $.post(url, {id: id, status: status}).done(function (data) {
-                    console.log(data);
-                    document.location.reload();
-                });
-            } // end if confirm
-        } // end if notes!=''
-        else {
-            $('#notes_err').html('Пожалуйста оставьте коментарии к заказу');
-        }
+
+        if (status == 2) {
+            var url = host + "/index.php/user/get_order_client_payments/";
+            $.post(url, {id: id}).done(function (data) {
+                if (data > 0) {
+                    $('#notes_err').html('');
+                    if (confirm('Изменить статус заказа?')) {
+                        $('#notes_err').html('');
+                        var url = host + "/index.php/user/set_order_status/";
+                        $.post(url, {id: id, status: status}).done(function (data) {
+                            console.log(data);
+                            document.location.reload();
+                        });
+                    } // end if confirm
+                } // end if data>0
+                else {
+                    $('#notes_err').html('Заказ еще не оплачен');
+                }
+            }); // end if $.post(url
+        } // end if status ==2
+
     });
 
     $(document).on('blur', '#notes', function () {
@@ -481,7 +509,7 @@ $(document).ready(function () {
 
 
     $("body").click(function (event) {
-        //console.log('Element clicked: ' + event.target.id);
+        console.log('Element clicked: ' + event.target.id);
         if (event.target.id.indexOf("game_detailes") >= 0) {
             var id = event.target.id.replace("game_detailes_id_", "");
             get_game_description_block(id);
@@ -497,6 +525,33 @@ $(document).ready(function () {
                 });
             } // end if id>0 && body!=''
         }
+
+        if (event.target.id == 'add_payment_btn') {
+            console.log('Inside add payment ..');
+            var amount = $('#amount').val();
+            var ptype = $('#ptype').val();
+            var id = $('#id').val();
+            var comment = $('#payment_comment').val();
+            if (amount != '') {
+                if ($.isNumeric(amount)) {
+                    $('#amount_err').html('');
+                    var url = host + "/index.php/user/add_payment/";
+                    $.post(url, {id: id, amount: amount, ptype: ptype, comment: comment}).done(function (data) {
+                        $('#myModal').modal('hide');
+                        $('#myModal').data('modal', null);
+                        $('#client_payments').html(data);
+                    });
+
+                } // end if $.isNumeric(amount)
+                else {
+                    $('#amount_err').html('Сумма указана неверно');
+                } // end else
+            } // end if amount!=''
+            else {
+                $('#amount_err').html('Пожалуйста укажите сумму');
+            } // end else
+        }
+
 
         if (event.target.id.indexOf("update_server_") >= 0) {
             var id = event.target.id.replace("update_server_", "");

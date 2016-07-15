@@ -158,4 +158,27 @@ class User extends CI_Controller {
         echo $list;
     }
 
+    public function get_add_payment_modal_box() {
+        $id = $_REQUEST['id'];
+        $list = $this->user_model->get_add_payment_modal_box($id);
+        echo $list;
+    }
+
+    public function add_payment() {
+        //print_r($_REQUEST);
+        $id = $_REQUEST['id'];
+        $amount = $_REQUEST['amount'];
+        $ptype = $_REQUEST['ptype'];
+        $comment = $_REQUEST['comment'];
+        //die();
+        $list = $this->user_model->add_payment($id, $amount, $comment, $ptype);
+        echo $list;
+    }
+    
+    public function get_order_client_payments () {
+        $id = $_REQUEST['id'];
+        $list = $this->user_model->get_order_client_payment($id);
+        echo $list;
+    }
+
 }
