@@ -164,14 +164,28 @@ class User extends CI_Controller {
         echo $list;
     }
 
+    public function get_add_payment_modal_box2() {
+        $id = $_REQUEST['id'];
+        $list = $this->user_model->get_add_payment_modal_box2($id);
+        echo $list;
+    }
+
     public function add_payment() {
-        //print_r($_REQUEST);
         $id = $_REQUEST['id'];
         $amount = $_REQUEST['amount'];
         $ptype = $_REQUEST['ptype'];
         $comment = $_REQUEST['comment'];
-        //die();
         $list = $this->user_model->add_payment($id, $amount, $comment, $ptype);
+        echo $list;
+    }
+
+    public function add_supplier_payment() {        
+        $id = $_REQUEST['id'];
+        $supplier_data=$_REQUEST['supplier_data'];
+        $amount = $_REQUEST['amount'];
+        $ptype = $_REQUEST['ptype'];
+        $comment = $_REQUEST['comment'];
+        $list = $this->user_model->add_supplier_payment($id, $amount, $comment, $ptype,$supplier_data);
         echo $list;
     }
 
@@ -182,10 +196,10 @@ class User extends CI_Controller {
     }
 
     public function get_cashier_orders() {
-        $orders = $_REQUEST['orders'];
+        $status = $_REQUEST['status'];
         $start = $_REQUEST['start'];
         $end = $_REQUEST['end'];
-        $list = $this->user_model->get_cashier_orders_detailes($orders, $start, $end);
+        $list = $this->user_model->search($status, $start, $end);
         echo $list;
     }
 

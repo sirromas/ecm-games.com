@@ -188,13 +188,15 @@ $(document).ready(function () {
     });
 
     $('#get_cashier_orders').click(function () {
-        var orders = $('#orders').val();
+        var status = $('#orders').val();
         var start = $('#start').val();
         var end = $('#end').val();
-        if (orders > 0 && start != '' && end != '') {
+        if (status > 0 && start != '' && end != '') {
             $('#orders_err').html('');
+            $('#ajax_loader').show();
             var url = host + "/index.php/user/get_cashier_orders";
-            $.post(url, {orders: orders, start: start, end: end}).done(function (data) {
+            $.post(url, {status: status, start: start, end: end}).done(function (data) {
+                $('#ajax_loader').hide();
                 $('#dashboard_container').html(data);
             });
         }
@@ -483,6 +485,8 @@ $(document).ready(function () {
         }
     });
 
+
+
     $(document).on('click', '#cancel_add_payment', function () {
         console.log('cancel_add_payment. ...');
         $('#myModal').data('modal', null);
@@ -571,6 +575,47 @@ $(document).ready(function () {
             } // end else
         }
 
+        if (event.target.id.indexOf("add_supplier_payment_") >= 0) {
+            var id = event.target.id.replace("add_supplier_payment_", "");
+            var url = host + "/index.php/user/get_add_payment_modal_box2/";
+            if (dialog_loaded !== true) {
+                $.post(url, {id: id}).done(function (data) {
+                    dialog_loaded = true;
+                    $("body").append(data);
+                    $("#myModal").modal('show');
+                });
+            } // end if dialog_loaded !== true
+            else {
+                $("#myModal").modal('show');
+            }
+
+        }
+
+        if (event.target.id == 'add_payment_supplier_btn') {
+            var amount = $('#amount').val();
+            var supplier_data = $('#supplier_data').val();
+            var ptype = $('#ptype').val();
+            var id = $('#id').val();
+            var comment = $('#payment_comment').val();
+            if (amount != '' && supplier_data) {
+                if ($.isNumeric(amount)) {
+                    $('#amount_err').html('');
+                    var url = host + "/index.php/user/add_supplier_payment/";
+                    $.post(url, {id: id, amount: amount, ptype: ptype, comment: comment, supplier_data: supplier_data}).done(function (data) {
+                        $('#myModal').modal('hide');
+                        $('#myModal').data('modal', null);
+                        $('#client_payments').html(data);
+                    });
+
+                } // end if $.isNumeric(amount)
+                else {
+                    $('#amount_err').html('Сумма указана неверно');
+                } // end else
+            } // end if amount!=''
+            else {
+                $('#amount_err').html('Пожалуйста укажите потсавщика и сумму');
+            } // end else            
+        }
 
         if (event.target.id.indexOf("update_server_") >= 0) {
             var id = event.target.id.replace("update_server_", "");

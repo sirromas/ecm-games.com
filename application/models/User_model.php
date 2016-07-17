@@ -241,11 +241,15 @@ class user_model extends CI_Model {
                 $list.= "</tr>";
 
                 $list.="<tr>";
-                $list.= "<td align='center' colspan='4'><span id='dashboard_container'></span></td>";
+                $list.= "<td align='center' colspan='6'><span id='ajax_loader' style='display:none;'><img src='/games/assets/images/ajax.gif' /></span></td>";
                 $list.= "</tr>";
 
                 $list.="<tr>";
-                $list.= "<td align='center' colspan='4'><span id='orders_err'></span></td>";
+                $list.= "<td align='center' colspan='6'><span id='dashboard_container'></span></td>";
+                $list.= "</tr>";
+
+                $list.="<tr>";
+                $list.= "<td align='center' colspan='6'><span id='orders_err'></span></td>";
                 $list.= "</tr>";
 
                 $list.= "</table><br>";
@@ -1264,7 +1268,7 @@ class user_model extends CI_Model {
                 <table align='center'>
                 
                 <tr>
-                <td style='padding:15px;'>Способ оплаты</span><td style='padding:15px;'>$ptype</td>
+                <td style='padding:15px;'>Способ оплаты*</span><td style='padding:15px;'>$ptype</td>
                 </tr>
 
                 <tr>
@@ -1292,6 +1296,92 @@ class user_model extends CI_Model {
         </div>";
 
         return $list;
+    }
+
+    public function get_add_payment_modal_box2($id) {
+        $list = "";
+        $query = "select * from orders where id=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $currency = $row->currency;
+        }
+
+        $ptype = $this->get_payment_types();
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>                
+                <h4 class='modal-title'>Добавить оплату</h4>
+                </div>                
+                <div class='modal-body'>                                
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <input type='hidden' id='id' value='$id'>          
+                
+                <table align='center'>
+                
+                <tr>
+                <td style='padding:15px;'>Данные поставщика*</span><td style='padding:15px;'><input type='text' id='supplier_data' style='width:175px;'></td>
+                </tr>
+                
+                <tr>
+                <td style='padding:15px;'>Способ оплаты*</span><td style='padding:15px;'>$ptype</td>
+                </tr>
+
+                <tr>
+                <td style='padding:15px;'>Cумма ($currency)*</td><td style='padding:15px;'><input type='text' id='amount' style='width:175px;'></td>
+                </tr>
+                
+                <tr>
+                <td style='padding:15px;'>Коментарий</td><td style='padding:15px;'><textarea id='payment_comment'></textarea></td>
+                </tr>
+                
+                <tr>
+                <td colspan='2' style='padding:15px;'><span style='text-align:center' id='amount_err'></span></td>
+                </tr>
+                
+                </table>               
+                                
+                </div>
+                
+                <div class='modal-footer'>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel_add_payment'>Отмена</button></span>
+                <span align='center'><button type='button' class='btn btn-primary'  id='add_payment_supplier_btn'>Ок</button></span>
+                </div>
+        </div>
+        </div>
+        </div>";
+
+        return $list;
+    }
+
+    public function add_supplier_payment($id, $amount, $comment, $ptype, $supplier_data) {
+        $order = $this->get_order_details2($id);
+        $usd_amount = $this->get_usd_amount($amount, $order->currency);
+        $now = time();
+        $query = "insert into supplier_order_payments "
+                . "(orderid,"
+                . "supplier_data,"
+                . "amount,"
+                . "usd_amount,"
+                . "currency,"
+                . "ptype,"
+                . "comment,"
+                . "pdate) "
+                . "values($id,"
+                . "'$supplier_data',"
+                . "'$amount',"
+                . "'$usd_amount',"
+                . "'$order->currency',"
+                . "'$ptype', "
+                . "'$comment',"
+                . "'$now')";
+        $this->db->query($query);
+        $paymentid = $this->db->insert_id();
+
+        $query = "insert into supplier_payments (order_id,payment_id) "
+                . "values($id, $paymentid)";
+        $this->db->query($query);
     }
 
     public function get_order_details2($id) {
@@ -1374,9 +1464,204 @@ class user_model extends CI_Model {
         return $num;
     }
 
-    public function get_cashier_orders_detailes($orders, $start, $end) {
+    public function get_supplier_payments_block($id, $status) {
         $list = "";
-        $query="select * from ";
+        if ($status == 1) {
+            $list.="<a href='#' onClick='return false;' style='color:black;' id='add_supplier_payment_$id'>Добавить оплату</a>";
+        } // end if $status==1
+        else {
+            $list.="<table align='center' border='0'>";
+            $query = "select * from supplier_order_payments where orderid=$id";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $type = $this->get_payment_type_name($row->ptype);
+                $date = date('d-m-Y  h:i:s', $row->pdate);
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Данные поставщика</td><td style='padding:5px;'>$row->supplier_data</td>";
+                $list.="<tr>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Оплаченная сумма</td><td style='padding:5px;'>$row->amount ($row->currency)</td>";
+                $list.="<tr>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Эквивалент в долларах</td><td style='padding:5px;'>$$row->usd_amount</td>";
+                $list.="<tr>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Тип оплаты</td><td style='padding:5px;'>$type</td>";
+                $list.="<tr>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Коментарий</td><td style='padding:5px;'>$row->comment</td>";
+                $list.="<tr>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:5px;'>Дата оплаты</td><td style='padding:5px;'>$date</td>";
+                $list.="<tr>";
+            } // end foreach
+            $list.="</table>";
+        } // end else
+
+        return $list;
+    }
+
+    public function get_order_details3($id, $status) {
+        $list = "";
+        $query = "select * from orders where id=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $game = $this->get_game_detailes2($row->gameid);
+            $nick = $row->nick;
+            $email = $row->email;
+            $game_amount = $row->game_amount;
+            $amount = $row->amount;
+            $usd_amount = $row->usd_amount;
+            $currency = $row->currency;
+            $method = $this->get_delivery_method($row->delivery_way);
+            $phone = $row->phone;
+            $skype = $row->skype;
+            $icq = $row->icq;
+            $comment = $row->comment;
+            $added = date('d-m-Y h:i:s', $row->added);
+            $userid = $row->userid;
+            $notes = $row->notes;
+            $order_db_status = $row->status;
+        } // end foreach
+        if ($userid == 0) {
+            // Assign order to manager
+            $managerid = $this->session->userdata('id');
+            $query = "update orders set userid=$managerid where id=$id";
+            $this->db->query($query);
+        } // end if $userid==0
+
+        $payments = $this->get_supplier_payments_block($id, $status);
+
+        $list.="<br><br><p align='center' style='font-weight:bold;'>Детали заказа</p>";
+
+        $list.="<br><table border='1' align='center' >";
+
+        $list.="<input type='hidden' value='$id' id='order_id'>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Название игры</td><td style='padding: 15px;'>$game->name</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Ник заказчика</td><td style='padding: 15px;'>$nick</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Email заказчика</td><td style='padding: 15px;'>$email</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Телефон заказчика</td><td style='padding: 15px;'>$phone</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>ICQ заказчика</td><td style='padding: 15px;'>$icq</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Skype заказчика</td><td style='padding: 15px;'>$skype</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Кол-во игровой валюты</td><td style='padding: 15px;'>" . $game_amount . " " . $game->currency . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Сумма к оплате</td><td style='padding: 15px;'>" . $amount . " " . $currency . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Сумма в долларах</td><td style='padding: 15px;'>" . $usd_amount . "USD</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Способ доставки</td><td style='padding: 15px;'>$method</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Оплаты поставщику</td><td style='padding: 15px;'><span id='supplier_payments'>$payments</span></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Коментарий</td><td style='padding: 15px;'>" . $comment . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Дата заказа</td><td style='padding: 15px;'>" . $added . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding: 15px;'>Приметки менеджера:</td><td style='padding: 15px;'><textarea rows='4' id='notes' cols='35' disabled>$notes</textarea><br><span id='notes_err'></span></td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+        $list.="<br/><hr/><br>";
+
+        return $list;
+    }
+
+    public function search($status, $start, $end) {
+        $list = "";
+        $unix_start = strtotime($start);
+        $unix_end = strtotime($end);
+        $supplier_payments = array();
+
+        $query = "select * from supplier_payments";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            // We have payment to suppliers
+            foreach ($result->result() as $row) {
+                $supplier_payments[] = $row->order_id;
+            } // end foreach
+            $supplier_payments_list = implode(',', $supplier_payments);
+        } // end if $num > 0
+
+        if ($status == 1) {
+            $query = "select * from orders "
+                    . "where status=2 "
+                    . "and added between $unix_start "
+                    . "and $unix_end and id not in ($supplier_payments_list) "
+                    . "order by added desc";
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+            if ($num > 0) {
+                foreach ($result->result() as $row) {
+                    $id = $row->id;
+                    $list.=$this->get_order_details3($id, $status);
+                } // end foreach
+            } // end if $num > 0
+            else {
+                $list.= "<p align='center'>Ничего не найдено</p>";
+            }
+        } // end if $status==1
+
+        if ($status == 2) {
+            $query = "select * from orders "
+                    . "where status=2 "
+                    . "and added between $unix_start "
+                    . "and $unix_end and id in ($supplier_payments_list) "
+                    . "order by added desc";
+            //echo "Query: " . $query . "<br>";
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+            if ($num > 0) {
+                // We have payment to suppliers within selected dates
+                foreach ($result->result() as $row) {
+                    $list.=$this->get_order_details3($row->id, $status);
+                } // end foreach
+            } // end if num>0
+            else {
+                $list.= "<p align='center'>Ничего не найдено</p>";
+            } // end else                        
+        } // end if $status==2
+
+
         return $list;
     }
 
