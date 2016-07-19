@@ -210,7 +210,7 @@ class Games_model extends CI_Model {
                 </div>
                 
                 <div class='modal-footer'>
-                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Отмена</button></span>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel_edit_game'>Отмена</button></span>
                 <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='upd_game'>Ок</button></span>
                 </div>
         </div>

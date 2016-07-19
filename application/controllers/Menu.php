@@ -56,4 +56,43 @@ class Menu extends CI_Controller {
         $this->load->view('page_view', $data);
     }
 
+    public function search_news() {
+        $start = $_REQUEST['start'];
+        $end = $_REQUEST['end'];
+        $list = $this->menu_model->get_news_by_date($start, $end);
+        echo $list;
+    }
+
+    public function get_add_news_modal_box() {
+        $list = $this->menu_model->get_add_news_modal_box();
+        echo $list;
+    }
+
+    public function add_news() {
+        $title = $_REQUEST['title'];
+        $body = $_REQUEST['body'];
+        $list = $this->menu_model->add_news($title, $body);
+        echo $list;
+    }
+
+    public function edit_news() {
+        $id = $_REQUEST['id'];
+        $list = $this->menu_model->get_edit_news_box($id);
+        echo $list;
+    }
+
+    public function update_news() {
+        $id = $_REQUEST['id'];
+        $title = $_REQUEST['title'];
+        $body = $_REQUEST['body'];
+        $list = $this->menu_model->update_news($id, $title, $body);
+        echo $list;
+    }
+
+    public function del_news() {
+        $id = $_REQUEST['id'];
+        $list = $this->menu_model->del_news($id);
+        echo $list;
+    }
+
 }

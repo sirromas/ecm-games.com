@@ -8,6 +8,7 @@ class user_model extends CI_Model {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->model('games_model');
+        $this->load->model('menu_model');
         $this->config->load('email');
         $this->load->library('email');
     }
@@ -176,28 +177,7 @@ class user_model extends CI_Model {
         $id = $this->uri->segment(4);
         $status = $this->validate_user();
         if ($status) {
-            if ($type == 3) {
-                // It is admin user
-                $games = $this->get_games_list();
-                $deals = $this->get_deals_list();
-                $users = $this->get_users_list();
-                $other = $this->get_others_list();
-                $list.="<br/><div class='calc'>";
-                $list.="<form class='calc_form' >";
-                $list.= "<br><br>";
-                $list.= "<table align='center' border='0' style='width: 100%;'>";
-                $list.="<tr>";
-                $list.= "<td><span id='games_container'>$games</span><td>";
-                $list.= "<td><span id='deals_container'>$deals</span><td>";
-                $list.= "<td><span id='user_container'>$users</span><td>";
-                $list.= "<td><span id='report_containers'>$other</span><td>";
-                $list.= "</tr>";
-                $list.="</table><br><br>";
-                $list.="<div style='text-align:center;' id='forgot_err'></div>";
-                $list.="</form>";
-                $list.="</div>";
-            } // end if $type==3        
-            else if ($type == 1) {
+            if ($type == 1) {
                 // It is partner
             } // end if $type==1
             else if ($type == 2) {
@@ -228,6 +208,43 @@ class user_model extends CI_Model {
                 $list.="</form>";
                 $list.="</div>";
             } // end if $type==2            
+            else if ($type == 3) {
+                // It is admin user
+                $games = $this->get_games_list();
+                $deals = $this->get_deals_list();
+                $users = $this->get_users_list();
+                $other = $this->get_others_list();
+                $list.="<br/><div class='calc'>";
+                $list.="<form class='calc_form' >";
+                $list.= "<br><br>";
+                $list.= "<table align='center' border='0' style='width: 100%;'>";
+                $list.="<tr>";
+                $list.= "<td><span id='games_container'>$games</span><td>";
+                $list.= "<td><span id='deals_container'>$deals</span><td>";
+                $list.= "<td><span id='user_container'>$users</span><td>";
+                $list.= "<td><span id='report_containers'>$other</span><td>";
+                $list.= "</tr>";
+                $list.="</table><br><br>";
+                $list.="<div style='text-align:center;' id='forgot_err'></div>";
+                $list.="</form>";
+                $list.="</div>";
+            } // end if $type==3        
+            else if ($type == 4) {
+                // It is moderator
+                $item = 9719147;
+                $news = $this->menu_model->get_admin_page($item);
+                $list.="<br/><div class='calc'>";
+                $list.="<form class='calc_form' >";
+                $list.= "<br><br>";
+                $list.= "<table align='center' border='0' style='width: 100%;'>";
+                $list.="<tr>";
+                $list.= "<td><span id='games_container'>$news</span><td>";
+                $list.= "</tr>";
+                $list.="</table><br><br>";
+                $list.="<div style='text-align:center;' id='forgot_err'></div>";
+                $list.="</form>";
+                $list.="</div>";
+            } // end if $type == 4
             else if ($type == 5) {
                 // Cashier
                 $orders = $this->get_cashier_orders();

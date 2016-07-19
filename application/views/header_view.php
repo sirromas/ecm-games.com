@@ -25,6 +25,8 @@
             $(function () {
                 $("#start").datepicker();
                 $("#end").datepicker();
+                $("#add_start").datepicker();
+                $("#add_end").datepicker();
             });
 
         </script>

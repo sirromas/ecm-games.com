@@ -485,13 +485,27 @@ $(document).ready(function () {
         }
     });
 
-
-
     $(document).on('click', '#cancel_add_payment', function () {
         console.log('cancel_add_payment. ...');
         $('#myModal').data('modal', null);
         dialog_loaded = false;
     });
+
+    $(document).on('click', '#cancel_add_news', function () {
+        console.log('cancel_add_news. ...');
+        CKEDITOR.instances.body.destroy();
+        $('#myModal').data('modal', null);
+        dialog_loaded = false;
+    });
+
+    $(document).on('click', '#cancel_edit_game', function () {
+        console.log('cancel_edit_game. ...');
+        CKEDITOR.instances.body.destroy();
+        $('#myModal').data('modal', null);
+        dialog_loaded = false;
+    });
+
+    //cancel_edit_game
 
     $(document).on('change', '#order_status', function () {
         var id = $('#order_id').val();
@@ -549,6 +563,60 @@ $(document).ready(function () {
             } // end if id>0 && body!=''
         }
 
+        if (event.target.id == 'search_news') {
+            var start = $('#start').val();
+            var end = $('#end').val();
+            if (start != '' && end != '') {
+                $('#news_err').html('');
+                $('#ajax_loader').show();
+                var url = host + "/index.php/menu/search_news/";
+                $.post(url, {start: start, end: end}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#news_container').html(data);
+                });
+            } // end if start!='' && end!=''
+            else {
+                $('#news_err').html('Пожалуйста укажите дату');
+            } // end else
+        }
+
+        if (event.target.id == 'add_news') {
+            var url = host + "/index.php/menu/get_add_news_modal_box/";
+            if (dialog_loaded !== true) {
+                $('#news_err').html('');
+                $('#ajax_loader').show();
+                $.post(url, {id: 1}).done(function (data) {
+                    dialog_loaded = true;
+                    $('#ajax_loader').hide();
+                    $('#myModal').data('modal', null);
+                    $('#myModal').remove();
+                    $("body").append(data);
+                    $("#myModal").modal('show');
+                });
+            } // end if dialog_loaded !== true
+            else {
+                $('#news_err').html('');
+                $("#myModal").modal('show');
+            }
+        }
+
+        if (event.target.id == 'add_news_btn') {
+            var title = $('#title').val();
+            var body = CKEDITOR.instances.body.getData();
+            if (title != '' && body != '') {
+                $('#add_news_err').html('');
+                var url = host + "/index.php/menu/add_news/";
+                $.post(url, {title: title, body: body}).done(function () {
+                    $('#myModal').modal('hide');
+                    $('#myModal').data('modal', null);
+                    $('#news_container').html('Новость успешно добавлена');
+                });
+            } // end if title!='' && body!=''
+            else {
+                $('#add_news_err').html('Пожалуйста укажите обязательные поля');
+            }
+        }
+
         if (event.target.id == 'add_payment_btn') {
             console.log('Inside add payment ..');
             var amount = $('#amount').val();
@@ -573,6 +641,39 @@ $(document).ready(function () {
             else {
                 $('#amount_err').html('Пожалуйста укажите сумму');
             } // end else
+        }
+
+        if (event.target.id.indexOf("edit_news_") >= 0) {
+            var id = event.target.id.replace("edit_news_", "");
+            var url = host + "/index.php/menu/edit_news/";
+            $('#ajax_loader').show();
+            $.post(url, {id: id}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#myModal').data('modal', null);
+                $('#myModal').remove();
+                $("body").append(data);
+                $("#myModal").modal('show');
+            });
+
+        }
+
+        if (event.target.id.indexOf("update_news_") >= 0) {
+            var id = event.target.id.replace("update_news_", "");
+            var title = $('#title').val();
+            var body = CKEDITOR.instances.body.getData();
+            if (title != '' && body != '' && id > 0) {
+                $('#add_news_err').html('');
+                $('#ajax_loader').hide();
+                var url = host + "/index.php/menu/update_news/";
+                $.post(url, {id: id, title: title, body: body}).done(function (data) {
+                    $('#myModal').modal('hide');
+                    $('#myModal').data('modal', null);
+                    $('#news_container').html(data);
+                });
+            } // end if title!='' && body!=''
+            else {
+                $('#add_news_err').html('Пожалуйста укажите обязательные поля');
+            }
         }
 
         if (event.target.id.indexOf("add_supplier_payment_") >= 0) {
@@ -631,6 +732,20 @@ $(document).ready(function () {
                 });
             } // end if id>0 && server_name!='' && $.isNumeric(server_rate)
         }
+
+        if (event.target.id.indexOf("delete_news_") >= 0) {
+            var id = event.target.id.replace("delete_news_", "");
+            if (id > 0) {
+                if (confirm('Удалить текущую новость?')) {
+                    var url = host + "/index.php/menu/del_news/";
+                    $.post(url, {id: id}).done(function (data) {
+                        $('#news_container').html(data);
+                    });
+                } // end if confirm
+            } // end if id>0
+        }
+
+
 
         if (event.target.id.indexOf("del_game_") >= 0) {
             var id = event.target.id.replace("del_game_", "");
