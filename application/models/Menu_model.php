@@ -76,9 +76,9 @@ class Menu_model extends CI_Model {
     }
 
     function get_page_content($item) {
-        $list = "";
-        $list.="<br><table align='center' border='0' width='100%'>";
+        $list = "";        
         if ($item == 'news') {
+            $list.="<br><table align='center' border='0' width='100%'>";
             $query = "select * from news order by added desc limit 0, 7";
             $result = $this->db->query($query);
             $num = $result->num_rows();
@@ -104,7 +104,7 @@ class Menu_model extends CI_Model {
             $query = "select * from top_menu where link='$item'";
             $result = $this->db->query($query);
             foreach ($result->result() as $row) {
-                $list.=$row->content;
+                $list.="<br><br>".$row->content;
             } // end foreach
         } // end else
         return $list;
