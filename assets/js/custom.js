@@ -745,7 +745,19 @@ $(document).ready(function () {
             } // end if id>0
         }
 
-
+        if (event.target.id.indexOf("more_") >= 0) {
+            var id = event.target.id.replace("more_", "");
+            if (id > 0) {
+                var tr_id = '#content_' + id;
+                var el = $(tr_id);
+                if (el.is(':visible')) {
+                    $(tr_id).hide();
+                } // end if 
+                else {
+                    $(tr_id).show();
+                } // end else
+            } // end if id>0
+        }
 
         if (event.target.id.indexOf("del_game_") >= 0) {
             var id = event.target.id.replace("del_game_", "");

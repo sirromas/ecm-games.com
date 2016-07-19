@@ -77,11 +77,36 @@ class Menu_model extends CI_Model {
 
     function get_page_content($item) {
         $list = "";
-        $query = "select * from top_menu where link='$item'";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $list.=$row->content;
-        }
+        $list.="<br><table align='center' border='0' width='100%'>";
+        if ($item == 'news') {
+            $query = "select * from news order by added desc limit 0, 7";
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+            if ($num > 0) {
+                foreach ($result->result() as $row) {
+                    $date = date('Y-m-d', $row->added);
+
+                    $list.="<tr>";
+                    $list.="<td style='padding:15px;' width='10%'>$date</td><td width='80%' style='padding:15px;'>$row->title</td><td width='10%' style='padding:15px;'><a href='#' onClick='return false;' id='more_$row->id' style='color:black;'>Далее ...</a></d>";
+                    $list.="</tr>";
+
+                    $list.="<tr id='content_$row->id' style='display:none;'>";
+                    $list.="<td colspan='3' align='justify' style='padding:15px;'>$row->content</td>";
+                    $list.="</tr>";
+                } // end foreacj
+            } // end if $num > 0
+            else {
+                
+            } // end else
+            $list.="</table>";
+        } // end if $item=='news'
+        else {
+            $query = "select * from top_menu where link='$item'";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $list.=$row->content;
+            } // end foreach
+        } // end else
         return $list;
     }
 
