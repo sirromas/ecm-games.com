@@ -24,7 +24,7 @@ class Games_model extends CI_Model {
             if ($status) {
                 if ($type == 3) {
                     if ($row->action == 1) {
-                        $list.="<li><a href='" . $this->config->item('base_url') . "index.php/games/edit/$row->gamID' title='$row->gamName'>$row->gamName</a>&nbsp;<a href='#' onClick='return false;' style='color:red;font-weight:bold;' data-toggle='popover' title='Акция' data-content='$row->action_text'>Акция</a></li>";
+                        $list.="<li><a href='" . $this->config->item('base_url') . "index.php/games/edit/$row->gamID' title='$row->gamName'>$row->gamName</a>&nbsp;<a href='#' onClick='return false;' style='color:red;font-weight:bold;' data-toggle='popover' title='Акция' data-content='$row->action_text'>Акция!</a></li>";
                     } // end if $row->action == 1
                     else {
                         $list.="<li><a href='" . $this->config->item('base_url') . "index.php/games/edit/$row->gamID' title='$row->gamName'>$row->gamName</a></li>";
@@ -32,7 +32,7 @@ class Games_model extends CI_Model {
                 } // end if $type==3
                 else {
                     if ($row->action == 1) {
-                        $list.="<li><a href='" . $this->config->item('base_url') . "index.php/user/page/$type/$row->gamID' title='$row->gamName'>$row->gamName</a>&nbsp;<a href='#' onClick='return false;' style='color:red;font-weight:bold;' data-toggle='popover' title='Акция' data-content='$row->action_text'>Акция</a></li>";
+                        $list.="<li><a href='" . $this->config->item('base_url') . "index.php/user/page/$type/$row->gamID' title='$row->gamName'>$row->gamName</a>&nbsp;<a href='#' onClick='return false;' style='color:red;font-weight:bold;' data-toggle='popover' title='Акция' data-content='$row->action_text'>Акция!</a></li>";
                     } // end if $row->action == 1
                     else {
                         $list.="<li><a href='" . $this->config->item('base_url') . "index.php/games/edit/$row->gamID' title='$row->gamName'>$row->gamName</a></li>";
@@ -41,7 +41,7 @@ class Games_model extends CI_Model {
             } // end if $status 
             else {
                 if ($row->action == 1) {
-                    $list.="<li><a href='" . $this->config->item('base_url') . "index.php/user/page/0/$row->gamID' title='$row->gamName'>$row->gamName</a>&nbsp;<a href='#' onClick='return false;' style='color:red;font-weight:bold;' data-toggle='popover' title='Акция' data-content='$row->action_text'>Акция</a></li>";
+                    $list.="<li><a href='" . $this->config->item('base_url') . "index.php/user/page/0/$row->gamID' title='$row->gamName'>$row->gamName</a>&nbsp;<a href='#' onClick='return false;' style='color:red;font-weight:bold;' data-toggle='popover' title='Акция' data-content='$row->action_text'>Акция!</a></li>";
                 } // end if $row->action==1
                 else {
                     $list.="<li><a href='" . $this->config->item('base_url') . "index.php/games/edit/$row->gamID' title='$row->gamName'>$row->gamName</a></li>";
@@ -88,7 +88,7 @@ class Games_model extends CI_Model {
         } // end else
 
         $list.="<tr>";
-        $list.="<td align='center' style='padding:5px;'><textarea id='game_action_text' name='game_action_text'>$action_text</textarea></td>";
+        $list.="<td align='center'><textarea id='game_action_text' cols='17' name='game_action_text'>$action_text</textarea></td>";
         $list.="</tr>";
 
 
