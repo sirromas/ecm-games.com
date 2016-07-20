@@ -441,6 +441,19 @@ class user_model extends CI_Model {
 
     public function get_users_list() {
         $list = "";
+        $list.="<select id='user_types' style='width:95px;'>";
+        $list.="<option value='0' selected>Пользователи</option>";
+        $list.="<option value='3' >Администраторы</option>";
+        $list.="<option value='2' >Менеджеры</option>";
+        $list.="<option value='4' >Модераторы</option>";
+        $list.="<option value='5' >Касиры</option>";
+        $list.="<option value='1' >Партнеры</option>";
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_users_list2() {
+        $list = "";
         $list.="<select id='users' style='width:95px;'>";
         $list.="<option value='0' selected>Пользователи</option>";
         $query = "select * from users order by firstname ";
@@ -474,8 +487,8 @@ class user_model extends CI_Model {
         $list.="<option value='0' selected>Другое</option>";
         $list.="<option value='add_game'><a href='" . $this->config->item('base_url') . "index.php/games/add_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить игру</a></option>";
         $list.="<option value='add_server'><a href='" . $this->config->item('base_url') . "index.php/games/add_server' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить сервер</a></option>";
-        $list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";
-        $list.="<option value='report'><a href='" . $this->config->item('base_url') . "index.php/user/report' style='color: #000000;font-size: 14px;text-decoration: none;'>Отчеты</a></option>";
+        $list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";        
+        $list.="<option value='exchange_rate'><a href='" . $this->config->item('base_url') . "index.php/user/exchange_rate' style='color: #000000;font-size: 14px;text-decoration: none;'>Курсы валют</a></option>";        
         $list.="<option value='news'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719147' style='color: #000000;font-size: 14px;text-decoration: none;'>Новости</a></option>";
         $list.="<option value='buy'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719146' style='color: #000000;font-size: 14px;text-decoration: none;'>Как купить</a></option>";
         $list.="<option value='service'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719145' style='color: #000000;font-size: 14px;text-decoration: none;'>Услуги Гаранта</a></option>";
@@ -483,7 +496,7 @@ class user_model extends CI_Model {
         $list.="<option value='guarantee'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719144' style='color: #000000;font-size: 14px;text-decoration: none;'>Гарантии</a></option>";
         $list.="<option value='contacts'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/3068' style='color: #000000;font-size: 14px;text-decoration: none;'>Контакты</a></option>";
         $list.="<option value='about'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/1' style='color: #000000;font-size: 14px;text-decoration: none;'>О нас</a></option>";
-        $list.="<option value='exit'><a href='" . $this->config->item('base_url') . "index.php/user/logout' style='color: #000000;font-size: 14px;text-decoration: none;'>Выход</a></option>";
+        
         $list.="</select>";
         return $list;
     }
@@ -1679,6 +1692,38 @@ class user_model extends CI_Model {
         } // end if $status==2
 
 
+        return $list;
+    }
+
+    public function get_users_by_type($type) {
+        $list = "";
+        $list.="<select id='users' style='width:95px;'>";
+        $list.="<option value='0' selected>Пользователи</option>";
+        $query = "select * from users where type=$type order by firstname ";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $list.="<option value='$row->id' >$row->firstname $row->lastname</option>";
+            } // end foreach
+        } // end if $num > 0                
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_user_accounts($type) {
+        $list="";
+        $users = $this->get_users_by_type($type);
+        $list.="<br/><div class=''>";
+        $list.="<form class='calc_form'>";
+        $list.= "<br>";
+        $list.= "<table align='center' border='0' style='width: 100%;'>";
+        $list.="<tr>";
+        $list.= "<td align='center'>$users</td><td align='left'><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span></td>";
+        $list.= "</tr>";
+        $list.= "</table><br>";
+        $list.="</form>";
+        $list.="</div>";
         return $list;
     }
 

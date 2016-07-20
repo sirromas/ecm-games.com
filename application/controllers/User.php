@@ -202,5 +202,15 @@ class User extends CI_Controller {
         $list = $this->user_model->search($status, $start, $end);
         echo $list;
     }
+    
+    public function get_user_accounts() {
+        $type = $this->uri->segment(3);
+        $page = $this->user_model->get_user_accounts($type);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+        
+    }
 
 }

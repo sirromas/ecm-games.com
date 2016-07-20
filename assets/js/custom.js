@@ -13,8 +13,8 @@ $(document).ready(function () {
         rub_s = currency.rub_s;
         usd_s = currency.usd_s;
     });
-    
-    $('[data-toggle="popover"]').popover(); 
+
+    $('[data-toggle="popover"]').popover();
 
 
     function validateEmail(email) {
@@ -128,12 +128,19 @@ $(document).ready(function () {
         } // end else 
     });
     /*************************** Other dropdwon ***************************/
+    $("#user_types").change(function () {
+        var selected = $("#user_types").val();
+        console.log('Selected item: ' + selected);
+        var url = host + "/index.php/user/get_user_accounts/"+selected;
+        window.document.location = url;
+    });
+
     $("#other").change(function () {
         var selected = $("#other").val();
         console.log('Selected item: ' + selected);
         var url;
         if (selected == 'exit') {
-            vurl = host + "/index.php/user/logout";
+            url = host + "/index.php/user/logout";
         } // end if event.target.id=='exit'        
         if (selected == 'add_game') {
             url = host + "/index.php/games/add_game";
@@ -556,18 +563,18 @@ $(document).ready(function () {
         }
 
         /*
-        if (event.target.id.indexOf("action_") >= 0) {
-            var id = event.target.id.replace("action_", "");
-            var section_id = "action_" + id;
-            var url = host + "/index.php/games/get_game_action/";
-            $.post(url, {id: id}).done(function (data) {
-                console.log('Action: ' + data);
-                $(body).append(data);
-            });
-        }
-        */
-       
-       
+         if (event.target.id.indexOf("action_") >= 0) {
+         var id = event.target.id.replace("action_", "");
+         var section_id = "action_" + id;
+         var url = host + "/index.php/games/get_game_action/";
+         $.post(url, {id: id}).done(function (data) {
+         console.log('Action: ' + data);
+         $(body).append(data);
+         });
+         }
+         */
+
+
 
         if (event.target.id == 'upd_game') {
             var id = $('#id').val();
