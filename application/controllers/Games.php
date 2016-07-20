@@ -150,6 +150,10 @@ class Games extends CI_Controller {
     }
 
     public function save_game() {
+
+        //print_r($_REQUEST);
+        //die();
+
         $game = new stdClass();
         $game->id = $this->input->post('id');
         $game->title = $this->input->post('title');
@@ -159,6 +163,14 @@ class Games extends CI_Controller {
         $game->minamount = $this->input->post('minamount');
         $game->min_price = $this->input->post('min_price');
         $game->max_price = $this->input->post('max_price');
+
+        if (array_key_exists('game_action', $_REQUEST)) {
+            $game->game_action = 1;
+        } // end if $_REQUEST['game_action']
+        else {
+            $game->game_action = 0;
+        } // end else
+        $game->game_action_text = $this->input->post('game_action_text');
         $page = $this->games_model->update_game_content($game);
         $common_data = $this->get_common_elements();
         $method_data = array('page' => $page);
@@ -206,7 +218,12 @@ class Games extends CI_Controller {
     public function rate() {
         $currency = $this->games_model->get_rate();
         echo $currency;
-    }   
-    
+    }
+
+    public function get_game_action() {
+        $id = $_REQUEST['id'];
+        $list = $this->games_model->get_game_action_text($id);
+        echo $list;
+    }
 
 }

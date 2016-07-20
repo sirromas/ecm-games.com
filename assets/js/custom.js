@@ -13,6 +13,8 @@ $(document).ready(function () {
         rub_s = currency.rub_s;
         usd_s = currency.usd_s;
     });
+    
+    $('[data-toggle="popover"]').popover(); 
 
 
     function validateEmail(email) {
@@ -533,6 +535,7 @@ $(document).ready(function () {
 
     });
 
+
     $(document).on('blur', '#notes', function () {
         console.log('Notes blur event ...');
         var id = $('#order_id').val();
@@ -544,13 +547,27 @@ $(document).ready(function () {
     });
 
 
-
     $("body").click(function (event) {
-        console.log('Element clicked: ' + event.target.id);
+        //console.log('Element clicked: ' + event.target.id);
+
         if (event.target.id.indexOf("game_detailes") >= 0) {
             var id = event.target.id.replace("game_detailes_id_", "");
             get_game_description_block(id);
         }
+
+        /*
+        if (event.target.id.indexOf("action_") >= 0) {
+            var id = event.target.id.replace("action_", "");
+            var section_id = "action_" + id;
+            var url = host + "/index.php/games/get_game_action/";
+            $.post(url, {id: id}).done(function (data) {
+                console.log('Action: ' + data);
+                $(body).append(data);
+            });
+        }
+        */
+       
+       
 
         if (event.target.id == 'upd_game') {
             var id = $('#id').val();
@@ -561,6 +578,12 @@ $(document).ready(function () {
                     console.log('Server response: ' + data);
                 });
             } // end if id>0 && body!=''
+        }
+
+        if (event.target.id.indexOf("game_action_") >= 0) {
+            var id = event.target.id.replace("game_action_", "");
+            var area_id = "#game_action_text_" + id;
+            var area_data = $(area_id).val();
         }
 
         if (event.target.id == 'search_news') {
