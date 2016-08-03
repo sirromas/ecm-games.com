@@ -18,6 +18,7 @@ class Servers extends CI_Controller {
         $server->id = $this->input->post('id');
         $server->name = $this->input->post('name');
         $server->rate = $this->input->post('rate');
+        $server->amount=$this->input->post('server_amount');
         $this->server_model->update($server);
     }
 

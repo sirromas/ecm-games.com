@@ -179,13 +179,13 @@ class User extends CI_Controller {
         echo $list;
     }
 
-    public function add_supplier_payment() {        
+    public function add_supplier_payment() {
         $id = $_REQUEST['id'];
-        $supplier_data=$_REQUEST['supplier_data'];
+        $supplier_data = $_REQUEST['supplier_data'];
         $amount = $_REQUEST['amount'];
         $ptype = $_REQUEST['ptype'];
         $comment = $_REQUEST['comment'];
-        $list = $this->user_model->add_supplier_payment($id, $amount, $comment, $ptype,$supplier_data);
+        $list = $this->user_model->add_supplier_payment($id, $amount, $comment, $ptype, $supplier_data);
         echo $list;
     }
 
@@ -202,7 +202,7 @@ class User extends CI_Controller {
         $list = $this->user_model->search($status, $start, $end);
         echo $list;
     }
-    
+
     public function get_user_accounts() {
         $type = $this->uri->segment(3);
         $page = $this->user_model->get_user_accounts($type);
@@ -210,7 +210,58 @@ class User extends CI_Controller {
         $method_data = array('page' => $page);
         $data = array_merge($common_data, $method_data);
         $this->load->view('page_view', $data);
-        
+    }
+
+    public function exchange_rate() {
+        $page = $this->user_model->get_get_exchange_rate_page();
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function update_rates() {
+        $usd = $_REQUEST['usd'];
+        $eur = $_REQUEST['eur'];
+        $rur = $_REQUEST['rur'];
+        $page = $this->user_model->update_rates($usd, $eur, $rur);
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function orders() {
+        $page = $this->user_model->get_orders_page();
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function search_orders() {
+        $orders = $_REQUEST['orders'];
+        $managers = $_REQUEST['managers'];
+        $start = $_REQUEST['start'];
+        $end = $_REQUEST['end'];
+        $list = $this->user_model->search_orders($orders, $managers, $start, $end);
+        echo $list;
+    }
+
+    public function revenue() {
+        $page = $this->user_model->get_revenue_page();
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function get_revenue() {
+        $game = $_REQUEST['game'];
+        $start = $_REQUEST['start'];
+        $end = $_REQUEST['end'];
+        $list = $this->user_model->get_revenue($game, $start, $end);
+        echo $list;
     }
 
 }

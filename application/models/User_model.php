@@ -2,6 +2,8 @@
 
 class user_model extends CI_Model {
 
+    public $path;
+
     public function __construct() {
         parent::__construct();
         $this->load->database();
@@ -11,6 +13,7 @@ class user_model extends CI_Model {
         $this->load->model('menu_model');
         $this->config->load('email');
         $this->load->library('email');
+        $this->path = $_SERVER['DOCUMENT_ROOT'] . "/games/tmp";
     }
 
     public function validate_user() {
@@ -64,10 +67,20 @@ class user_model extends CI_Model {
         $list = "";
         $list.="<select id='server' name='server'>";
         $list.="<option value='0' selected>Сервер</option>";
-        $servers = $this->games_model->get_game_servers($id);
+        $servers = array();
+        $query = "select * from gameservers where gasGameID=$id and gasKurs>0";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $server = new stdClass();
+            $server->id = $row->gasID;
+            $server->name = $row->gasName;
+            $server->exchangerate = $row->gasKurs;
+            $server->amount = $row->gasAmount;
+            $servers[] = $server;
+        }
         if (count($servers) > 0) {
             foreach ($servers as $server) {
-                $list.="<option value='$server->exchangerate'>$server->name</option>";
+                $list.="<option value='" . $server->id . "_" . $server->exchangerate . "_" . $server->amount . "'>$server->name</option>";
             } // end foreach
         } // end if count($servers)>0
         $list.="</select>";
@@ -258,7 +271,7 @@ class user_model extends CI_Model {
                 $list.= "</tr>";
 
                 $list.="<tr>";
-                $list.= "<td align='center' colspan='6'><span id='ajax_loader' style='display:none;'><img src='/games/assets/images/ajax.gif' /></span></td>";
+                $list.= "<td align='center' colspan='6'><span id='ajax_loader' style='display:none;'><img src='/games/assets/images/ajax.gif' width='32' height='32' /></span></td>";
                 $list.= "</tr>";
 
                 $list.="<tr>";
@@ -307,24 +320,24 @@ class user_model extends CI_Model {
                                 <input type='text' id='currency' name='currency' value='' class='inputsBorder' disabled>
                             </td>
                             <td id='calc_money'>
-                                <span>Стоимость($):</span><br>
+                                <span>Стоимость:&nbsp;<span id='real_currency'></span></span><br>
                                 <input type='text' id='amount' name='amount' value='' class='inputsBorder' disabled>
                             </td>
                             </tr>
                             </tbody></table>
-                            <div class='calc_min_sum_order'><small><strong>*Минимальная сумма заказа $<span class='min_sum_order_js'>$game->minamount</span><span class='CURRENCY_NAME'></span></strong></small></div>
+                            
 
                             <hr>
                             <div id='change_kurs'>
-                            <div><strong>Цена:</strong></div>
+                            <div><strong>Цена с учетом скидки:</strong></div>
                             <div><span id='count_money' class='red'>0</span> <span id='CURRENCY_NAME'>грн</span></div>
-                            <div> за <span id='const_zoloto' class='red'>0</span> <span id='text_money'>$game->currency</span></div>
+                            <div><br> за <span id='const_zoloto' class='red'>0</span> <span id='text_money'>$game->currency</span></div>
                             </div>
                             <hr>
                             
                                         
                             <div class='contactField'>
-                            <label for='inp_phone'>Телефон*:</label>
+                            <label for='inp_phone'>Телефон:</label>
                             <input type='text' class='optionalInput' required='required' inputsBorder' name='inp_phone' id='inp_phone' value='' data-validation='required'>
                             </div>
                             
@@ -336,17 +349,14 @@ class user_model extends CI_Model {
                             <div class='contactField'>
                             <label for='inp_icq'>ICQ:</label>
                             <input type='text' class='optionalInput inputsBorder' name='inp_icq' id='inp_icq' value=''>
-                            </div>
-                            
-                            <div>
-                            <div id='infoContact' class='calc_infoContact'>Можно заполнить одно поле из 2-х (skype или icq).</div>
-                            </div>                     
+                            </div>                   
                             
                             <div class='swap delivery_select' data-id-server='502'>
                             <select name='s_delivery' id='s_delivery' class='inputsBorder'>
                             <option value=''>Выберите способ доставки</option>
                             <option value='1' selected>Способ доставки на усмотрение оператора</option>
                             <option value='2'>Игровая почта</option>
+                            <option value='3'>Встреча в игре</option>
                             </select>
                             </div>
                             
@@ -435,6 +445,8 @@ class user_model extends CI_Model {
         $list = "";
         $list.="<select id='deals' style='width:95px;'>";
         $list.="<option value='0' selected>Сделки</option>";
+        $list.="<option value='deals'>Заказы</option>";
+        //$list.="<option value='revenue'>Прибыль</option>";
         $list.="</select>";
         return $list;
     }
@@ -487,8 +499,8 @@ class user_model extends CI_Model {
         $list.="<option value='0' selected>Другое</option>";
         $list.="<option value='add_game'><a href='" . $this->config->item('base_url') . "index.php/games/add_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить игру</a></option>";
         $list.="<option value='add_server'><a href='" . $this->config->item('base_url') . "index.php/games/add_server' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить сервер</a></option>";
-        $list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";        
-        $list.="<option value='exchange_rate'><a href='" . $this->config->item('base_url') . "index.php/user/exchange_rate' style='color: #000000;font-size: 14px;text-decoration: none;'>Курсы валют</a></option>";        
+        $list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";
+        $list.="<option value='exchange_rate'><a href='" . $this->config->item('base_url') . "index.php/user/exchange_rate' style='color: #000000;font-size: 14px;text-decoration: none;'>Курсы валют</a></option>";
         $list.="<option value='news'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719147' style='color: #000000;font-size: 14px;text-decoration: none;'>Новости</a></option>";
         $list.="<option value='buy'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719146' style='color: #000000;font-size: 14px;text-decoration: none;'>Как купить</a></option>";
         $list.="<option value='service'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719145' style='color: #000000;font-size: 14px;text-decoration: none;'>Услуги Гаранта</a></option>";
@@ -496,7 +508,7 @@ class user_model extends CI_Model {
         $list.="<option value='guarantee'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719144' style='color: #000000;font-size: 14px;text-decoration: none;'>Гарантии</a></option>";
         $list.="<option value='contacts'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/3068' style='color: #000000;font-size: 14px;text-decoration: none;'>Контакты</a></option>";
         $list.="<option value='about'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/1' style='color: #000000;font-size: 14px;text-decoration: none;'>О нас</a></option>";
-        
+
         $list.="</select>";
         return $list;
     }
@@ -915,10 +927,78 @@ class user_model extends CI_Model {
         $this->db->query($query);
     }
 
+    public function get_server_data($id) {
+        $query = "select * from gameservers where gasID=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $server = $row;
+        }
+        return $server;
+    }
+
+    public function get_order_no() {
+        $query = "select * from orders "
+                . "order by id desc limit 0,1";
+        //echo "Order Query: ".$query."<br>";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $order = $row->order_no;
+            } // end foreach            
+            $order_data = explode('-', $order);
+            $order_no = $order_data[1];
+            $order_no++;
+            $new_order_no = 'ECM-' . $order_no;
+        } // end if $num > 0
+        else {
+            $new_order_no = 'ECM-10001';
+        } // end else
+        //echo "New Order: ".$new_order_no."<br>";
+        return $new_order_no;
+    }
+
+    public function update_users_discount($email, $amount, $currency) {
+        $query = "select * from users where email='$email'";
+        //echo "Order Query: ".$query."<br>";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            if ($currency != 'usd') {
+                $usd_amount = $this->get_usd_amount($amount, $currency);
+            } // end if $currency!='usd'
+            else {
+                $usd_amount = $amount;
+            }
+            $query = "select * from users_discount where email='$email'";
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+            if ($num > 0) {
+                foreach ($result->result() as $row) {
+                    $db_usd_amount = $row->usd_amount;
+                } // end foreach
+                $new_usd_amount = $db_usd_amount + $usd_amount;
+                $query = "update users_discount "
+                        . "set usd_amount='$new_usd_amount' "
+                        . "where email='$email'";
+            } // end if $num>0
+            else {
+                $new_usd_amount = $usd_amount;
+                $query = "insert into users_discount (email,usd_amount) "
+                        . "values('$email','$new_usd_amount')";
+            }
+            $this->db->query($query);
+        } // end if $num > 0
+    }
+
     public function add_order($order) {
         $now = time();
+        $server_data = $this->get_server_data($order['server']);
+        $total_game_currency = $order['game_amount'] * $server_data->gasAmount;
+        $order_no = $this->get_order_no();
+        $usd_amount = $this->get_usd_amount($order['amount'], $order['currency']);
         $query = "insert into orders "
-                . "(gameid, nick, game_amount, email,"
+                . "(gameid, order_no, serverid, nick, game_amount, email,"
                 . "amount,"
                 . "usd_amount,"
                 . "currency,"
@@ -929,12 +1009,12 @@ class user_model extends CI_Model {
                 . "comment,"
                 . "status,"
                 . "added) "
-                . "values('" . $order['gameid'] . "', "
+                . "values('" . $order['gameid'] . "', '" . $order_no . "' ," . $order['server'] . ", "
                 . "'" . $order['nick'] . "', "
-                . "'" . $order['game_amount'] . "', "
+                . "'" . $total_game_currency . "', "
                 . "'" . $order['email'] . "',"
                 . "'" . $order['amount'] . "',"
-                . "'" . $order['usd_amount'] . "',"
+                . "'" . $usd_amount . "',"
                 . "'" . $order['currency'] . "',"
                 . "'" . $order['phone'] . "',"
                 . "'" . $order['skype'] . "',"
@@ -944,6 +1024,9 @@ class user_model extends CI_Model {
                 . "'1',"
                 . "'" . $now . "')";
         $this->db->query($query);
+        $this->update_users_discount($order['email'], $order['amount'], $order['currency']);
+        $order['order_no'] = $order_no;
+        $order['game_amount'] = $total_game_currency;
         $this->send_order_confirmation($order);
 
         $list = "";
@@ -971,6 +1054,9 @@ class user_model extends CI_Model {
             case 2:
                 $method = "Игровая почта";
                 break;
+            case 3:
+                $method = "Встреча в игре";
+                break;
         }
         return $method;
     }
@@ -982,7 +1068,7 @@ class user_model extends CI_Model {
         $msg.= "<html>";
         $msg.="<body>";
         $msg.="<p align='center'>Уважаемый(я) " . $order['nick'] . "!</p>";
-        $msg.="<p align='center'>Ваш заказ принят в обработку. Наш менеджер скоро с Вами свяжится</p>";
+        $msg.="<p align='center'>Ваш заказ #" . $order['order_no'] . " принят  в обработку. Наш менеджер скоро с Вами свяжится</p>";
 
         $msg.="<table border='0' align='center'>";
 
@@ -1133,7 +1219,7 @@ class user_model extends CI_Model {
         return $list;
     }
 
-    public function get_order_details($id, $status) {
+    public function get_order_details($id, $status, $manager = true) {
         $list = "";
         $order_status = $this->get_status_dropdown($status);
         $query = "select * from orders where id=$id and status=$status";
@@ -1156,22 +1242,27 @@ class user_model extends CI_Model {
             $notes = $row->notes;
             $order_db_status = $row->status;
         } // end foreach
-        if ($userid == 0) {
-            // Assign order to manager
-            $managerid = $this->session->userdata('id');
-            $query = "update orders set userid=$managerid where id=$id";
-            $this->db->query($query);
-        } // end if $userid==0
+        if ($manager == true) {
+            if ($userid == 0) {
+                // Assign order to manager
+                $managerid = $this->session->userdata('id');
+                $query = "update orders set userid=$managerid where id=$id";
+                $this->db->query($query);
+            } // end if $userid==0
+        } // end fi $manager==true
 
         $payments = $this->get_client_payments_block($id);
 
-        if ($order_db_status == 1) {
-            $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Необработанные заказы</p>";
-        }
+        if ($manager == true) {
 
-        if ($order_db_status == 2) {
-            $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Обработанные заказы</p>";
-        }
+            if ($order_db_status == 1) {
+                $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Необработанные заказы</p>";
+            }
+
+            if ($order_db_status == 2) {
+                $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Обработанные заказы</p>";
+            }
+        } // end if $manager == true
 
         $list.="<p align='center' style='font-weight:bold;'>Детали заказа</p>";
 
@@ -1219,9 +1310,11 @@ class user_model extends CI_Model {
         $list.="<td style='padding: 15px;'>Способ доставки</td><td style='padding: 15px;'>$method</td>";
         $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td style='padding: 15px;'>Оплаты клиента</td><td style='padding: 15px;'><span id='client_payments'>$payments</span></td>";
-        $list.="</tr>";
+        if ($manager == true) {
+            $list.="<tr>";
+            $list.="<td style='padding: 15px;'>Оплаты клиента</td><td style='padding: 15px;'><span id='client_payments'>$payments</span></td>";
+            $list.="</tr>";
+        } // end if $manager == true
 
         $list.="<tr>";
         $list.="<td style='padding: 15px;'>Коментарий</td><td style='padding: 15px;'>" . $comment . "</td>";
@@ -1235,11 +1328,15 @@ class user_model extends CI_Model {
         $list.="<td style='padding: 15px;'>Приметки менеджера:</td><td style='padding: 15px;'><textarea rows='4' id='notes' cols='35'>$notes</textarea><br><span id='notes_err'></span></td>";
         $list.="</tr>";
 
-        if ($order_db_status == 1) {
-            $list.="<tr>";
-            $list.="<td style='padding: 15px;'>Статус заказа</td><td style='padding: 15px;'>$order_status</td>";
-            $list.="</tr>";
-        } // end if $order_db_status==1
+        if ($manager == true) {
+            if ($order_db_status == 1) {
+                $list.="<tr>";
+                $list.="<td style='padding: 15px;'>Статус заказа</td><td style='padding: 15px;'>$order_status</td>";
+                $list.="</tr>";
+            } // end if $order_db_status==1
+        } // end if $manager == true
+
+        $list.="</table>";
 
         return $list;
     }
@@ -1306,7 +1403,7 @@ class user_model extends CI_Model {
                 </tr>
                 
                 <tr>
-                <td style='padding:15px;'>Коментарий</td><td style='padding:15px;'><textarea id='payment_comment'></textarea></td>
+                <td style='padding:15px;'>Коментарий</td><td style='padding:15px;'><textarea id='payment_comment' cols='26'></textarea></td>
                 </tr>
                 
                 <tr>
@@ -1418,11 +1515,7 @@ class user_model extends CI_Model {
         $query = "select * from orders where id=$id";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $order = new stdClass();
-            $order->id = $id;
-            $order->nick = $row->nick;
-            $order->currency = $row->currency;
-            // Do other stuff ...
+            $order = $row;
         }
         return $order;
     }
@@ -1436,21 +1529,22 @@ class user_model extends CI_Model {
             $rates->rur = $row->rur_rate;
             $rates->usd = $row->usd_rate;
         }
+        ///echo "Currency: " . $currency . "<br>";
         switch ($currency) {
             case 'eur':
-                $rate = round(($rates->eur / $rates->usd), 2);
+                $rate = round(($rates->usd / $rates->eur), 2);
                 break;
             case 'rur':
-                $rate = round(($rates->rur / $rates->usd), 2);
+                $rate = round(($rates->usd / $rates->rur), 2);
                 break;
             case 'usd':
                 $rate = 1;
                 break;
             case 'uah':
-                $rate = round((1 / $rates->usd), 2);
+                $rate = round(($rates->usd), 2);
                 break;
         }
-        $usd_amount = round(($amount) * $rate, 2);
+        $usd_amount = round(($amount/$rate), 2);
         return $usd_amount;
     }
 
@@ -1712,7 +1806,7 @@ class user_model extends CI_Model {
     }
 
     public function get_user_accounts($type) {
-        $list="";
+        $list = "";
         $users = $this->get_users_by_type($type);
         $list.="<br/><div class=''>";
         $list.="<form class='calc_form'>";
@@ -1725,6 +1819,415 @@ class user_model extends CI_Model {
         $list.="</form>";
         $list.="</div>";
         return $list;
+    }
+
+    public function get_rates() {
+        $list = "";
+        $query = "select * from exchange_rate";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $usd_rate = $row->usd_rate;
+            $eur_rate = $row->eur_rate;
+            $rur_rate = $row->rur_rate;
+        }
+        $list.="<table align='center' border='0' style='width: 100%;'>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Курс продажи USD*</td><td style='padding:15px;'><input type='text' id='usd' name='usd' value='$usd_rate'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Курс продажи EUR*</td><td style='padding:15px;'><input type='text' id='eur' name='eur' value='$eur_rate'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Курс продажи RUR*</td><td style='padding:15px;'><input type='text' id='rur' name='rur' value='$rur_rate'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;' align='center' colspan='2'><span id='rate_err'></span></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;' align='center' colspan='2'><button id=''>OK</button></td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+
+        return $list;
+    }
+
+    public function get_get_exchange_rate_page() {
+        $list = "";
+        $rates = $this->get_rates();
+        $list.="<br/><div class=''>";
+        $list.="<form class='calc_form'  action='" . $this->config->item('base_url') . "index.php/user/update_rates' id='update_rates' method='post' >";
+        $list.= "<br>";
+        $list.= "<table align='center' border='0' style='width: 100%;'>";
+
+        $list.="<tr>";
+        $list.= "<td align='center'><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center'><br><span id='container'>$rates</span></td>";
+        $list.= "</tr>";
+
+        $list.= "</table><br>";
+        $list.="</form>";
+        $list.="</div>";
+        return $list;
+    }
+
+    public function update_rates($usd, $eur, $rur) {
+        $clean_usd = str_replace(',', '.', $usd);
+        $clean_eur = str_replace(',', '.', $eur);
+        $clean_rur = str_replace(',', '.', $rur);
+        $list = "";
+        $query = "update exchange_rate "
+                . "set usd_rate='$clean_usd', "
+                . "eur_rate='$clean_eur', "
+                . "rur_rate='$clean_rur' ";
+        $this->db->query($query);
+        $list.="<br/><div class=''>";
+        $list.="<form class='calc_form'>";
+        $list.= "<br>";
+        $list.= "<table align='center' border='0' style='width: 100%;'>";
+        $list.="<tr>";
+        $list.= "<td align='center'>Курсы валют успешно обновлены</td><td align='left'><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span></td>";
+        $list.= "</tr>";
+        $list.= "</table><br>";
+        $list.="</form>";
+        $list.="</div>";
+        return $list;
+    }
+
+    public function get_orders_dropdown() {
+        $list = "";
+        $list.= "<select id='orders' name='orders' style='width:75px;'>";
+        $list.="<option value='non-processed'>Необработанные</option>";
+        $list.="<option value='processed'>Oбработанные</option>";
+        $list.="<option value='non-paid'>Неоплаченные</option>";
+        $list.="<option value='paid'>Оплаченные</option>";
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_managers_list() {
+        $list = "";
+        $list.= "<select id='managers' name='managers' style='width:75px;'>";
+        $list.="<option value='0' selected>Менеджеры</option>";
+        $query = "select * from users where type=2";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $list.="<option value='$row->id'>$row->firstname $row->lastname</option>";
+            } // end foreach
+        } // end if $num > 0
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_report_toolbar() {
+        $list = "";
+        $orders = $this->get_orders_dropdown();
+        $managers = $this->get_managers_list();
+        $list.="<br><div><table align='center' border='0' style='width: 100%;'>";
+        $list.="<tr>";
+        $list.="<td style='padding:5px;'>$orders</td>";
+        $list.="<td style='padding:5px;'>Дата:*</td>";
+        $list.="<td style='padding:5px;'><input type='text' id='start' style='width:55px;'></td>";
+        $list.="<td style='padding:5px;'>Дата:*</td>";
+        $list.="<td style='padding:5px;'><input type='text' id='end' style='width:55px;'></td>";
+        $list.="<td style='padding:5px;'>$managers </td>";
+        $list.="<td style='padding:5px;'><a href='#' onClick='return false;' id='search_orders' style='color:black;'>OK</a></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center' colspan='7'><hr/></td>";
+        $list.= "</tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center' colspan='7'><span id='orders_err'></span></td>";
+        $list.= "</tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center' colspan='7'><span id='ajax_loader' style='display:none;'><img src='/games/assets/images/ajax.gif' width='32' height='32' /></span></td>";
+        $list.= "</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='7' align='center' style='padding:15px;'><span id='orders_container'></span></td>";
+        $list.="</tr>";
+
+        $list.="</table></div>";
+
+        return $list;
+    }
+
+    public function get_orders_page() {
+        $list = "";
+        $toolbar = $this->get_report_toolbar();
+        $list.="<br/><div class=''>";
+        $list.="<form class='calc_form'>";
+        $list.= "<br>";
+        $list.= "<table align='center' border='0' style='width: 100%;'>";
+
+        $list.="<tr>";
+        $list.= "<td align='center'><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span></td>";
+        $list.= "</tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center'>$toolbar</td>";
+        $list.="<tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center'><span id='orders_container'></span></td>";
+        $list.="<tr>";
+
+        $list.= "</tr>";
+        $list.= "</table><br>";
+        $list.="</form>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    public function search_orders($orders, $managers, $start, $end) {
+        $list = "";
+
+        $orders_array = array();
+        $paid = array();
+        $unix_start = strtotime($start);
+        $unix_end = strtotime($end);
+
+        $query0 = "select * from supplier_payments";
+        $result = $this->db->query($query0);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $paid[] = $row->order_id;
+            } // end foreach
+        } // end if $num > 0
+        $paid_list = implode(",", $paid);
+
+
+        if ($managers == 0) {
+            switch ($orders) {
+                case 'non-processed':
+                    $query = "select * from orders where status=1 "
+                            . "and added between $unix_start and $unix_end "
+                            . "order by added desc ";
+                    break;
+                case 'processed':
+                    $query = "select * from orders where status=2 "
+                            . "and added between $unix_start and $unix_end "
+                            . "order by added desc ";
+                    break;
+                case 'non-paid':
+                    $query = "select * from orders "
+                            . "where status=2 "
+                            . "and id not in ($paid_list) "
+                            . "and added between $unix_start and $unix_end  "
+                            . "order by added desc";
+                    break;
+                case 'paid':
+                    $query = "select * from orders "
+                            . "where status=2 "
+                            . "and id in ($paid_list) "
+                            . "and added between $unix_start and $unix_end  "
+                            . "order by added desc";
+                    break;
+            } // end switch            
+        } // end if $managers==0
+        else {
+            // Select orders by managers
+            switch ($orders) {
+                case 'non-processed':
+                    $query = "select * from orders where status=1 "
+                            . "and userid=$managers "
+                            . "and added between $unix_start and $unix_end "
+                            . "order by added desc ";
+                    break;
+                case 'processed':
+                    $query = "select * from orders where status=2 "
+                            . "and userid=$managers "
+                            . "and added between $unix_start and $unix_end "
+                            . "order by added desc ";
+                    break;
+                case 'non-paid':
+                    $query = "select * from orders "
+                            . "where status=2 "
+                            . "and userid=$managers "
+                            . "and id not in ($paid_list) "
+                            . "and added between $unix_start and $unix_end  "
+                            . "order by added desc";
+                    break;
+                case 'paid':
+                    $query = "select * from orders "
+                            . "where status=2 "
+                            . "and userid=$managers "
+                            . "and id in ($paid_list) "
+                            . "and added between $unix_start and $unix_end  "
+                            . "order by added desc";
+                    break;
+            } // end switch
+        } // end else when we need report by managers
+        $i = 0;
+        $result2 = $this->db->query($query);
+        $num2 = $result2->num_rows();
+        if ($num2 > 0) {
+            $list.="<table>";
+
+            $list.="";
+            $list.="";
+
+            foreach ($result2->result() as $row) {
+                $order_detailes = $this->get_order_details($row->id, $row->status, false);
+                $preface = $this->get_order_details2($row->id);
+                $game_arr = $this->get_game_detailes($preface->gameid);
+                $game = $game_arr['game'];
+                $gamename = $game->name;
+                $date = date('Y-m-d h:i:s', $preface->added);
+
+                $order_block = "";
+                $order_block.="<table width='100%'>";
+                $order_block.="<tr>";
+                $order_block.= "<td width='50%' style='padding:15px;' width='75px;'>$gamename</td>";
+                $order_block.= "<td width='25%' style='padding:15px;'>$date</td>";
+                $order_block.= "<td  style='padding:15px;'><a href='#' onClick='return false;' style='color:black' id='get_details_$row->id'>Детали</a></td>";
+                $order_block.="</tr>";
+
+                $order_block.="<tr>";
+                $order_block.="<td colspan='3' align='center;'><span style='display:none;' id='det_$row->id'>$order_detailes</span></td>";
+                $order_block.="</tr>";
+
+                $order_block.="</table>";
+
+                $list.="<tr>";
+                $list.="<td style='padding:15px;'>$order_block</td>";
+                $list.="</tr>";
+                $i++;
+            } // end foreach
+
+            $list.="<tr>";
+            $list.="<td style='padding:15px;'><span style='font-weight:bold;'>Всего заказов $i</span></td>";
+            $list.="</tr>";
+            $list.="</table>";
+        } // end if $num > 0
+        else {
+            $list.="<p align='center'>Ничего не найдено</p>";
+        }
+        return $list;
+    }
+
+    public function get_revenue_toolbar() {
+        $list = "";
+
+        $games = $this->get_games_list();
+        $list.="<br><div><table align='center' border='0' style='width: 100%;'>";
+        $list.="<tr>";
+        $list.="<td style='padding:5px;'>$games</td>";
+        $list.="<td style='padding:5px;'>Дата:*</td>";
+        $list.="<td style='padding:5px;'><input type='text' id='start' style='width:55px;'></td>";
+        $list.="<td style='padding:5px;'>Дата:*</td>";
+        $list.="<td style='padding:5px;'><input type='text' id='end' style='width:55px;'></td>";
+        $list.="<td style='padding:5px;'><a href='#' onClick='return false;' id='get_revenue' style='color:black;'>OK</a></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center' colspan='7'><hr/></td>";
+        $list.= "</tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center' colspan='7'><span id='revenue_err'></span></td>";
+        $list.= "</tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center' colspan='7'><span id='ajax_loader' style='display:none;'><img src='/games/assets/images/ajax.gif' width='32' height='32' /></span></td>";
+        $list.= "</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='7' align='center' style='padding:15px;'><span id='chartdiv'></span></td>";
+        $list.="</tr>";
+
+        $list.="</table></div>";
+
+        return $list;
+    }
+
+    public function get_revenue_page() {
+        $list = "";
+        $toolbar = $this->get_revenue_toolbar();
+        $list.="<br/><div class=''>";
+        $list.="<form class='calc_form'>";
+        $list.= "<br>";
+        $list.= "<table align='center' border='0' style='width: 100%;'>";
+
+        $list.="<tr>";
+        $list.= "<td align='center'><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span></td>";
+        $list.= "</tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center'>$toolbar</td>";
+        $list.="<tr>";
+
+        $list.="<tr>";
+        $list.= "<td align='center'><span id='orders_container'></span></td>";
+        $list.="<tr>";
+
+        $list.= "</tr>";
+        $list.= "</table><br>";
+        $list.="</form>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    public function get_revenue($game, $start, $end) {
+        $payments = array();
+        $games = array();
+        $c_paid = array();
+        $itmes = array();
+        if ($game == 0) {
+            $query = "select * from client_order_payments "
+                    . "order by pdate desc";
+        } //end if $game==0
+        else {
+            $query = "select a.*, b.* "
+                    . "from client_order_payments a, "
+                    . "orders b "
+                    . "where a.orderid=b.id "
+                    . "and b.gameid=$game "
+                    . "group by orderid "
+                    . "order by a.pdate desc ";
+        } // end else
+
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $payments[] = $row;
+            } // end foreach
+        } // end if $num > 0         
+        foreach ($payments as $payment) {
+            $order_detailes = $this->get_order_details2($payment->orderid);
+            $game_detailes = $this->get_game_detailes2($order_detailes->gameid);
+            $gamename = $game_detailes->name;
+            $item = $game_detailes->name . "," . $payment->usd_amount;
+            $items[] = $item;
+            $games[] = $gamename;
+            $c_paid[] = $payment->usd_amount;
+        } // end foreach
+
+        $file = fopen($this->path . '/data.csv', "w");
+        foreach ($items as $item) {
+            fputcsv($file, explode(',', $item));
+        }
+        fclose($file);
+
+        $data = array('games' => json_encode($games), 'paid' => json_encode($c_paid));
+        return json_encode($data);
     }
 
 }

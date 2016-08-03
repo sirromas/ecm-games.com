@@ -35,7 +35,7 @@ class Games_model extends CI_Model {
                         $list.="<li><a href='" . $this->config->item('base_url') . "index.php/user/page/$type/$row->gamID' title='$row->gamName'>$row->gamName</a>&nbsp;<a href='#' onClick='return false;' style='color:red;font-weight:bold;' data-toggle='popover' title='Акция' data-content='$row->action_text'>Акция!</a></li>";
                     } // end if $row->action == 1
                     else {
-                        $list.="<li><a href='" . $this->config->item('base_url') . "index.php/games/edit/$row->gamID' title='$row->gamName'>$row->gamName</a></li>";
+                        $list.="<li><a href='" . $this->config->item('base_url') . "index.php/user/page/$type/$row->gamID' title='$row->gamName'>$row->gamName</a></li>";
                     }
                 } // end else                
             } // end if $status 
@@ -44,7 +44,7 @@ class Games_model extends CI_Model {
                     $list.="<li><a href='" . $this->config->item('base_url') . "index.php/user/page/0/$row->gamID' title='$row->gamName'>$row->gamName</a>&nbsp;<a href='#' onClick='return false;' style='color:red;font-weight:bold;' data-toggle='popover' title='Акция' data-content='$row->action_text'>Акция!</a></li>";
                 } // end if $row->action==1
                 else {
-                    $list.="<li><a href='" . $this->config->item('base_url') . "index.php/games/edit/$row->gamID' title='$row->gamName'>$row->gamName</a></li>";
+                    $list.="<li><a href='" . $this->config->item('base_url') . "index.php/user/page/0/$row->gamID' title='$row->gamName'>$row->gamName</a></li>";
                 } // else
             } // end else
         }
@@ -144,7 +144,7 @@ class Games_model extends CI_Model {
 
         foreach ($servers as $server) {
             $list.="<tr>";
-            $list.="<td align='left'>Сервер</td><td><input type='text' id='name_$server->id' value='$server->name'></td><td><input type='text' id='exchange_$server->id' value='$server->exchangerate' style='width:75px;'></td><td><a href='#' onClick='return false;' id='update_server_$server->id' style='color: #000000;font-size: 14px;text-decoration: none;'>Обновить</a></td>";
+            $list.="<td align='left'>Сервер</td><td><input type='text' id='name_$server->id' value='$server->name'></td><td><input type='text' id='server_amount_$server->id' value='$server->amount' style='width:75px;'></td><td><input type='text' id='exchange_$server->id' value='$server->exchangerate' style='width:75px;'></td><td><a href='#' onClick='return false;' id='update_server_$server->id' style='color: #000000;font-size: 14px;text-decoration: none;'>Обновить</a></td>";
             $list.="</tr>";
         }
 
@@ -192,6 +192,7 @@ class Games_model extends CI_Model {
             $server->id = $row->gasID;
             $server->name = $row->gasName;
             $server->exchangerate = $row->gasKurs;
+            $server->amount = $row->gasAmount;
             $servers[] = $server;
         }
         return $servers;
@@ -486,20 +487,51 @@ class Games_model extends CI_Model {
         return $currency_json;
     }
 
+    public function get_currency_rates() {
+        $query = "select * from exchange_rate";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $currency = new stdClass();
+            $currency->euro_s = $row->eur_rate;
+            $currency->rub_s = $row->rur_rate;
+            $currency->usd_s = $row->usd_rate;
+        }
+        return $currency;
+    }
+
+    public function get_game_currency($id) {
+        $query = "select * from games where gamID=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $game = $row;
+        }
+        return $game;
+    }
+
     public function get_game_prices($id) {
+        $game=$this->get_game_currency($id);
         $list = "";
-        $list.="<table border='0'>";
+        $list.="<table border='1'>";
         $list.="";
         $list.="";
         $list.="";
         $list.="<tr>";
-        $list.="<th style='padding:5px;'>Сервер</th><th style='padding:5px;'>Стоимость</th>";
+        $list.="<th style='padding:5px;'>Сервер</th><th style='padding:5px;'>EUR</th><th style='padding:5px;'>USD</th><th style='padding:5px;'>UAH</th><th style='padding:5px;'>RUR</th>";
         $list.="</tr>";
-        $query = "select * from gameservers where gasGameID=$id";
+        $query = "select * from gameservers where gasGameID=$id and gasKurs>0";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
+            $currency = $this->get_currency_rates();
+            $usd_price = $row->gasKurs;
+            $eur_price = $row->gasKurs * ($currency->usd_s/$currency->euro_s);
+            $rur_price = $row->gasKurs * ($currency->usd_s / $currency->rub_s);
+            $uah_price = $row->gasKurs * ($currency->usd_s);
             $list.="<tr>";
-            $list.="<td align='left' style='padding:5px;'>$row->gasName</td><td align='left' style='padding:5px;'>$$row->gasKurs</td>";
+            $list.="<td align='left' style='padding:5px;'>$row->gasName ($row->gasAmount $game->gamMoneys)</td>"
+                    . "<td align='left' style='padding:5px;'>".round($eur_price,4)."</td>"
+                    . "<td align='left' style='padding:5px;'>".round($usd_price,4)."</td>"
+                    . "<td align='left' style='padding:5px;'>".round($uah_price,4)."</td>"
+                    . "<td align='left' style='padding:5px;'>".round($rur_price,4)."</td>";
             $list.="</tr>";
         } // end foreach
         $list.="</table>";

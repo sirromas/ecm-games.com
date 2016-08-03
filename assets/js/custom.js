@@ -131,7 +131,7 @@ $(document).ready(function () {
     $("#user_types").change(function () {
         var selected = $("#user_types").val();
         console.log('Selected item: ' + selected);
-        var url = host + "/index.php/user/get_user_accounts/"+selected;
+        var url = host + "/index.php/user/get_user_accounts/" + selected;
         window.document.location = url;
     });
 
@@ -175,8 +175,8 @@ $(document).ready(function () {
             url = host + "/index.php/menu/adminpage/1";
         }
 
-        if (selected == 'report') {
-            url = host + "/index.php/user/report";
+        if (selected == 'exchange_rate') {
+            url = host + "/index.php/user/exchange_rate";
         }
         window.document.location = url;
     });
@@ -185,6 +185,71 @@ $(document).ready(function () {
         var url = host + "/index.php/user/logoutdone";
         window.document.location = url;
     });
+
+    $('#get_revenue').click(function () {
+        var start = $('#start').val();
+        var end = $('#end').val();
+        var game = $('#games').val();
+        if (start != '' && end != '') {
+            $('#revenue_err').html('');
+            $('#ajax_loader').show();
+            var url = host + "/index.php/user/get_revenue";
+            $.post(url, {game: game, start: start, end: end}).done(function (data) {
+                $('#ajax_loader').hide();
+                var revenue_obj = JSON.parse(data);
+                var games = (revenue_obj.games)
+                var paid = (revenue_obj.paid)
+                console.log('Games data: ' + games);
+                console.log('Paid data: ' + paid);
+                var data_url = host + "/tmp/data.csv";
+                console.log('Data URL: ' + data_url);
+                $.get(data_url, function (csv) {
+                    $('#chartdiv').highcharts({
+                        chart: {
+                            type: 'column'
+                        },
+                        data: {
+                            csv: csv
+                        },
+                        title: {
+                            text: 'Fruit Consumption'
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Units'
+                            }
+                        }
+                    });
+                });
+
+            }); // end of POST
+        } // end if start!='' && end1=''
+        else {
+            $('#revenue_err').html('Пожалуйста укажите даты');
+        } // end else
+    });
+
+    $('#search_orders').click(function () {
+        console.log('Search clicked ...');
+        var orders = $('#orders').val();
+        var managers = $('#managers').val();
+        var start = $('#start').val();
+        var end = $('#end').val();
+
+        if (start != '' && end != '') {
+            $('#orders_err').html('');
+            $('#ajax_loader').show();
+            var url = host + "/index.php/user/search_orders";
+            $.post(url, {orders: orders, managers: managers, start: start, end: end}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#orders_container').html(data);
+            });
+        } // end if start!='' && end!=''
+        else {
+            $('#orders_err').html('Пожалуйста укажите даты');
+        }
+    });
+
     $('#user_page').submit(function (event) {
         var body = CKEDITOR.instances.body.getData();
         if (body != '') {
@@ -225,6 +290,19 @@ $(document).ready(function () {
         var url = host + "/index.php/games/edit/" + selected;
         window.document.location = url;
     });
+
+    $('#deals').change(function () {
+        var url;
+        var selected = $('#deals').val();
+        if (selected == 'deals') {
+            url = host + "/index.php/user/orders/";
+        }
+        if (selected == 'revenue') {
+            url = host + "/index.php/user/revenue/";
+        }
+        window.document.location = url;
+    });
+
     /********************* Users edit block ***********************/
     $('#users').change(function () {
         var selected = $('#users').val();
@@ -345,87 +423,95 @@ $(document).ready(function () {
      * 
      ********************************************************************/
 
-    $("#make_order").one('click', function () {
+    $("#make_order").click(function () {
+        console.log('Make order ...');
         var game_amount = $('#currency').val();
         var amount = $('#count_money').html();
-        var usd_amount = $('#amount').val();
         var currency = $('#CURRENCY_NAME').html();
         var phone = $('#inp_phone').val();
         var skype = $('#inp_skype').val();
         var icq = $('#inp_icq').val();
+
+        var server_value = $('#server').val();
+        var server_data = server_value.split('_');
+        var server_id = server_data[0];
+
         var delivery_way = $('#s_delivery').val();
         var email = $('#inp_email').val();
         var nick = $('#inp_nickname').val();
         var comment = $('#ta_comment').val();
-        var min_amount = $('.min_sum_order_js').html();
+
         var gameid = $('#gameid').val();
         console.log("Game id: " + gameid);
-        console.log('Usd amount: ' + usd_amount);
-        if (amount > 0 && phone != '' && email != '' && nick != '' && currency != 0) {
+        console.log('Amount: ' + amount);
+        console.log('Currency: ' + currency);
+        console.log('Nick: ' + nick);
+        console.log('Email: ' + email);
+        console.log('Phone: ' + phone);
+        console.log('Server id: ' + server_id);
+        if (amount > 0 && email != '' && nick != '' && currency != 0) {
             if (!validateEmail(email)) {
                 $('#order_err').html('Пожалуйста укажите правильный email');
             }
             else {
-                if ((usd_amount - min_amount) > 0) {
-                    $('#add_order').fadeTo("slow", 0.3);
-                    $('#order_err').html('');
-                    var order = {gameid: gameid,
-                        game_amount: game_amount,
-                        amount: amount,
-                        usd_amount: usd_amount,
-                        currency: currency,
-                        nick: nick,
-                        email: email,
-                        phone: phone,
-                        skype: skype,
-                        icq: icq,
-                        delivery_way: delivery_way,
-                        comment: comment};
-                    var url = host + "/index.php/user/add_order";
-                    $.post(url, {order: order}).done(function (data) {
-                        $('#add_order').css("opacity", "1");
-                        $('#add_order').html(data);
-                    });
-                } // end if usd_amount - min_amount
-                else {
-                    $('#order_err').html('Вы не сделали заказ на минимальную сумму');
-                } // end else
+                //if ((usd_amount - min_amount) > 0) {
+                $('#add_order').fadeTo("slow", 0.3);
+                $('#order_err').html('');
+                var order = {gameid: gameid,
+                    game_amount: game_amount,
+                    amount: amount,
+                    currency: currency,
+                    nick: nick,
+                    server: server_id,
+                    email: email,
+                    phone: phone,
+                    skype: skype,
+                    icq: icq,
+                    delivery_way: delivery_way,
+                    comment: comment};
+                var url = host + "/index.php/user/add_order";
+                $.post(url, {order: order}).done(function (data) {
+                    $('#add_order').css("opacity", "1");
+                    $('#add_order').html(data);
+                });
+                //} // end if usd_amount - min_amount
+                //else {
+                //  $('#order_err').html('Вы не сделали заказ на минимальную сумму');
+                //} // end else
             } // end else
         } // end if amount>0 && phone!='' && email!='' && nick!=''
         else {
-            $('#order_err').html('Пожалуйста укажите все обязатяельные поля');
+            $('#order_err').html('Пожалуйста укажите все обязательные поля');
         }
     });
 
-    $('#server').change(function () {
-        $('#ptype').prop("disabled", false);
-    });
 
-    $('#ptype').change(function () {
-        $('#currency').prop("disabled", false);
-        var currency = $('#ptype').val();
-        $('#CURRENCY_NAME').html(currency);
-    });
-
-    $("#currency").blur(function () {
+    function update_price() {
         var rate;
-        var server_rate = $('#server').val();
+        var server_value = $('#server').val();
+        var server_data = server_value.split('_');
+        var server_id = server_data[0];
+        var server_rate = server_data[1];
+        var server_currency_num = server_data[2];
+
+        console.log('Server ID: ' + server_id);
+        console.log('Server rate: ' + server_rate);
+        console.log('Server game currency amount multiplier: ' + server_currency_num);
+
         var amount = $('#currency').val();
         var currency = $('#ptype').val();
         if (amount != "" && $.isNumeric(amount)) {
-            // Set USD value
-            var usd_amount = amount * server_rate;
-            $('#amount').val(usd_amount.toFixed(2));
-            $('#const_zoloto').html(amount);
+
+            $('#const_zoloto').html(amount * server_currency_num);
 
             // Set selected currency value
             switch (currency) {
                 case 'eur':
-                    rate = (eur_s / usd_s).toFixed(3);
+                    rate = (eur_s / usd_s);
                     break;
 
                 case 'rur':
-                    rate = (rub_s / usd_s).toFixed(3);
+                    rate = (rub_s / usd_s);
                     break;
 
                 case 'usd':
@@ -433,16 +519,87 @@ $(document).ready(function () {
                     break;
 
                 case 'uah':
-                    rate = (1 / usd_s).toFixed(3);
+                    rate = (1 / usd_s);
                     break;
             }
             var total_amount = usd_amount / rate;
+            $('#count_money').html(total_amount.toFixed(2));
+
+            var usd_amount = amount * server_rate;
+
+            var rur_val = usd_amount.toFixed(2) / (rub_s / usd_s);
+            console.log('Rur value: ' + rur_val);
+
+            var discount;
+            var complete_usd_amount;
+            var discount_amount;
+
+            if (rur_val >= 80000) {
+                discount = 5;
+            }
+
+            if (rur_val > 15000 && rur_val < 79999) {
+                discount = 4;
+            }
+
+            if (rur_val > 10000 && rur_val < 14999) {
+                discount = 3;
+            }
+
+            if (rur_val > 3000 && rur_val < 9999) {
+                discount = 2;
+            }
+
+            if (rur_val > 1000 && rur_val < 2999) {
+                discount = 1;
+            }
+
+            if (rur_val < 1000) {
+                discount = 0;
+            }
+
+            console.log('Discount size %' + discount);
+
+            if (discount > 0) {
+                discount_amount = (usd_amount * discount) / 100;
+                console.log('Discount amount: ' + discount_amount);
+                complete_usd_amount = usd_amount - discount_amount;
+            }
+            else {
+                complete_usd_amount = usd_amount;
+            }
+
+            console.log('Complete USD amount: ' + complete_usd_amount);
+            console.log('Current rate: ' + rate);
+
+            var total_amount = complete_usd_amount / rate;
+            if (rate != 1) {
+                var total_amount = usd_amount / rate;
+            }
+            $('#amount').val(total_amount.toFixed(2));
             $('#count_money').html(total_amount.toFixed(2));
 
         } // end if amount != "" && $.isNumeric(amount)
         else {
             $('#amount').val('');
         }
+    }
+
+    $('#server').change(function () {
+        $('#ptype').prop("disabled", false);
+        update_price();
+    });
+
+    $('#ptype').change(function () {
+        $('#currency').prop("disabled", false);
+        var currency = $('#ptype').val();
+        $('#CURRENCY_NAME').html(currency);
+        $('#real_currency').html(currency);
+        update_price();
+    });
+
+    $("#currency").blur(function () {
+        update_price();
     });
 
 
@@ -561,6 +718,23 @@ $(document).ready(function () {
             var id = event.target.id.replace("game_detailes_id_", "");
             get_game_description_block(id);
         }
+
+        if (event.target.id.indexOf("get_details_") >= 0) {
+            var id = event.target.id.replace("get_details_", "");
+            console.log('ID: ' + id);
+            var detailes_id = "#det_" + id;
+            var el = $(detailes_id);
+            console.log('Element: ' + el);
+            if (el.is(":visible")) {
+                console.log('Inside if ...');
+                $(detailes_id).hide();
+            }
+            else {
+                console.log('Inside else ...');
+                $(detailes_id).show();
+            }
+        }
+
 
         /*
          if (event.target.id.indexOf("action_") >= 0) {
@@ -736,6 +910,7 @@ $(document).ready(function () {
                         $('#myModal').modal('hide');
                         $('#myModal').data('modal', null);
                         $('#client_payments').html(data);
+                        document.location.reload();
                     });
 
                 } // end if $.isNumeric(amount)
@@ -744,7 +919,7 @@ $(document).ready(function () {
                 } // end else
             } // end if amount!=''
             else {
-                $('#amount_err').html('Пожалуйста укажите потсавщика и сумму');
+                $('#amount_err').html('Пожалуйста укажите поставщика и сумму');
             } // end else            
         }
 
@@ -752,15 +927,21 @@ $(document).ready(function () {
             var id = event.target.id.replace("update_server_", "");
             var server_name_id = '#name_' + id;
             var server_rate_id = '#exchange_' + id;
+            var server_amount_id = '#server_amount_' + id
             var server_name = $(server_name_id).val();
             var server_rate = $(server_rate_id).val();
-            if (id > 0 && server_name != '' && $.isNumeric(server_rate)) {
+            var server_amount = $(server_amount_id).val();
+            if (id > 0 && server_name != '' && $.isNumeric(server_rate) && $.isNumeric(server_amount)) {
+                $('#game_err').html('');
                 var url = host + "/index.php/servers/update_server/";
-                $.post(url, {id: id, name: server_name, rate: server_rate}).done(function (data) {
+                $.post(url, {id: id, name: server_name, rate: server_rate, server_amount: server_amount}).done(function (data) {
                     alert('Сервер обвновлен.');
                     console.log('Server response: ' + data);
                 });
             } // end if id>0 && server_name!='' && $.isNumeric(server_rate)
+            else {
+                $('#game_err').html('Пожалуйста укажите обязательные поля');
+            }
         }
 
         if (event.target.id.indexOf("delete_news_") >= 0) {
