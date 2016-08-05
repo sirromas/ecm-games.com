@@ -9,6 +9,7 @@ class Menu extends CI_Controller {
         $this->load->model('menu_model');
         $this->load->model('login_model');
         $this->load->model('games_model');
+        $this->load->library('session');
     }
 
     public function get_top_menu() {
@@ -24,14 +25,24 @@ class Menu extends CI_Controller {
     }
 
     public function page() {
+        $type = $this->session->userdata('type');
+        //echo "User email: ".$email."<br>";
         $item = $this->uri->segment(3);
         $common_data = $this->get_common_elements();
-        if ($item != 'login') {
-            $page = $this->menu_model->get_page_content($item);
-        } // end if $item!='login'
+        if ($type == '') {
+            if ($item != 'login') {
+                $page = $this->menu_model->get_page_content($item);
+            } // end if $item!='login'
+            else {
+                $page = $this->login_model->get_login_page();
+            } // end else        
+        } // end if $email==''
         else {
-            $page = $this->login_model->get_login_page();
-        }
+            if ($type == 3) {
+                $page = $this->menu_model->get_admin_page2($item);
+            } // end if $email=='admin@ecm_games.com'
+        } // end else
+
         $method_data = array('page' => $page);
         $data = array_merge($common_data, $method_data);
         $this->load->view('page_view', $data);

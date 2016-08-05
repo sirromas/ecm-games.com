@@ -264,4 +264,17 @@ class User extends CI_Controller {
         echo $list;
     }
 
+    public function add_supplier_order_payment() {
+        $amount = $_REQUEST['amount'];
+        $orderid = $_REQUEST['orderid'];
+        $list = $this->user_model->add_supplier_order_payment($amount, $orderid);
+        echo $list;
+    }
+
+    public function get_order_currency_price() {
+        $id = $_REQUEST['id'];
+        $list = $this->user_model->get_order_currency_price2($id);
+        echo $list;
+    }
+
 }

@@ -143,7 +143,22 @@ class user_model extends CI_Model {
 
         if ($status == 2) {
             $list.="<select id='processed_orders' style='width:95px;'>";
-            $list.="<option values='0' selected>Обработанные заказы</option>";
+            $list.="<option values='0' selected>Обрабатываются</option>";
+        }
+
+        if ($status == 3) {
+            $list.="<select id='money_received' style='width:95px;'>";
+            $list.="<option values='0' selected>Получены деньги от клиента</option>";
+        }
+
+        if ($status == 4) {
+            $list.="<select id='money_sent' style='width:95px;'>";
+            $list.="<option values='0' selected>Отданы клиенту</option>";
+        }
+
+        if ($status == 5) {
+            $list.="<select id='supplier_paid' style='width:95px;'>";
+            $list.="<option values='0' selected>Оплачены поставщику</option>";
         }
 
         $games_arr = array();
@@ -199,22 +214,28 @@ class user_model extends CI_Model {
                 $firstname = $this->session->userdata('firstname');
                 $lastname = $this->session->userdata('lastname');
                 $pending_orders = $this->get_manager_orders($email, 1);
-                $processed_orders = $this->get_manager_orders($email, 2);
+                $in_process = $this->get_manager_orders($email, 2);
+                $client_received = $this->get_manager_orders($email, 3);
+                $client_sent = $this->get_manager_orders($email, 4);
+                $supplier_paid = $this->get_manager_orders($email, 5);
                 $games_list = $this->get_manager_games_list($email);
 
-                $list.="<br/><div class=''>";
+                $list.="<div class=''>";
                 $list.="<form class='calc_form'>";
                 $list.= "<br>";
                 $list.= "<table align='center' border='0' style='width: 100%;'>";
 
                 $list.="<tr>";
                 $list.= "<td>$pending_orders</td>";
-                $list.= "<td>$processed_orders</td>";
+                $list.= "<td>$in_process</td>";
+                $list.= "<td>$client_received </td>";
+                $list.= "<td>$client_sent</td>";
+                $list.= "<td>$supplier_paid </td>";
                 $list.= "<td>$games_list</td>";
                 $list.= "</tr>";
 
                 $list.="<tr>";
-                $list.= "<td align='center' colspan='3'><span id='dashboard_container'></span></td>";
+                $list.= "<td align='center' colspan='6'><span id='dashboard_container'></span></td>";
                 $list.= "</tr>";
 
                 $list.= "</table><br>";
@@ -227,18 +248,17 @@ class user_model extends CI_Model {
                 $deals = $this->get_deals_list();
                 $users = $this->get_users_list();
                 $other = $this->get_others_list();
-                $list.="<br/><div class='calc'>";
+                $list.="<div class='calc'>";
                 $list.="<form class='calc_form' >";
-                $list.= "<br><br>";
-                $list.= "<table align='center' border='0' style='width: 100%;'>";
+                $list.="<table align='center' border='0' width='100%'>";
                 $list.="<tr>";
-                $list.= "<td><span id='games_container'>$games</span><td>";
-                $list.= "<td><span id='deals_container'>$deals</span><td>";
-                $list.= "<td><span id='user_container'>$users</span><td>";
-                $list.= "<td><span id='report_containers'>$other</span><td>";
-                $list.= "</tr>";
-                $list.="</table><br><br>";
-                $list.="<div style='text-align:center;' id='forgot_err'></div>";
+                $list.= "<td style='padding:15px;'><span id='games_container'>$games</span></td>";
+                $list.= "<td style='padding:15px;'><span id='deals_container'>$deals</span></td>";
+                $list.= "<td style='padding:15px;'><span id='user_container'>$users</span></td>";
+                $list.= "<td style='padding:15px;'><span id='report_containers'>$other</span></td>";
+                $list.="</tr>";
+                $list.="</table>";
+                $list.="<div style='text-align:center;' class='row' id='forgot_err'></div>";
                 $list.="</form>";
                 $list.="</div>";
             } // end if $type==3        
@@ -261,7 +281,7 @@ class user_model extends CI_Model {
             else if ($type == 5) {
                 // Cashier
                 $orders = $this->get_cashier_orders();
-                $list.="<br/><div class=''>";
+                $list.="<div class=''>";
                 $list.="<form class='calc_form'>";
                 $list.= "<br>";
                 $list.= "<table align='center' border='0' style='width: 100%;'>";
@@ -502,12 +522,12 @@ class user_model extends CI_Model {
         $list.="<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";
         $list.="<option value='exchange_rate'><a href='" . $this->config->item('base_url') . "index.php/user/exchange_rate' style='color: #000000;font-size: 14px;text-decoration: none;'>Курсы валют</a></option>";
         $list.="<option value='news'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719147' style='color: #000000;font-size: 14px;text-decoration: none;'>Новости</a></option>";
-        $list.="<option value='buy'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719146' style='color: #000000;font-size: 14px;text-decoration: none;'>Как купить</a></option>";
-        $list.="<option value='service'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719145' style='color: #000000;font-size: 14px;text-decoration: none;'>Услуги Гаранта</a></option>";
-        $list.="<option value='supplier'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719143' style='color: #000000;font-size: 14px;text-decoration: none;'>Поставщикам</a></option>";
-        $list.="<option value='guarantee'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719144' style='color: #000000;font-size: 14px;text-decoration: none;'>Гарантии</a></option>";
-        $list.="<option value='contacts'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/3068' style='color: #000000;font-size: 14px;text-decoration: none;'>Контакты</a></option>";
-        $list.="<option value='about'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/1' style='color: #000000;font-size: 14px;text-decoration: none;'>О нас</a></option>";
+        //$list.="<option value='buy'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719146' style='color: #000000;font-size: 14px;text-decoration: none;'>Как купить</a></option>";
+        //$list.="<option value='service'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719145' style='color: #000000;font-size: 14px;text-decoration: none;'>Услуги Гаранта</a></option>";
+        //$list.="<option value='supplier'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719143' style='color: #000000;font-size: 14px;text-decoration: none;'>Поставщикам</a></option>";
+        //$list.="<option value='guarantee'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719144' style='color: #000000;font-size: 14px;text-decoration: none;'>Гарантии</a></option>";
+        //$list.="<option value='contacts'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/3068' style='color: #000000;font-size: 14px;text-decoration: none;'>Контакты</a></option>";
+        //$list.="<option value='about'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/1' style='color: #000000;font-size: 14px;text-decoration: none;'>О нас</a></option>";
 
         $list.="</select>";
         return $list;
@@ -687,7 +707,7 @@ class user_model extends CI_Model {
             $type = $this->session->userdata('type');
             if ($type == 3) {
                 $user = $this->get_user_edit_block($id);
-                $list.="<br/><div class='calc' style='text-align:center;'>";
+                $list.="<div class='calc' style='text-align:center;'>";
                 $list.="<form class='calc_form' id='update_user' method='post' action='" . $this->config->item('base_url') . "index.php/user/edit_done'>";
                 $list.= "<br><br>";
                 $list.= "<table align='center' border='0' style='width: 100%;'>";
@@ -810,7 +830,7 @@ class user_model extends CI_Model {
         $games = $this->get_games_list2();
         $types = $this->get_user_types2();
         $list = "";
-        $list.="<br/><div class=''>";
+        $list.="<div class=''>";
         $list.="<form class='calc_form' id='add_manager'  method='post' action='" . $this->config->item('base_url') . "index.php/user/added_done'>";
         $list.= "<br>";
         $list.= "<table align='center' border='0' >";
@@ -1042,6 +1062,8 @@ class user_model extends CI_Model {
             $game->id = $row->gamID;
             $game->name = $row->gamName;
             $game->currency = $row->gamMoneys;
+            $game->min_price = $row->min_price;
+            $game->max_price = $row->max_price;
         }
         return $game;
     }
@@ -1117,12 +1139,21 @@ class user_model extends CI_Model {
         $list.="<select id='order_status'>";
         if ($status == 1) {
             $list.="<option value='1' selected>Необработанный</option>";
-            $list.="<option value='2' >Обработанный</option>";
+            $list.="<option value='2' >Обрабатывается</option>";
         } // end if $status==1
         if ($status == 2) {
-            $list.="<option value='1'>Необработанный</option>";
-            $list.="<option value='2' selected>Обработанный</option>";
-        } // end i $status==2
+            $list.="<option value='2' selected>Обрабатывается</option>";
+            $list.="<option value='3'>Получены деньги от клиента</option>";
+        } // end i $status==2        
+        if ($status == 3) {
+            $list.="<option value='3' selected>Получены деньги от клиента</option>";
+            $list.="<option value='4'>Отданы клиенту</option>";
+        } // end i $status==3
+        if ($status == 4) {
+            $list.="<option value='4' selected>Отданы клиенту</option>";
+            $list.="<option value='5'>Оплачены поставщику</option>";
+        } // end if $status==4
+
         $list.="</select>";
         return $list;
     }
@@ -1219,8 +1250,54 @@ class user_model extends CI_Model {
         return $list;
     }
 
+    public function get_order_server_block($serverid) {
+        $list = "";
+        $query = "select * from gameservers where gasID=$serverid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $server = $row;
+        }
+        $game = $this->get_game_detailes2($server->gasGameID);
+        $list.="<p align='center'>$server->gasName</p>";        
+        $list.="<p align='center'>Цена за $server->gasAmount ($game->currency) &nbsp; $$server->gasKurs</p>";
+        return $list;
+    }
+
+    public function get_currencies_block() {
+        $list = "";
+        $list.="<select id='currencies'>";
+        $list.="<option value='usd' selected>USD</option>";
+        $list.="<option value='uah'>UAH</option>";
+        $list.="<option value='eur'>EUR</option>";
+        $list.="<option value='rur'>RUR</option>";
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_order_currency_price($id) {
+        $payments = "";
+        $query = "select * from orders where id=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $supplier_paid = $row->currency_price;
+            $game = $this->get_game_detailes2($row->gameid);
+        }
+
+        if ($supplier_paid > 0) {
+            $payments.="<p align='center'>Мин цена ($): $game->min_price&nbsp;Макс цена ($): $game->max_price</p>";
+            $payments.= "<p align='center'>$" . $supplier_paid . "</p>";
+        } // end if $supplier_paid > 0
+        else {
+            $payments.="<p align='center'>Мин цена ($): $game->min_price&nbsp;Макс цена ($): $game->max_price</p>";
+            $payments.= "<p align='center'>N/A &nbsp; <span id='add_sup_payment' style='cursor:pointer;font-weight:bold;'>Добавить</span></p>"
+                    . "<div id='supplier' style='display:none;text-align:center;'>$<input type='text' style='width:75px;' id='supp_amount'>&nbsp;<a id='add_supplier_payment2_btn' href='#' onClick='return false;' style='color:black;font-weight:bold;'>OK</a></div>";
+        }
+        return $payments;
+    }
+
     public function get_order_details($id, $status, $manager = true) {
         $list = "";
+        $payments = "";
         $order_status = $this->get_status_dropdown($status);
         $query = "select * from orders where id=$id and status=$status";
         $result = $this->db->query($query);
@@ -1239,6 +1316,7 @@ class user_model extends CI_Model {
             $comment = $row->comment;
             $added = date('d-m-Y h:i:s', $row->added);
             $userid = $row->userid;
+            $server = $this->get_order_server_block($row->serverid);
             $notes = $row->notes;
             $order_db_status = $row->status;
         } // end foreach
@@ -1251,7 +1329,7 @@ class user_model extends CI_Model {
             } // end if $userid==0
         } // end fi $manager==true
 
-        $payments = $this->get_client_payments_block($id);
+        $payments.= $this->get_order_currency_price($id);
 
         if ($manager == true) {
 
@@ -1261,6 +1339,18 @@ class user_model extends CI_Model {
 
             if ($order_db_status == 2) {
                 $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Обработанные заказы</p>";
+            }
+
+            if ($order_db_status == 3) {
+                $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Получены деньги от клиента</p>";
+            }
+
+            if ($order_db_status == 4) {
+                $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Отданы клиенту</p>";
+            }
+
+            if ($order_db_status == 5) {
+                $list.="<br><br><p align='center' style='font-weight:bold;' id='order_types'>Оплачены поставщику</p>";
             }
         } // end if $manager == true
 
@@ -1299,11 +1389,11 @@ class user_model extends CI_Model {
         $list.="</tr>";
 
         $list.="<tr>";
-        $list.="<td style='padding: 15px;'>Сумма к оплате</td><td style='padding: 15px;'>" . $amount . " " . $currency . "</td>";
+        $list.="<td style='padding: 15px;'>Сервер игры</td><td style='padding: 15px;'>$server</td>";
         $list.="</tr>";
 
         $list.="<tr>";
-        $list.="<td style='padding: 15px;'>Сумма в долларах</td><td style='padding: 15px;'>" . $usd_amount . "USD</td>";
+        $list.="<td style='padding: 15px;'>Сумма к оплате</td><td style='padding: 15px;'>" . $amount . " " . $currency . " (&nbsp;$$usd_amount)</td>";
         $list.="</tr>";
 
         $list.="<tr>";
@@ -1312,7 +1402,7 @@ class user_model extends CI_Model {
 
         if ($manager == true) {
             $list.="<tr>";
-            $list.="<td style='padding: 15px;'>Оплаты клиента</td><td style='padding: 15px;'><span id='client_payments'>$payments</span></td>";
+            $list.="<td style='padding: 15px;'>Цена покупки валюты ($)</td><td style='padding: 15px;'><span id='currency_price'>$payments</span></td>";
             $list.="</tr>";
         } // end if $manager == true
 
@@ -1544,7 +1634,7 @@ class user_model extends CI_Model {
                 $rate = round(($rates->usd), 2);
                 break;
         }
-        $usd_amount = round(($amount/$rate), 2);
+        $usd_amount = round(($amount / $rate), 2);
         return $usd_amount;
     }
 
@@ -1808,7 +1898,7 @@ class user_model extends CI_Model {
     public function get_user_accounts($type) {
         $list = "";
         $users = $this->get_users_by_type($type);
-        $list.="<br/><div class=''>";
+        $list.="<div class=''>";
         $list.="<form class='calc_form'>";
         $list.= "<br>";
         $list.= "<table align='center' border='0' style='width: 100%;'>";
@@ -1860,7 +1950,7 @@ class user_model extends CI_Model {
     public function get_get_exchange_rate_page() {
         $list = "";
         $rates = $this->get_rates();
-        $list.="<br/><div class=''>";
+        $list.="<div class=''>";
         $list.="<form class='calc_form'  action='" . $this->config->item('base_url') . "index.php/user/update_rates' id='update_rates' method='post' >";
         $list.= "<br>";
         $list.= "<table align='center' border='0' style='width: 100%;'>";
@@ -2228,6 +2318,22 @@ class user_model extends CI_Model {
 
         $data = array('games' => json_encode($games), 'paid' => json_encode($c_paid));
         return json_encode($data);
+    }
+
+    public function add_supplier_order_payment($amount, $orderid) {
+        $query = "update orders set currency_price='$amount' where id=$orderid";
+        $this->db->query($query);
+        $list = $this->get_order_currency_price($orderid);
+        return $list;
+    }
+
+    public function get_order_currency_price2($id) {
+        $query = "select * from orders where id=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $price = $row->currency_price;
+        }
+        return $price;
     }
 
 }

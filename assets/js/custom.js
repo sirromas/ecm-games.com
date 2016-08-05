@@ -87,6 +87,7 @@ $(document).ready(function () {
             } // end if confirm()
         } // end if id>0
     });
+
     $('#restore_btn_done').click(function () {
         var pwd1 = $('#pwd1').val();
         var pwd2 = $('#pwd2').val();
@@ -602,8 +603,6 @@ $(document).ready(function () {
         update_price();
     });
 
-
-
     $("#pending_orders").change(function () {
         var id = $('#pending_orders').val();
         if (id > 0) {
@@ -612,7 +611,6 @@ $(document).ready(function () {
                 $('#dashboard_container').html(data);
             });
         } // end if id > 0
-
     });
 
     $("#processed_orders").change(function () {
@@ -623,8 +621,40 @@ $(document).ready(function () {
                 $('#dashboard_container').html(data);
             });
         } // end if id > 0
-
     });
+
+    $("#money_received").change(function () {
+        var id = $('#processed_orders').val();
+        if (id > 0) {
+            var url = host + "/index.php/user/get_order_details/";
+            $.post(url, {id: id, status: 3}).done(function (data) {
+                $('#dashboard_container').html(data);
+            });
+        } // end if id > 0
+    });
+
+    $("#money_sent").change(function () {
+        var id = $('#processed_orders').val();
+        if (id > 0) {
+            var url = host + "/index.php/user/get_order_details/";
+            $.post(url, {id: id, status: 4}).done(function (data) {
+                $('#dashboard_container').html(data);
+            });
+        } // end if id > 0
+    });
+
+    $("#supplier_paid").change(function () {
+        var id = $('#processed_orders').val();
+        if (id > 0) {
+            var url = host + "/index.php/user/get_order_details/";
+            $.post(url, {id: id, status: 5}).done(function (data) {
+                $('#dashboard_container').html(data);
+            });
+        } // end if id > 0
+    });
+
+
+
 
     $("#user_type").change(function () {
         var id = $('#user_type').val();
@@ -677,8 +707,8 @@ $(document).ready(function () {
         var id = $('#order_id').val();
         var status = $('#order_status').val();
 
-        if (status == 2) {
-            var url = host + "/index.php/user/get_order_client_payments/";
+        if (status >= 2) {
+            var url = host + "/index.php/user/get_order_currency_price/";
             $.post(url, {id: id}).done(function (data) {
                 if (data > 0) {
                     $('#notes_err').html('');
@@ -692,7 +722,7 @@ $(document).ready(function () {
                     } // end if confirm
                 } // end if data>0
                 else {
-                    $('#notes_err').html('Заказ еще не оплачен');
+                    $('#notes_err').html('Пожалуйста укажите цену покупки валюты');
                 }
             }); // end if $.post(url
         } // end if status ==2
@@ -710,7 +740,6 @@ $(document).ready(function () {
         });
     });
 
-
     $("body").click(function (event) {
         //console.log('Element clicked: ' + event.target.id);
 
@@ -718,6 +747,29 @@ $(document).ready(function () {
             var id = event.target.id.replace("game_detailes_id_", "");
             get_game_description_block(id);
         }
+
+        if (event.target.id.indexOf("add_sup_payment") >= 0) {
+            console.log('Add payment clicked ...');
+            if ($('#supplier').is(':visible')) {
+                $('#supplier').hide();
+            }
+            else {
+                $('#supplier').show();
+            }
+        }
+
+        if (event.target.id == 'add_supplier_payment2_btn') {
+            var orderid = $('#order_id').val();
+            var amount = $('#supp_amount').val();
+            if (amount != '' && $.isNumeric(amount)) {
+                var url = host + "/index.php/user/add_supplier_order_payment/";
+                $.post(url, {amount: amount, orderid: orderid}).done(function (data) {
+                    $('#currency_price').html(data);
+                });
+            }
+        }
+
+
 
         if (event.target.id.indexOf("get_details_") >= 0) {
             var id = event.target.id.replace("get_details_", "");

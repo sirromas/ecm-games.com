@@ -77,7 +77,7 @@ class Server_model extends CI_Model {
     public function add_server() {
         $list = "";
         $server = $this->get_add_server_page();
-        $list.="<br/><div class=''>";
+        $list.="<div class=''>";
         $list.="<form class='calc_form' id='add_server' method='post' action='" . $this->config->item('base_url') . "index.php/servers/add_server_done/'>";
         $list.= "<br>";
         $list.= "<table align='center' border='0' style='width: 100%;'>";

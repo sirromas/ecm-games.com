@@ -20,7 +20,7 @@ class Menu_model extends CI_Model {
                 $item = 'Как купить';
                 break;
             case 'garant':
-                $item = 'Услуги Гаранта';
+                $item = 'Услуги';
                 break;
             case 'supplier':
                 $item = 'Поставщикам';
@@ -33,6 +33,9 @@ class Menu_model extends CI_Model {
                 break;
             case 'about':
                 $item = 'О нас';
+                break;
+            case 'discount':
+                $item = 'Скидки';
                 break;
             case 'login':
                 $status = $this->session->userdata('email');
@@ -49,7 +52,7 @@ class Menu_model extends CI_Model {
 
     public function get_top_menu() {
         $list = "";
-        $query = "select * from top_menu";
+        $query = "select * from top_menu order by id";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
             $menu_name = $this->get_menu_russian_name($row->name);
@@ -70,30 +73,25 @@ class Menu_model extends CI_Model {
             else {
                 $link = $this->config->item('base_url');
             } // end else     
-            $list.="<li style='min-width: 11.1%;'><a href='$link' title='$menu_name'>$menu_name</a></li>";
+            $list.="<li style='min-width: 10%;'><a href='$link' title='$menu_name'>$menu_name</a></li>";
         } // end foreach
         return $list;
     }
 
     function get_page_content($item) {
-        $list = "";        
+        $list = "";
         if ($item == 'news') {
-            $list.="<br><table align='center' border='0' width='100%'>";
+            $list.="<br>";
             $query = "select * from news order by added desc limit 0, 7";
             $result = $this->db->query($query);
             $num = $result->num_rows();
             if ($num > 0) {
                 foreach ($result->result() as $row) {
                     $date = date('Y-m-d', $row->added);
-
-                    $list.="<tr>";
-                    $list.="<td style='padding:15px;' width='10%'>$date</td><td width='80%' style='padding:15px;'>$row->title</td><td width='10%' style='padding:15px;'><a href='#' onClick='return false;' id='more_$row->id' style='color:black;'>Далее ...</a></d>";
-                    $list.="</tr>";
-
-                    $list.="<tr id='content_$row->id' style='display:none;'>";
-                    $list.="<td colspan='3' align='justify' style='padding:15px;'>$row->content</td>";
-                    $list.="</tr>";
-                } // end foreacj
+                    $list.="<div class='row'>";
+                    $list.="<span class='span9'>" . $row->content . "</span>";
+                    $list.="</div>";
+                } // end foreach
             } // end if $num > 0
             else {
                 
@@ -104,8 +102,117 @@ class Menu_model extends CI_Model {
             $query = "select * from top_menu where link='$item'";
             $result = $this->db->query($query);
             foreach ($result->result() as $row) {
-                $list.="<br><br>".$row->content;
+                $list.="<br><br>" . $row->content;
             } // end foreach
+        } // end else
+        return $list;
+    }
+
+    function get_admin_page2($item) {
+        $list = "";
+        switch ($item) {
+            case 'news':                 
+                $id=9719147;
+                $title = "Новости";
+                break;
+            case 'buy': 
+                $id=9719146;
+                $title = "Как купить";
+                break;
+            case 'garant':                
+                $id=9719145;
+                $title = "Услуги гаранта";
+                break;
+            case 'supplier':
+                $id=9719143;
+                $title = "Поставщикам";
+                break;
+            case 'guarantee':                
+                $id=9719144;
+                $title = "Гарантии";
+                break;
+            case 'contact':                
+                $id=3068;
+                $title = "Контакты";
+                break;
+            case 'about':
+                $id=1;
+                $title = "О нас";
+                break;
+        }
+
+        if ($id != 9719147) {
+            $query = "select * from content where cntID=$id and cntLanguageID=2";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $id = $row->cntID;
+                $content = $row->cntBody;
+            }
+            $list.="<form id='user_page' method='post' action='" . $this->config->item('base_url') . "index.php/menu/update_page'>";
+            $list.="<input type='hidden' id='id' name='id' value='$id'>";
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>$title</span>";
+            $list.="<span class='2'><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>&nbsp;&nbsp;Меню</a></span>";
+            $list.="</div>";
+            $list.="<br><div class='container-fluid' style='text-align:left;'>
+                <input type='hidden' id='id' value='$id'>
+                <textarea name='body' >$content</textarea>
+                <script>
+                CKEDITOR.replace('body');
+                </script>
+                </div>";
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span2'><button id='update_user_page' style='background: rgba(0, 0, 0, 0) linear-gradient(to bottom, #fdfbec 0%, #e3c271 48%, #d9ad43 50%, #ce9428 100%) repeat scroll 0 0;
+                                                                            border: 0 none;
+                                                                            border-radius: 15px;
+                                                                            box-shadow: 0 0 20px 1px #000000;
+                                                                            color: #000000;
+                                                                            font-size: 16px;
+                                                                            font-weight: bold;
+                                                                            line-height: 50px;
+                                                                            margin: 10px auto;
+                                                                            text-align: center;
+                                                                            text-decoration: none;
+                                                                            text-shadow: 1px 1px 1px #ffffff;
+                                                                            text-transform: uppercase;
+                                                                            width: 150px;'>Ok</button></span>";
+            $list.="</div>";
+        } // end if $id!=9719147
+        else {
+            $list.="<br/><div class=''>";
+            $list.="<form class='calc_form'>";
+            $list.= "<br>";
+            $list.= "<table align='center' border='0' style='width: 100%;'>";
+
+            $list.="<table align='center' border='0' width=100%>";
+
+            if ($this->session->userdata('type') == 3) {
+                // It is admin
+                $list.="<tr>";
+                $list.="<td colspan='6' align='center'><span style=''><a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color:black;font-weight:bolder;'>Меню</a></span></td>";
+                $list.="</tr>";
+            }
+
+            $list.= "<tr>";
+            $list.="<td style='padding:15px;'>Дата*</td><td style='padding:15px;'><input type='text' style='width:75px;' id='start'></td><td style='padding:15px;'>Дата*</td><td style='padding:15px;'><input type='text' style='width:75px;' id='end'></td><td style='padding:15px;'><a href='#' onClick='return false;' id='search_news' style='color:black;'>Ok</a></td><td style='padding:15px;'><a href='#' onClick='return false;' id='add_news' style='color:black;padding:15px;'>Добавить</a></td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.= "<td align='center' colspan='6' ><span id='ajax_loader' style='display:none;'><img src='/games/assets/images/ajax.gif' width='32' height='32' /></span></td>";
+            $list.= "</tr>";
+
+            $list.= "<tr>";
+            $list.="<td colspan='6' align='center' style='padding:15px;'><span id='news_container'></span></td>";
+            $list.="</tr>";
+
+            $list.= "<tr>";
+            $list.="<td colspan='6' align='center' style='padding:15px;'><span id='news_err'></span></td>";
+            $list.="</tr>";
+
+            $list.="</table><br>";
+
+            $list.="</form>";
+            $list.="</div>";
         } // end else
         return $list;
     }
