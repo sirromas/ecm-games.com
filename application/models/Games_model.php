@@ -96,6 +96,37 @@ class Games_model extends CI_Model {
         return $list;
     }
 
+    public function get_server_amount($id) {
+        $list = "";
+        $list.="<select id='server_amount_$id' style='width:75px;'>";
+        $query = "select * from gameservers where gasID=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $server_amount = $row->gasAmount;
+        }
+        if ($server_amount == 'k') {
+            $list.="<option value='k' selected>k</option>";
+        } // end if $server_amount=='k'
+        else {
+            $list.="<option value='k' >k</option>";
+        } // end else
+
+        if ($server_amount == 'kk') {
+            $list.="<option value='kk' selected>kk</option>";
+        } // end if $server_amount=='kk'
+        else {
+            $list.="<option value='kk'>kk</option>";
+        } // end else
+        if ($server_amount == 'kkk') {
+            $list.="<option value='kkk' selected>kkk</option>";
+        } // end if $server_amount=='kkk'
+        else {
+            $list.="<option value='kkk'>kkk</option>";
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
     public function get_game_details($id) {
         $list = "";
         $games_list = $this->user_model->get_games_list();
@@ -143,8 +174,9 @@ class Games_model extends CI_Model {
         $list.="<tr>";
 
         foreach ($servers as $server) {
+            $server_amount = $this->get_server_amount($server->id);
             $list.="<tr>";
-            $list.="<td align='left'>Сервер</td><td><input type='text' id='name_$server->id' value='$server->name'></td><td><input type='text' id='server_amount_$server->id' value='$server->amount' style='width:75px;'></td><td><input type='text' id='exchange_$server->id' value='$server->exchangerate' style='width:75px;'></td><td><a href='#' onClick='return false;' id='update_server_$server->id' style='color: #000000;font-size: 14px;text-decoration: none;'>Обновить</a></td>";
+            $list.="<td align='left'>Сервер</td><td><input type='text' id='name_$server->id' value='$server->name'></td><td>&nbsp;$server_amount</td><td><input type='text' id='exchange_$server->id' value='$server->exchangerate' style='width:75px;'></td><td><a href='#' onClick='return false;' id='update_server_$server->id' style='color: #000000;font-size: 14px;text-decoration: none;'>Обновить</a></td>";
             $list.="</tr>";
         }
 
@@ -509,7 +541,7 @@ class Games_model extends CI_Model {
     }
 
     public function get_game_prices($id) {
-        $game=$this->get_game_currency($id);
+        $game = $this->get_game_currency($id);
         $list = "";
         $list.="<table border='1'>";
         $list.="";
@@ -523,15 +555,15 @@ class Games_model extends CI_Model {
         foreach ($result->result() as $row) {
             $currency = $this->get_currency_rates();
             $usd_price = $row->gasKurs;
-            $eur_price = $row->gasKurs * ($currency->usd_s/$currency->euro_s);
+            $eur_price = $row->gasKurs * ($currency->usd_s / $currency->euro_s);
             $rur_price = $row->gasKurs * ($currency->usd_s / $currency->rub_s);
             $uah_price = $row->gasKurs * ($currency->usd_s);
             $list.="<tr>";
             $list.="<td align='left' style='padding:5px;'>$row->gasName ($row->gasAmount $game->gamMoneys)</td>"
-                    . "<td align='left' style='padding:5px;'>".round($eur_price,4)."</td>"
-                    . "<td align='left' style='padding:5px;'>".round($usd_price,4)."</td>"
-                    . "<td align='left' style='padding:5px;'>".round($uah_price,4)."</td>"
-                    . "<td align='left' style='padding:5px;'>".round($rur_price,4)."</td>";
+                    . "<td align='left' style='padding:5px;'>" . round($eur_price, 4) . "</td>"
+                    . "<td align='left' style='padding:5px;'>" . round($usd_price, 4) . "</td>"
+                    . "<td align='left' style='padding:5px;'>" . round($uah_price, 4) . "</td>"
+                    . "<td align='left' style='padding:5px;'>" . round($rur_price, 4) . "</td>";
             $list.="</tr>";
         } // end foreach
         $list.="</table>";

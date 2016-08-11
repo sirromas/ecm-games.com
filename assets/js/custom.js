@@ -503,7 +503,16 @@ $(document).ready(function () {
         var currency = $('#ptype').val();
         if (amount != "" && $.isNumeric(amount)) {
 
-            $('#const_zoloto').html(amount * server_currency_num);
+            /*
+             var human_amount = (amount * server_currency_num).toString();
+             console.log('Human amount: ' + human_amount);
+             var re = new RegExp('000', 'g');
+             var server_currency_num_human = human_amount.replace(re, 'k');
+             console.log('Server currency num: ' + server_currency_num_human);
+             */
+
+            $('#const_zoloto').html(amount + server_currency_num);
+            //$('#const_zoloto').html(server_currency_num_human);
 
             // Set selected currency value
             switch (currency) {
@@ -523,17 +532,25 @@ $(document).ready(function () {
                     rate = (1 / usd_s);
                     break;
             }
-            var total_amount = usd_amount / rate;
-            $('#count_money').html(total_amount.toFixed(2));
-
+            
             var usd_amount = amount * server_rate;
+            // Real money attached to selected currency
+            var total_amount = usd_amount / rate; 
+
+            $('#count_money').html(total_amount.toFixed(2));            
 
             var rur_val = usd_amount.toFixed(2) / (rub_s / usd_s);
-            console.log('Rur value: ' + rur_val);
+            var eur_val = usd_amount.toFixed(2) / (eur_s / usd_s);
+            var uah_val = usd_amount.toFixed(2) / (1 / usd_s);
 
+            console.log('RUR value: ' + rur_val);
+            console.log('UAH value: ' + uah_val);
+            console.log('EUR value: ' + eur_val);
+            console.log('USD value: ' +usd_amount);
+            
             var discount;
-            var complete_usd_amount;
             var discount_amount;
+            var amount_with_discount;            
 
             if (rur_val >= 80000) {
                 discount = 5;
@@ -557,28 +574,38 @@ $(document).ready(function () {
 
             if (rur_val < 1000) {
                 discount = 0;
-            }
-
-            console.log('Discount size %' + discount);
+            }           
 
             if (discount > 0) {
-                discount_amount = (usd_amount * discount) / 100;
-                console.log('Discount amount: ' + discount_amount);
-                complete_usd_amount = usd_amount - discount_amount;
-            }
+                switch (currency) {
+                    case 'eur':
+                        discount_amount = (eur_val * discount) / 100;
+                        amount_with_discount = eur_val - discount_amount;
+                        break;
+                    case 'rur':
+                        discount_amount = (rur_val * discount) / 100;
+                        amount_with_discount = rur_val - discount_amount;
+                        break;
+                    case 'usd':
+                        discount_amount = (usd_amount * discount) / 100;
+                        amount_with_discount = usd_amount - discount_amount;
+                        break;
+                    case 'uah':
+                        discount_amount = (uah_val * discount) / 100;
+                        amount_with_discount = uah_val - discount_amount;
+                        break;
+                } // end switch
+            } // end if
             else {
-                complete_usd_amount = usd_amount;
-            }
+                amount_with_discount=total_amount;
+            } // end else
 
-            console.log('Complete USD amount: ' + complete_usd_amount);
-            console.log('Current rate: ' + rate);
-
-            var total_amount = complete_usd_amount / rate;
-            if (rate != 1) {
-                var total_amount = usd_amount / rate;
-            }
-            $('#amount').val(total_amount.toFixed(2));
-            $('#count_money').html(total_amount.toFixed(2));
+            console.log('Discount size %' + discount);
+            console.log('Discount amount: ' + discount_amount);
+            console.log('Amount with discount: ' + amount_with_discount);
+            
+            $('#amount').val(amount_with_discount.toFixed(2));
+            $('#count_money').html(amount_with_discount.toFixed(2));
 
         } // end if amount != "" && $.isNumeric(amount)
         else {
@@ -983,7 +1010,7 @@ $(document).ready(function () {
             var server_name = $(server_name_id).val();
             var server_rate = $(server_rate_id).val();
             var server_amount = $(server_amount_id).val();
-            if (id > 0 && server_name != '' && $.isNumeric(server_rate) && $.isNumeric(server_amount)) {
+            if (id > 0 && server_name != '') {
                 $('#game_err').html('');
                 var url = host + "/index.php/servers/update_server/";
                 $.post(url, {id: id, name: server_name, rate: server_rate, server_amount: server_amount}).done(function (data) {
