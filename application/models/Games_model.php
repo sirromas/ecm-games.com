@@ -104,25 +104,49 @@ class Games_model extends CI_Model {
         foreach ($result->result() as $row) {
             $server_amount = $row->gasAmount;
         }
-        if ($server_amount == 'k') {
-            $list.="<option value='k' selected>k</option>";
+        
+        if ($server_amount=='1') {
+            $list.="<option value='1' selected>1</option>";
+        }
+        else {
+            $list.="<option value='1' >1</option>";
+        }
+        
+        if ($server_amount=='10') {
+            $list.="<option value='10' selected>10</option>";
+        }
+        else {
+            $list.="<option value='10'>10</option>";
+        }
+        
+        if ($server_amount=='100') {
+            $list.="<option value='100' selected>100</option>";
+        }
+        else {
+            $list.="<option value='100'>100</option>";
+        }
+        
+        if ($server_amount == '1k') {
+            $list.="<option value='1k' selected>1k</option>";
         } // end if $server_amount=='k'
         else {
-            $list.="<option value='k' >k</option>";
+            $list.="<option value='1k' >1k</option>";
         } // end else
 
-        if ($server_amount == 'kk') {
-            $list.="<option value='kk' selected>kk</option>";
+        if ($server_amount == '1kk') {
+            $list.="<option value='1kk' selected>1kk</option>";
         } // end if $server_amount=='kk'
         else {
-            $list.="<option value='kk'>kk</option>";
-        } // end else
-        if ($server_amount == 'kkk') {
-            $list.="<option value='kkk' selected>kkk</option>";
+            $list.="<option value='1kk'>1kk</option>";
+        } // end else       
+        
+        if ($server_amount == '1kkk') {
+            $list.="<option value='1kkk' selected>1kkk</option>";
         } // end if $server_amount=='kkk'
         else {
-            $list.="<option value='kkk'>kkk</option>";
+            $list.="<option value='1kkk'>1kkk</option>";
         } // end else
+        
         $list.="</select>";
         return $list;
     }
@@ -599,6 +623,103 @@ class Games_model extends CI_Model {
         </div>
         </div>";
 
+        return $list;
+    }
+
+    public function get_game_managers($id) {
+        $list = "";
+        $linked_userid = 0;
+        $query = "select * from manager2game where gameid=$id";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $linked_userid = $row->userid;
+            } // end foreach
+        } // end if $num > 0
+
+        $query = "select * from users where type=2 order by firstname";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $managers[] = $row;
+            } // end foreach
+        } // end if $num > 0
+
+        if (count($managers) > 0) {
+            $list.="<table border='0'>";
+            foreach ($managers as $m) {
+                $list.="<tr>";
+                if ($m->id == $linked_userid) {
+                    $list.="<td><input type='checkbox' id='link_" . $id . "_$m->id' checked></td>";
+                    $list.="<td style='padding:15px;'>$m->firstname $m->lastname</td>";
+                } // end if $m->id==$linked_userid
+                else {
+                    $list.="<td><input type='checkbox' id='link_" . $id . "_$m->id'></td>";
+                    $list.="<td style='padding:15px;'>$m->firstname $m->lastname</td>";
+                }
+                $list.="</tr>";
+            } // end foreach
+            $list.="</table>";
+        } // end if count($managers)>0
+        return $list;
+    }
+
+    public function get_game_linkage() {
+        $list = "";
+        $games_block = "";
+        $query = "select * from games order by gamName";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $games_block.="<table border='1' style='table-layout:fixed;width:475px;'>";
+                $managers = $this->get_game_managers($row->gamID);
+                $games_block.="<tr>";
+                $games_block.="<td style='padding:15px;'>$row->gamName</td><td style='padding:15px;'>$managers</td>";
+                $games_block.="</tr>";
+                $games_block.="</table>";
+            } // end foreach            
+        } // end if $num > 0 
+        $list.="<div class='calc'>";
+        $list.="<form class='calc_form' style='padding:15px;'>";
+        $list.= "<br><br>";
+        $list.="<table align='center'>";
+        
+        $list.="<tr>";
+        $list.= "<td colspan='2' align='center' style='padding:15px;'><span style='font-weight:bold;'>Привязки игр</span> &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.= "<td colspan='2' align='center' style='padding:15px;'>$games_block<td>";
+        $list.= "</tr>";
+        $list.="</table><br><br>";
+        $list.="</form>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    public function update_game_link($gameid, $userid, $action) {
+        if ($action == 1) {
+            $query = "select * from manager2game "
+                    . "where gameid=$gameid and userid=$userid";
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+            //if ($num == 0) {
+                $query = "insert into manager2game "
+                        . "(gameid,userid) values ($gameid,$userid)";
+                $this->db->query($query);
+            //} // end if $num == 0
+        } // end if $action==1
+        else {
+            $query = "delete from manager2game "
+                    . "where gameid=$gameid and userid=$userid";
+            $this->db->query($query);
+        } // end else
+
+        $list = "ok";
         return $list;
     }
 

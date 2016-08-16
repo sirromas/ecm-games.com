@@ -146,6 +146,9 @@ $(document).ready(function () {
         if (selected == 'add_game') {
             url = host + "/index.php/games/add_game";
         }
+        if (selected == 'manager_game') {
+            url = host + "/index.php/games/manager_game";
+        }
         if (selected == 'add_server') {
             url = host + "/index.php/servers/add_server";
         }
@@ -190,38 +193,15 @@ $(document).ready(function () {
     $('#get_revenue').click(function () {
         var start = $('#start').val();
         var end = $('#end').val();
-        var game = $('#games').val();
+        var game = $('#revgames').val();
         if (start != '' && end != '') {
             $('#revenue_err').html('');
             $('#ajax_loader').show();
             var url = host + "/index.php/user/get_revenue";
             $.post(url, {game: game, start: start, end: end}).done(function (data) {
                 $('#ajax_loader').hide();
-                var revenue_obj = JSON.parse(data);
-                var games = (revenue_obj.games)
-                var paid = (revenue_obj.paid)
-                console.log('Games data: ' + games);
-                console.log('Paid data: ' + paid);
-                var data_url = host + "/tmp/data.csv";
-                console.log('Data URL: ' + data_url);
-                $.get(data_url, function (csv) {
-                    $('#chartdiv').highcharts({
-                        chart: {
-                            type: 'column'
-                        },
-                        data: {
-                            csv: csv
-                        },
-                        title: {
-                            text: 'Fruit Consumption'
-                        },
-                        yAxis: {
-                            title: {
-                                text: 'Units'
-                            }
-                        }
-                    });
-                });
+                $('#orders_container').html(data);
+                $("#myTable").tablesorter(); 
 
             }); // end of POST
         } // end if start!='' && end1=''
@@ -511,7 +491,15 @@ $(document).ready(function () {
              console.log('Server currency num: ' + server_currency_num_human);
              */
 
-            $('#const_zoloto').html(amount + server_currency_num);
+            if (server_currency_num == '1k' || server_currency_num == '1kk' || server_currency_num == '1kkk') {
+                var clear_server_currency= server_currency_num.replace("1", "");
+                $('#const_zoloto').html(amount + '&nbsp;' + clear_server_currency);
+            }
+            else {
+                $('#const_zoloto').html(amount * server_currency_num);
+            }
+
+
             //$('#const_zoloto').html(server_currency_num_human);
 
             // Set selected currency value
@@ -532,12 +520,12 @@ $(document).ready(function () {
                     rate = (1 / usd_s);
                     break;
             }
-            
+
             var usd_amount = amount * server_rate;
             // Real money attached to selected currency
-            var total_amount = usd_amount / rate; 
+            var total_amount = usd_amount / rate;
 
-            $('#count_money').html(total_amount.toFixed(2));            
+            $('#count_money').html(total_amount.toFixed(2));
 
             var rur_val = usd_amount.toFixed(2) / (rub_s / usd_s);
             var eur_val = usd_amount.toFixed(2) / (eur_s / usd_s);
@@ -546,11 +534,11 @@ $(document).ready(function () {
             console.log('RUR value: ' + rur_val);
             console.log('UAH value: ' + uah_val);
             console.log('EUR value: ' + eur_val);
-            console.log('USD value: ' +usd_amount);
-            
+            console.log('USD value: ' + usd_amount);
+
             var discount;
             var discount_amount;
-            var amount_with_discount;            
+            var amount_with_discount;
 
             if (rur_val >= 80000) {
                 discount = 5;
@@ -574,7 +562,7 @@ $(document).ready(function () {
 
             if (rur_val < 1000) {
                 discount = 0;
-            }           
+            }
 
             if (discount > 0) {
                 switch (currency) {
@@ -597,13 +585,13 @@ $(document).ready(function () {
                 } // end switch
             } // end if
             else {
-                amount_with_discount=total_amount;
+                amount_with_discount = total_amount;
             } // end else
 
             console.log('Discount size %' + discount);
             console.log('Discount amount: ' + discount_amount);
             console.log('Amount with discount: ' + amount_with_discount);
-            
+
             $('#amount').val(amount_with_discount.toFixed(2));
             $('#count_money').html(amount_with_discount.toFixed(2));
 
@@ -651,7 +639,7 @@ $(document).ready(function () {
     });
 
     $("#money_received").change(function () {
-        var id = $('#processed_orders').val();
+        var id = $('#money_received').val();
         if (id > 0) {
             var url = host + "/index.php/user/get_order_details/";
             $.post(url, {id: id, status: 3}).done(function (data) {
@@ -661,7 +649,7 @@ $(document).ready(function () {
     });
 
     $("#money_sent").change(function () {
-        var id = $('#processed_orders').val();
+        var id = $('#money_sent').val();
         if (id > 0) {
             var url = host + "/index.php/user/get_order_details/";
             $.post(url, {id: id, status: 4}).done(function (data) {
@@ -671,7 +659,7 @@ $(document).ready(function () {
     });
 
     $("#supplier_paid").change(function () {
-        var id = $('#processed_orders').val();
+        var id = $('#supplier_paid').val();
         if (id > 0) {
             var url = host + "/index.php/user/get_order_details/";
             $.post(url, {id: id, status: 5}).done(function (data) {
@@ -733,28 +721,38 @@ $(document).ready(function () {
     $(document).on('change', '#order_status', function () {
         var id = $('#order_id').val();
         var status = $('#order_status').val();
-
         if (status >= 2) {
-            var url = host + "/index.php/user/get_order_currency_price/";
-            $.post(url, {id: id}).done(function (data) {
-                if (data > 0) {
-                    $('#notes_err').html('');
-                    if (confirm('Изменить статус заказа?')) {
+            if (status == 4) {
+                var url = host + "/index.php/user/get_order_currency_price/";
+                $.post(url, {id: id}).done(function (data) {
+                    if (data > 0) {
                         $('#notes_err').html('');
-                        var url = host + "/index.php/user/set_order_status/";
-                        $.post(url, {id: id, status: status}).done(function (data) {
-                            console.log(data);
-                            document.location.reload();
-                        });
-                    } // end if confirm
-                } // end if data>0
-                else {
-                    $('#notes_err').html('Пожалуйста укажите цену покупки валюты');
-                }
-            }); // end if $.post(url
-        } // end if status ==2
-
-    });
+                        if (confirm('Изменить статус заказа?')) {
+                            $('#notes_err').html('');
+                            var url = host + "/index.php/user/set_order_status/";
+                            $.post(url, {id: id, status: status}).done(function (data) {
+                                console.log(data);
+                                document.location.reload();
+                            });
+                        } // end if confirm
+                    } // end if data>0
+                    else {
+                        $('#notes_err').html('Пожалуйста укажите цену покупки валюты');
+                    }
+                }); // end if $.post(url
+            } // end if status == 4
+            else {
+                if (confirm('Изменить статус заказа?')) {
+                    $('#notes_err').html('');
+                    var url = host + "/index.php/user/set_order_status/";
+                    $.post(url, {id: id, status: status}).done(function (data) {
+                        console.log(data);
+                        document.location.reload();
+                    });
+                } // end if confirm
+            } // end else
+        } // end if status >=2
+    }); // $(document).on('change', '#order_status', function () {
 
 
     $(document).on('blur', '#notes', function () {
@@ -1072,6 +1070,29 @@ $(document).ready(function () {
                 event.preventDefault();
             }
         });
+
+        if (event.target.id.indexOf("link_") >= 0) {
+            var data = event.target.id.replace('link_', '');
+            var game_data = data.split('_');
+            var gameid = game_data[0];
+            var userid = game_data[1];
+            var action;
+            console.log('Game ID: ' + gameid);
+            console.log('User ID: ' + userid);
+            if ($("#" + event.target.id).is(':checked')) {
+                console.log('Checked ....');
+                action = 1;
+            }
+            else {
+                console.log('Unchecked ....');
+                action = 0;
+            }
+            var url = host + "/index.php/games/update_link/";
+            $.post(url, {gameid: gameid, userid: userid, action: action}).done(function (data) {
+                console.log(data);
+            });
+
+        }
 
     }); // end of $("body").click(function (event) {
 

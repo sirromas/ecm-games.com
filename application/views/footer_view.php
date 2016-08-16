@@ -36,7 +36,10 @@
 
 </script>
 
+<?php echo "<script src='http://" . $_SERVER['SERVER_NAME'] . '/games/assets/js/tablesorter/sorter.js' . "'></script>"; ?>
+
 <script type="text/javascript">
+    
     jQuery(document).ready(function ($) {
         $("#icon-menu").on("click", function () {
             $(this).toggleClass("active");
@@ -46,6 +49,9 @@
             $(this).toggleClass("active");
             $("#block-category").toggleClass("toggled");
         });
+        
+        
     });
 </script>
 </body>
+</html>

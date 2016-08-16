@@ -226,4 +226,20 @@ class Games extends CI_Controller {
         echo $list;
     }
 
+    public function manager_game() {
+        $page = $this->games_model->get_game_linkage();
+        $common_data = $this->get_common_elements();
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
+    public function update_link() {
+        $gameid = $_REQUEST['gameid'];
+        $userid = $_REQUEST['userid'];
+        $action = $_REQUEST['action'];
+        $list = $this->games_model->update_game_link($gameid, $userid, $action);
+        echo $list;
+    }
+
 }
