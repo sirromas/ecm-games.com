@@ -201,7 +201,7 @@ $(document).ready(function () {
             $.post(url, {game: game, start: start, end: end}).done(function (data) {
                 $('#ajax_loader').hide();
                 $('#orders_container').html(data);
-                $("#myTable").tablesorter(); 
+                $("#myTable").tablesorter();
 
             }); // end of POST
         } // end if start!='' && end1=''
@@ -492,13 +492,15 @@ $(document).ready(function () {
              */
 
             if (server_currency_num == '1k' || server_currency_num == '1kk' || server_currency_num == '1kkk') {
-                var clear_server_currency= server_currency_num.replace("1", "");
+                var clear_server_currency = server_currency_num.replace("1", "");
                 $('#const_zoloto').html(amount + '&nbsp;' + clear_server_currency);
             }
             else {
-                $('#const_zoloto').html(amount * server_currency_num);
+                //$('#const_zoloto').html(amount * server_currency_num);
+                clear_server_currency = server_currency_num;
             }
 
+            $('#const_zoloto').html(amount + '&nbsp;' + clear_server_currency);
 
             //$('#const_zoloto').html(server_currency_num_human);
 
@@ -1092,6 +1094,20 @@ $(document).ready(function () {
                 console.log(data);
             });
 
+        }
+
+        if (event.target.id == 'check_discount') {
+            //console.log('Discount clicked ...');
+            var email = $('#email').val();
+            if (email != '') {
+                var url = host + "/index.php/user/check_discount/";
+                $.post(url, {email: email}).done(function (data) {
+                    $('#discount_result').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>' + data + '</span>');
+                });
+            } // end if email!=''
+            else {
+                $('#discount_result').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>Пожалуйста укажите email</span>');
+            }
         }
 
     }); // end of $("body").click(function (event) {

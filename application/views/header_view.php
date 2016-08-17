@@ -18,7 +18,7 @@
         
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>    
-        <!--<script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>-->
+        <script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
         <?php echo "<script src='http://" . $_SERVER['SERVER_NAME'] . '/games/assets/js/custom.js' . "'></script>"; ?>
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
         <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>

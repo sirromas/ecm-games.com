@@ -39,7 +39,7 @@
 <?php echo "<script src='http://" . $_SERVER['SERVER_NAME'] . '/games/assets/js/tablesorter/sorter.js' . "'></script>"; ?>
 
 <script type="text/javascript">
-    
+
     jQuery(document).ready(function ($) {
         $("#icon-menu").on("click", function () {
             $(this).toggleClass("active");
@@ -49,8 +49,44 @@
             $(this).toggleClass("active");
             $("#block-category").toggleClass("toggled");
         });
-        
-        
+
+        $('[data-toggle="popover"]').popover({html: true});
+
+        $("#discount5").mouseover(function () {
+            $('#help5').show();
+        });
+        $("#discount5").mouseout(function () {
+            $('#help5').hide();
+        });
+
+        $("#discount4").mouseover(function () {
+            $('#help4').show();
+        });
+        $("#discount4").mouseout(function () {
+            $('#help4').hide();
+        });
+
+        $("#discount3").mouseover(function () {
+            $('#help3').show();
+        });
+        $("#discount3").mouseout(function () {
+            $('#help3').hide();
+        });
+
+        $("#discount2").mouseover(function () {
+            $('#help2').show();
+        });
+        $("#discount2").mouseout(function () {
+            $('#help2').hide();
+        });
+
+        $("#discount1").mouseover(function () {
+            $('#help1').show();
+        });
+        $("#discount1").mouseout(function () {
+            $('#help1').hide();
+        });
+
     });
 </script>
 </body>

@@ -2471,7 +2471,7 @@ class user_model extends CI_Model {
 
             $list.="<table border='0' align='right' style='margin-right:33px;'>";
             $list.="<tr>";
-            $list.="<th style='padding:8px;'>$$this->revenue_total</th>";
+            $list.="<th style='padding:15px;'></td><th style='padding:8px;'>$$this->revenue_total</th>";
             $list.="</tr>";
             $list.="</table>";
         } // end if $num > 0
@@ -2502,9 +2502,11 @@ class user_model extends CI_Model {
     }
 
     function get_dicount_size($usd_amount) {
+        //echo "USD amount: " . $usd_amount . "<br>";
         $rur_rate = $this->get_exchange_rate('rur');
-        $rur_amount = $usd_amount * $rur_rate;
-
+        $usd_rate=$this->get_exchange_rate('usd');        
+        $rur_amount = $usd_amount/($rur_rate/$usd_rate);
+        //echo "RUR amount: " . $rur_amount . "<br>";
         if ($rur_amount >= 80000) {
             $discount = 5;
         }
@@ -2596,6 +2598,25 @@ class user_model extends CI_Model {
             $price = $row->currency_price;
         }
         return $price;
+    }
+
+    public function check_discount($email) {
+        $list = "";
+        $query = "select * from users_discount where email='$email'";
+        //echo "Query: ".$query."<br>";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $discount = $this->get_dicount_size($row->usd_amount);
+            } // end foreach
+        } // end $num > 0
+        else {
+            $discount = 0;
+        }
+
+        $list.="Ваша скидка: $discount%";
+        return $list;
     }
 
 }

@@ -277,4 +277,10 @@ class User extends CI_Controller {
         echo $list;
     }
 
+    public function check_discount() {
+        $email = $_REQUEST['email'];
+        $list = $this->user_model->check_discount($email);
+        echo $list;
+    }
+
 }

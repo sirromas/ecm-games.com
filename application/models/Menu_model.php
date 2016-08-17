@@ -99,44 +99,122 @@ class Menu_model extends CI_Model {
             $list.="</table>";
         } // end if $item=='news'
         else {
-            $query = "select * from top_menu where link='$item'";
-            $result = $this->db->query($query);
-            foreach ($result->result() as $row) {
-                $list.="<br><br>" . $row->content;
-            } // end foreach
+            if ($item == 'discount') {
+                $list.=$this->get_disocunt_page();
+            } // end if $item=='discount'
+            else {
+                $query = "select * from top_menu where link='$item'";
+                $result = $this->db->query($query);
+                foreach ($result->result() as $row) {
+                    $list.="<br><br>" . $row->content;
+                } // end foreach
+            } // end else 
         } // end else
+        return $list;
+    }
+
+    function get_disocunt_page() {
+        $list = "";
+        $list.="<br><span>Делая заказ в нашем игровом магазине, система скидок запомнит вашу покупку, которую вы сделали, указав 'e-mail' при регистрации. Запомнив вашу покупку система дает вам скидку и делая заказ в следующий раз, вы получаете скидку. </span>";
+
+        $list.=" 
+                
+                    <div class='diagram-block'>
+                    
+                    <div class='diagram-item' id='discount5' data-discount='5' id='two-block' style='float:left;position: relative;width:70px;margin-right:40px;margin-left:15px;'>
+                    <div class='block-action-text5'>5%</div>
+                    <div class='text-block5'>Premium</div>
+                    <div class='help-text' id='help5' style='display: none; opacity: 1;'>
+                     скидка 5% (покупка на сайте от 80000р)
+                    </div>
+                    </div>&nbsp;&nbsp;
+                    
+                    <div data-discount='4' id='discount4' style='float:left;position: relative;width:70px; margin-right:40px'>
+                    <div class='block-action-text4'>4%</div>
+                    <div class='text-block4'>VIP</div>
+                    <div class='help-text' id='help4' style='display: none; opacity: 1;' style=''>
+                        скидка 4% (покупка на сайте от 15000р до 79999р)
+                    </div>
+                    </div>
+
+                    <div data-discount='3' id='discount3' style='float:left;position: relative;width: 70px;margin-right:40px;'>
+                    <div class='block-action-text3'>3%</div>
+                    <div class='text-block3'>Gold</div>
+                    <div class='help-text' id='help3' style='display: none; opacity: 1;' style=''>
+                        скидка 3% (покупка на сайте от 10000р до 14999р)
+                    </div>
+                    </div>
+
+                    <div data-discount='2' id='discount2' style='float:left;position: relative;width: 70px;margin-right:40px;'>
+                    <div class='block-action-text2'>2%</div>
+                    <div class='text-block2'>Silver</div>
+                    <div class='help-text' id='help2' style='display: none; opacity: 1;'>
+                        скидка 2% (покупка на сайте от 3000р до 9999р)
+                    </div>
+                    </div>
+
+                    <div data-discount='1' id='discount1' style='float:left;position: relative;width: 70px;'>
+                    <div class='block-action-text1'>1%</div>
+                    <div class='text-block1'>Стандарт</div>
+                    <div class='help-text' id='help1' style='display: none; opacity: 1;'>
+                        скидка 1% (покупка на сайте от 1000р до 2999р)
+                    </div>
+                    </div>
+                    
+                    </div>";
+        $discount_content = $this->get_discount_popover_content();
+        $list.="<div class='panel panel-default'>";
+        $list.="<div class='panel-heading' style='text-align:left;font-weight:bold;'>Проверь уровень скидки </div>";
+        $list.="<div class='panel-body' style='text-align:left;'>";
+        $list.="<div>Email: &nbsp;<input type='text' id='email' style='width:145px;'> "
+                . "&nbsp; "
+                . "<button type='button' class='btn btn-default' id='check_discount'>Проверить</button>&nbsp; - Узнать какая Ваша <span onClick='return false;' style='color:black;cursor:pointer;font-weight:bolder;' data-toggle='popover' data-html='true' title='Скидки' data-content='$discount_content'>скидка</span></div>";
+        $list.="<div stlyle='' id='discount_result'></div>";
+        $list.="";
+        $list.="</div>";
+        $list.="</div>";
+        return $list;
+    }
+
+    function get_discount_popover_content() {
+        $list = "";
+        $list.="<span>Стандарт</span> - скидка 1% (покупка на сайте от 1000р до 2999р)<br><br>";
+        $list.="<span>Silver</span> - скидка 2% (покупка на сайте от 3000р до 9999р)<br><br>";
+        $list.="<span>Gold</span> - скидка 3% (покупка на сайте от 10000р до 14999р)<br><br>";
+        $list.="<span>VIP</span> - скидка 4% (покупка на сайте от 15000р до 79999р)<br><br>";
+        $list.="<span>Premium</span> - скидка 5% (покупка на сайте от 80000р)";
         return $list;
     }
 
     function get_admin_page2($item) {
         $list = "";
         switch ($item) {
-            case 'news':                 
-                $id=9719147;
+            case 'news':
+                $id = 9719147;
                 $title = "Новости";
                 break;
-            case 'buy': 
-                $id=9719146;
+            case 'buy':
+                $id = 9719146;
                 $title = "Как купить";
                 break;
-            case 'garant':                
-                $id=9719145;
+            case 'garant':
+                $id = 9719145;
                 $title = "Услуги гаранта";
                 break;
             case 'supplier':
-                $id=9719143;
+                $id = 9719143;
                 $title = "Поставщикам";
                 break;
-            case 'guarantee':                
-                $id=9719144;
+            case 'guarantee':
+                $id = 9719144;
                 $title = "Гарантии";
                 break;
-            case 'contact':                
-                $id=3068;
+            case 'contact':
+                $id = 3068;
                 $title = "Контакты";
                 break;
             case 'about':
-                $id=1;
+                $id = 1;
                 $title = "О нас";
                 break;
         }
