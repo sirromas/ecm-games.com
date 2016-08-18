@@ -490,7 +490,8 @@ $(document).ready(function () {
              var server_currency_num_human = human_amount.replace(re, 'k');
              console.log('Server currency num: ' + server_currency_num_human);
              */
-
+            
+            /*
             if (server_currency_num == '1k' || server_currency_num == '1kk' || server_currency_num == '1kkk') {
                 var clear_server_currency = server_currency_num.replace("1", "");
                 $('#const_zoloto').html(amount + '&nbsp;' + clear_server_currency);
@@ -499,6 +500,9 @@ $(document).ready(function () {
                 //$('#const_zoloto').html(amount * server_currency_num);
                 clear_server_currency = server_currency_num;
             }
+            */
+            
+            var clear_server_currency = server_currency_num;
 
             $('#const_zoloto').html(amount + '&nbsp;' + clear_server_currency);
 
@@ -616,7 +620,7 @@ $(document).ready(function () {
         update_price();
     });
 
-    $("#currency").blur(function () {
+    $("#currency").keyup(function () {
         update_price();
     });
 
@@ -893,6 +897,7 @@ $(document).ready(function () {
                     $('#myModal').modal('hide');
                     $('#myModal').data('modal', null);
                     $('#news_container').html('Новость успешно добавлена');
+                    document.location.reload();
                 });
             } // end if title!='' && body!=''
             else {

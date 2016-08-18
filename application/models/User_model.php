@@ -202,6 +202,16 @@ class user_model extends CI_Model {
         return $list;
     }
 
+    public function get_user_discount($email) {
+        $query = "select * from users_discount where email='$email'";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $usd_amount = $row->usd_amount;
+        }
+        $discount = $this->get_dicount_size($usd_amount);
+        return $discount;
+    }
+
     public function get_user_dashboard($type) {
         $list = "";
         $id = $this->uri->segment(4);
@@ -209,6 +219,18 @@ class user_model extends CI_Model {
         if ($status) {
             if ($type == 1) {
                 // It is partner
+                $discount = $this->get_user_discount($this->session->userdata('email'));
+                $list.="<div class='calc'>";
+                $list.="<form class='calc_form' >";
+                $list.= "<br><br>";
+                $list.= "<table align='center' border='0' style='width: 100%;'>";
+                $list.="<tr>";
+                $list.= "<td align='center'><span id='games_container'>Ваша скидка <span style='font-weight:bold;'>$discount %</span></span><td>";
+                $list.= "</tr>";
+                $list.="</table><br><br>";
+                $list.="<div style='text-align:center;' id='forgot_err'></div>";
+                $list.="</form>";
+                $list.="</div>";
             } // end if $type==1
             else if ($type == 2) {
                 // It is manager
@@ -2504,8 +2526,8 @@ class user_model extends CI_Model {
     function get_dicount_size($usd_amount) {
         //echo "USD amount: " . $usd_amount . "<br>";
         $rur_rate = $this->get_exchange_rate('rur');
-        $usd_rate=$this->get_exchange_rate('usd');        
-        $rur_amount = $usd_amount/($rur_rate/$usd_rate);
+        $usd_rate = $this->get_exchange_rate('usd');
+        $rur_amount = $usd_amount / ($rur_rate / $usd_rate);
         //echo "RUR amount: " . $rur_amount . "<br>";
         if ($rur_amount >= 80000) {
             $discount = 5;

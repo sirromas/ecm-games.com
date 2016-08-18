@@ -67,6 +67,15 @@ class Menu extends CI_Controller {
         $this->load->view('page_view', $data);
     }
 
+    public function fullnews() {
+        $id = $this->uri->segment(3);
+        $common_data = $this->get_common_elements();
+        $page = $this->menu_model->full_news($id);
+        $method_data = array('page' => $page);
+        $data = array_merge($common_data, $method_data);
+        $this->load->view('page_view', $data);
+    }
+
     public function search_news() {
         $start = $_REQUEST['start'];
         $end = $_REQUEST['end'];

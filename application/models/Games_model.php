@@ -104,28 +104,25 @@ class Games_model extends CI_Model {
         foreach ($result->result() as $row) {
             $server_amount = $row->gasAmount;
         }
-        
-        if ($server_amount=='1') {
+
+        if ($server_amount == '1') {
             $list.="<option value='1' selected>1</option>";
-        }
-        else {
+        } else {
             $list.="<option value='1' >1</option>";
         }
-        
-        if ($server_amount=='10') {
+
+        if ($server_amount == '10') {
             $list.="<option value='10' selected>10</option>";
-        }
-        else {
+        } else {
             $list.="<option value='10'>10</option>";
         }
-        
-        if ($server_amount=='100') {
+
+        if ($server_amount == '100') {
             $list.="<option value='100' selected>100</option>";
-        }
-        else {
+        } else {
             $list.="<option value='100'>100</option>";
         }
-        
+
         if ($server_amount == '1k') {
             $list.="<option value='1k' selected>1k</option>";
         } // end if $server_amount=='k'
@@ -139,14 +136,14 @@ class Games_model extends CI_Model {
         else {
             $list.="<option value='1kk'>1kk</option>";
         } // end else       
-        
+
         if ($server_amount == '1kkk') {
             $list.="<option value='1kkk' selected>1kkk</option>";
         } // end if $server_amount=='kkk'
         else {
             $list.="<option value='1kkk'>1kkk</option>";
         } // end else
-        
+
         $list.="</select>";
         return $list;
     }
@@ -583,7 +580,7 @@ class Games_model extends CI_Model {
             $rur_price = $row->gasKurs * ($currency->usd_s / $currency->rub_s);
             $uah_price = $row->gasKurs * ($currency->usd_s);
             $list.="<tr>";
-            $list.="<td align='left' style='padding:5px;'>$row->gasName ($row->gasAmount $game->gamMoneys)</td>"
+            $list.="<td align='left' style='padding:5px;'>$row->gasName ($row->gasAmount $game->gamMoney)</td>"
                     . "<td align='left' style='padding:5px;'>" . round($eur_price, 4) . "</td>"
                     . "<td align='left' style='padding:5px;'>" . round($usd_price, 4) . "</td>"
                     . "<td align='left' style='padding:5px;'>" . round($uah_price, 4) . "</td>"
@@ -628,13 +625,13 @@ class Games_model extends CI_Model {
 
     public function get_game_managers($id) {
         $list = "";
-        $linked_userid = 0;
+        $linked_userid = array();
         $query = "select * from manager2game where gameid=$id";
         $result = $this->db->query($query);
         $num = $result->num_rows();
         if ($num > 0) {
             foreach ($result->result() as $row) {
-                $linked_userid = $row->userid;
+                $linked_userid[] = $row->userid;
             } // end foreach
         } // end if $num > 0
 
@@ -651,7 +648,7 @@ class Games_model extends CI_Model {
             $list.="<table border='0'>";
             foreach ($managers as $m) {
                 $list.="<tr>";
-                if ($m->id == $linked_userid) {
+                if (in_array($m->id, $linked_userid)) {
                     $list.="<td><input type='checkbox' id='link_" . $id . "_$m->id' checked></td>";
                     $list.="<td style='padding:15px;'>$m->firstname $m->lastname</td>";
                 } // end if $m->id==$linked_userid
@@ -686,7 +683,7 @@ class Games_model extends CI_Model {
         $list.="<form class='calc_form' style='padding:15px;'>";
         $list.= "<br><br>";
         $list.="<table align='center'>";
-        
+
         $list.="<tr>";
         $list.= "<td colspan='2' align='center' style='padding:15px;'><span style='font-weight:bold;'>Привязки игр</span> &nbsp; <a href='" . $this->config->item('base_url') . "index.php/user/page/" . $this->session->userdata('type') . "' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>Меню</a></span></td>";
         $list.="</tr>";
@@ -703,19 +700,21 @@ class Games_model extends CI_Model {
 
     public function update_game_link($gameid, $userid, $action) {
         if ($action == 1) {
-            $query = "select * from manager2game "
-                    . "where gameid=$gameid and userid=$userid";
-            $result = $this->db->query($query);
-            $num = $result->num_rows();
-            //if ($num == 0) {
-                $query = "insert into manager2game "
-                        . "(gameid,userid) values ($gameid,$userid)";
-                $this->db->query($query);
-            //} // end if $num == 0
-        } // end if $action==1
-        else {
+            echo "Action ==1";
             $query = "delete from manager2game "
                     . "where gameid=$gameid and userid=$userid";
+            echo "Quey: " . $query . "<br>";
+            $this->db->query($query);
+            $query = "insert into manager2game "
+                    . "(gameid,userid) values ($gameid,$userid)";
+            echo "Quey: " . $query . "<br>";
+            $this->db->query($query);
+        } // end if $action==1
+        else {
+            echo "Action ==0";
+            $query = "delete from manager2game "
+                    . "where gameid=$gameid and userid=$userid";
+            echo "Quey: " . $query . "<br>";
             $this->db->query($query);
         } // end else
 

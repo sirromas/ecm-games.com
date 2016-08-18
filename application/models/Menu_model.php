@@ -78,25 +78,38 @@ class Menu_model extends CI_Model {
         return $list;
     }
 
+    function full_news($id) {
+        $list = "";
+        $query = "select * from news where id=$id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $news = $row;
+        }
+        $list.="<div class = 'list-group'>";
+        $list.="<a href = '#' class = 'list-group-item'>
+                    <p class = 'list-group-item-text'>$news->content</p>
+                    </a>";
+        $list.="</div>";
+        return $list;
+    }
+
     function get_page_content($item) {
         $list = "";
         if ($item == 'news') {
-            $list.="<br>";
+            $list.="<div class = 'list-group' style='text-align:left;'>";
             $query = "select * from news order by added desc limit 0, 7";
             $result = $this->db->query($query);
             $num = $result->num_rows();
             if ($num > 0) {
                 foreach ($result->result() as $row) {
-                    $date = date('Y-m-d', $row->added);
-                    $list.="<div class='row'>";
-                    $list.="<span class='span9'>" . $row->content . "</span>";
-                    $list.="</div>";
+                    $id = $row->id;
+                    $date=date('m-d-Y', $row->added);
+                    $list.="<a href = '" . $this->config->item('base_url') . "index.php/menu/fullnews/$id' class = 'list-group-item'>
+                    <p class = 'list-group-item-text' style=''><span style='font-weight:bold;'>$date &nbsp | &nbsp</span>  $row->title  ....</p>
+                    </a>";
                 } // end foreach
             } // end if $num > 0
-            else {
-                
-            } // end else
-            $list.="</table>";
+            $list.="</div>";
         } // end if $item=='news'
         else {
             if ($item == 'discount') {
@@ -364,7 +377,7 @@ class Menu_model extends CI_Model {
             $list.="</div>";
         } // end if $id!=9719147
         else {
-            $list.="<br/><div class=''>";
+            $list.="<div class=''>";
             $list.="<form class='calc_form'>";
             $list.= "<br>";
             $list.= "<table align='center' border='0' style='width: 100%;'>";
@@ -406,7 +419,7 @@ class Menu_model extends CI_Model {
         $list = "";
         $news = array();
         $unix_start = strtotime($start);
-        $unix_end = strtotime($end);
+        $unix_end = strtotime($end)+86400;
         $query = "select * from news "
                 . "where added between $unix_start and $unix_end "
                 . "order by added desc";
@@ -464,7 +477,7 @@ class Menu_model extends CI_Model {
     public function get_add_news_modal_box() {
         $list = "";
         $list.="<div id='myModal' class='modal fade'>
-        <div class='modal-dialog'>
+        <div class='modal-dialog modal-lg'>
         <div class='modal-content'>
             <div class='modal-header'>                
                 <h4 class='modal-title'>Добавить новость</h4>
@@ -476,7 +489,7 @@ class Menu_model extends CI_Model {
                 <table align='center' border='0'>             
                 
                 <tr>
-                <td style='padding:15px;'>Заголовок*</span><td style='padding:15px;'><input type='text' id='title' style='width:395px;'></td>
+                <td style='padding:15px;'>Заголовок/Вступление*</span><td style='padding:15px;'><textarea id='title' cols='77'></textarea></td>
                 </tr>
 
                 <tr>
@@ -525,7 +538,7 @@ class Menu_model extends CI_Model {
         }
 
         $list.="<div id='myModal' class='modal fade'>
-        <div class='modal-dialog'>
+        <div class='modal-dialog modal-lg'>
         <div class='modal-content'>
             <div class='modal-header'>                
                 <h4 class='modal-title'>Редактировать новость</h4>
@@ -537,7 +550,7 @@ class Menu_model extends CI_Model {
                 <table align='center' border='0'>             
                 
                 <tr>
-                <td style='padding:15px;'>Заголовок*</span><td style='padding:15px;'><input type='text' id='title' style='width:395px;' value='$title'></td>
+                <td style='padding:15px;'>Заголовок/Вступление*</span><td style='padding:15px;'><textarea id='title' cols='77'>$title</textarea></td>
                 </tr>
 
                 <tr>

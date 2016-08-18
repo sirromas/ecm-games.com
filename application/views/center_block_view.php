@@ -6,7 +6,8 @@ if (array_key_exists('email', $_SESSION) == FALSE) {
         echo "<br><div style='float: left;
     margin: 0 3%;
     text-align: center;
-    width: 74%;border: 1px dotted #ccc;'>";
+    width: 74%;'>";
+        //echo "<div id='main'>";
     } // end if strpos($url, 'news') === TRUE    
     else {
         echo "<div id='main'>";
