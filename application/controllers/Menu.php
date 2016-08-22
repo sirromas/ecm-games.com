@@ -39,7 +39,12 @@ class Menu extends CI_Controller {
         } // end if $email==''
         else {
             if ($type == 3) {
-                $page = $this->menu_model->get_admin_page2($item);
+                if ($item=='discount') {
+            		$page=$this->menu_model->get_disocunt_page();
+                }
+                else {
+                	$page = $this->menu_model->get_admin_page2($item);
+                }
             } // end if $email=='admin@ecm_games.com'
         } // end else
 

@@ -106,7 +106,7 @@ class Menu_model extends CI_Model {
                     $date=date('m-d-Y', $row->added);
                     $list.="<a href = '" . $this->config->item('base_url') . "index.php/menu/fullnews/$id' class = 'list-group-item'>
                     <p class = 'list-group-item-text' style=''><span style='font-weight:bold;'>$date &nbsp | &nbsp</span>  $row->title  ....</p>
-                    </a>";
+                    </a><br><br><br><br>";
                 } // end foreach
             } // end if $num > 0
             $list.="</div>";

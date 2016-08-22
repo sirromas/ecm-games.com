@@ -297,7 +297,7 @@ class Games_model extends CI_Model {
 
         $content = $this->get_game_content($id);
         $list.="<div id='myModal' class='modal fade'>
-        <div class='modal-dialog'>
+        <div class='modal-dialog modal-lg'>
         <div class='modal-content'>
             <div class='modal-header'>                
                 <h4 class='modal-title'>Описание игры</h4>
