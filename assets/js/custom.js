@@ -556,10 +556,11 @@ $(document).ready(function () {
         
         
         var zoloto_amount=(amount_with_discount/server_rate).toFixed(2);
+        var integer_zoloto=Math.round(zoloto_amount);
         
         $('#count_money').html(amount);
-        $('#const_zoloto').html(zoloto_amount+'&nbsp;'+server_currency_num);
-        $('#currency').val(zoloto_amount);
+        $('#const_zoloto').html(integer_zoloto+'&nbsp;'+server_currency_num);
+        $('#currency').val(integer_zoloto);
 
         } // end if amount != "" && $.isNumeric(amount)
     }
