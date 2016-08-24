@@ -30,7 +30,7 @@ class Games_model extends CI_Model {
                         $list.="<li><a href='" . $this->config->item('base_url') . "index.php/games/edit/$row->gamID' title='$row->gamName'>$row->gamName</a></li>";
                     }
                 } // end if $type==3
-                else {
+               else {
                     if ($row->action == 1) {
                         $list.="<li><a href='" . $this->config->item('base_url') . "index.php/user/page/$type/$row->gamID' title='$row->gamName'>$row->gamName</a>&nbsp;<span style='color:red;font-weight:bold;'>$row->action_text</span></li>";
                     } // end if $row->action == 1

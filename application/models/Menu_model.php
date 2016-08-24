@@ -96,17 +96,17 @@ class Menu_model extends CI_Model {
     function get_page_content($item) {
         $list = "";
         if ($item == 'news') {
-            $list.="<div class = 'list-group' style='text-align:left;'>";
-            $query = "select * from news order by added desc limit 0, 7";
+            $list.="<div class = '' style='text-align:left;'>";
+            $query = "select * from news order by added desc limit 0, 3";
             $result = $this->db->query($query);
             $num = $result->num_rows();
             if ($num > 0) {
                 foreach ($result->result() as $row) {
                     $id = $row->id;
                     $date=date('m-d-Y', $row->added);
-                    $list.="<a href = '" . $this->config->item('base_url') . "index.php/menu/fullnews/$id' class = 'list-group-item'>
-                    <p class = 'list-group-item-text' style=''><span style='font-weight:bold;'>$date &nbsp | &nbsp</span>  $row->title  ....</p>
-                    </a><br><br><br><br>";
+                    $list.="<a href = '" . $this->config->item('base_url') . "index.php/menu/fullnews/$id' class = 'list-group-item' style='border-style: hidden;'>
+                    <p><span style='font-weight:bold;'>$date &nbsp | &nbsp</span>  $row->title  ....<br><br><br></p>
+                    </a><hr>";
                 } // end foreach
             } // end if $num > 0
             $list.="</div>";

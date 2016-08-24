@@ -195,12 +195,136 @@ else {
 	public function get_user_discount($email) {
 		$query = "select * from users_discount where email='$email'";
 		$result = $this->db->query ( $query );
+		$num = $result->num_rows ();
+		if ($num > 0) {
 		foreach ( $result->result () as $row ) {
 			$usd_amount = $row->usd_amount;
 		}
 		$discount = $this->get_dicount_size ( $usd_amount );
+		}
+		else {
+			$discount=0;
+		}
 		return $discount;
 	}
+	
+	public function get_order_page ($id) {
+		$list="";
+		$detailes = $this->get_game_detailes ( $id ); // array
+		$game = $detailes ['game'];
+		$content = $detailes ['content'];
+		$servers = $this->get_game_servers ( $id );
+		$ptype = $this->get_payment_methods ();
+		$prices = $this->get_game_prices ( $id );
+		$list .= "<br/><div class=''>";
+		$list .= "<div class='calc_form' id='add_order'>";
+		$list .= "<input type='hidden' id='gameid' value='$id'>";
+		$list .= "<h2 class='title'></h2>" . "<div class='game-title'>
+		<img src='$game->icon' title='Купить $game->currency $game->name' alt='Купить $game->currency $game->name'>
+		<ul>
+		<li><a href='#description' title='Об игре'>Об игре $game->name</a></li>
+		<li><a href='#video' title='Видео-обзор Lineage'>Видео-обзор $game->name</a></li>
+		</ul>
+		</div>
+		<div id='block1'>
+		<select id='action' name='action'>
+		<option value='0' selected>Я хочу ....</option>
+		<option value='1' selected>Купить $game->currency</option>
+		</select> <br>
+		$servers <br>
+		$ptype <br>
+		<table>
+		<tbody><tr>
+		<td id='calc_zoloto'>
+		<span>Получу:</span><br>
+		<input type='text' id='currency' name='currency' value='' class='inputsBorder' disabled>
+		</td>
+		<td id='calc_money'>
+		<span>Стоимость:&nbsp;<span id='real_currency'></span></span><br>
+		<input type='text' id='amount' name='amount' value='' class='inputsBorder' disabled>
+		</td>
+		</tr>
+		</tbody></table>
+		
+		
+		<hr>
+		<div id='change_kurs'>
+		<div><strong>Цена с учетом скидки:</strong></div>
+		<div><span id='count_money' class='red'>0</span> <span id='CURRENCY_NAME'>грн</span></div>
+		<div><br> за <span id='const_zoloto' class='red'>0</span> <span id='text_money'>$game->currency</span></div>
+		</div>
+		<hr>
+		
+		
+		<div class='contactField'>
+		<label for='inp_phone'>Телефон:</label>
+		<input type='text' class='optionalInput' required='required' inputsBorder' name='inp_phone' id='inp_phone' value='' data-validation='required'>
+		</div>
+		
+		<div class='contactField'>
+		<label for='inp_skype'>Skype:</label>
+		<input type='text' class='optionalInput inputsBorder' name='inp_skype' id='inp_skype' value=''>
+		</div>
+		
+		<div class='contactField'>
+		<label for='inp_icq'>ICQ:</label>
+		<input type='text' class='optionalInput inputsBorder' name='inp_icq' id='inp_icq' value=''>
+		</div>
+		
+		<div class='swap delivery_select' data-id-server='502'>
+		<select name='s_delivery' id='s_delivery' class='inputsBorder'>
+		<option value=''>Выберите способ доставки</option>
+		<option value='1' selected>Способ доставки на усмотрение оператора</option>
+		<option value='2'>Игровая почта</option>
+		<option value='3'>Встреча в игре</option>
+		</select>
+		</div>
+		
+		<div>
+		<div>
+		<label for='inp_email'>Email*:</label>
+		<input type='email' required='required' id='inp_email' name='inp_email' value='' class='inputsBorder' data-validation='email'>
+		</div>
+		
+		<div>
+		<label for='inp_nickname'>Ник*:</label>
+		<input type='text' required='required' id='inp_nickname' name='inp_nickname' value='' class='inputsBorder' data-validation='required'>
+		</div>
+		
+		<div>
+		<label for='ta_comment' style='color:red;'>Комментарий:</label>
+		<textarea name='ta_comment' id='ta_comment' class='inputsBorder'></textarea>
+		</div>
+		
+		</div>
+		</div>
+		<div id='order_err'></div>
+		<div class='calc_order'>
+		<button type='submit' class='calc_order_send' id='make_order'>Заказать</button>
+		
+		<div class='popup_visibility_visible popup popup_name_agreement popup_theme_ededed popup_autoclosable_yes popup_adaptive_yes popup_animate_yes agreement i-bem agreement_js_inited popup_js_inited popup_to_right' onclick='return {&quot;popup&quot;:{&quot;directions&quot;:{&quot;to&quot;:&quot;right&quot;}},&quot;agreement&quot;:{}};' style=': -17px; left: -300px;'>
+		<div class='popup__under'></div><i class='popup__tail' style='top: 24.98px;right:1px;'></i>
+		<div class='popup__content'>
+		Оформляя заказ, Вы принимаете <a target='_blank' href='/rules/' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>условия соглашения</a>.
+		</div>
+		</div>
+		</div></form><br>
+		<div style='text-align:center;width:80%;margin:0 auto;'>$prices</div><br>
+		<div id='block2'>
+		<div class='swap'>$content->body</div>
+		</div>";
+		
+		$list .= "<br>";
+		$list .= "<table align='center' border='0' style='width: 100%;'>";
+		$list .= "<tr>";
+		$list .= "<td align center><td>";
+		$list .= "</tr>";
+		$list .= "</table><br>";
+		$list .= "</div>";
+		$list .= "</div>";
+		return $list; 
+	}
+	
 	public function get_user_dashboard($type) {
 		$list = "";
 		$id = $this->uri->segment ( 4 );
@@ -208,20 +332,26 @@ else {
 		if ($status) {
 			if ($type == 1) {
 				// It is partner
-				$discount = $this->get_user_discount ( $this->session->userdata ( 'email' ) );
-				$list .= "<div class='calc'>";
-				$list .= "<form class='calc_form' >";
-				$list .= "<br><br>";
-				$list .= "<table align='center' border='0' style='width: 100%;'>";
-				$list .= "<tr>";
-				$list .= "<td align='center'><span id='games_container'>Ваша скидка <span style='font-weight:bold;'>$discount %</span></span><td>";
-				$list .= "</tr>";
-				$list .= "</table><br><br>";
-				$list .= "<div style='text-align:center;' id='forgot_err'></div>";
-				$list .= "</form>";
-				$list .= "</div>";
+				if ($id>0) {
+					$list.=$this->get_order_page($id);
+				}	
+				else {
+					$discount = $this->get_user_discount ( $this->session->userdata ( 'email' ) );
+					$list .= "<div class='calc'>";
+					$list .= "<form class='calc_form' >";
+					$list .= "<br><br>";
+					$list .= "<table align='center' border='0' style='width: 100%;'>";
+					$list .= "<tr>";
+					$list .= "<td align='center'><span id='games_container'>Ваша скидка <span style='font-weight:bold;'>$discount %</span></span><td>";
+					$list .= "</tr>";
+					$list .= "</table><br><br>";
+					$list .= "<div style='text-align:center;' id='forgot_err'></div>";
+					$list .= "</form>";
+					$list .= "</div>";
+				}
+				
 			}  // end if $type==1
-else if ($type == 2) {
+			else if ($type == 2) {
 				// It is manager
 				$email = $this->session->userdata ( 'email' );
 				$firstname = $this->session->userdata ( 'firstname' );
@@ -255,7 +385,7 @@ else if ($type == 2) {
 				$list .= "</form>";
 				$list .= "</div>";
 			}  // end if $type==2
-else if ($type == 3) {
+			else if ($type == 3) {
 				// It is admin user
 				$games = $this->get_games_list ();
 				$deals = $this->get_deals_list ();
@@ -275,7 +405,7 @@ else if ($type == 3) {
 				$list .= "</form>";
 				$list .= "</div>";
 			}  // end if $type==3
-else if ($type == 4) {
+			else if ($type == 4) {
 				// It is moderator
 				$item = 9719147;
 				$news = $this->menu_model->get_admin_page ( $item );
@@ -291,7 +421,7 @@ else if ($type == 4) {
 				$list .= "</form>";
 				$list .= "</div>";
 			}  // end if $type == 4
-else if ($type == 5) {
+			else if ($type == 5) {
 				// Cashier
 				$orders = $this->get_cashier_orders ();
 				$list .= "<div class=''>";
@@ -320,122 +450,11 @@ else if ($type == 5) {
 				$list .= "</div>";
 			} // end if
 		}  // end if $status
-else {
+			else {
 			if ($id > 0) {
-				$detailes = $this->get_game_detailes ( $id ); // array
-				$game = $detailes ['game'];
-				$content = $detailes ['content'];
-				$servers = $this->get_game_servers ( $id );
-				$ptype = $this->get_payment_methods ();
-				$prices = $this->get_game_prices ( $id );
-				$list .= "<br/><div class=''>";
-				$list .= "<div class='calc_form' id='add_order'>";
-				$list .= "<input type='hidden' id='gameid' value='$id'>";
-				$list .= "<h2 class='title'></h2>" . "<div class='game-title'>
-                        <img src='$game->icon' title='Купить $game->currency $game->name' alt='Купить $game->currency $game->name'>
-                        <ul>              
-                            <li><a href='#description' title='Об игре'>Об игре $game->name</a></li>
-                            <li><a href='#video' title='Видео-обзор Lineage'>Видео-обзор $game->name</a></li>                                            
-                        </ul>
-                        </div>
-                            <div id='block1'>                            
-                            <select id='action' name='action'>    
-                            <option value='0' selected>Я хочу ....</option>
-                            <option value='1' selected>Купить $game->currency</option>                            
-                            </select> <br> 
-                            $servers <br>                            
-                            $ptype <br> 
-                                <table>
-                            <tbody><tr>
-                            <td id='calc_zoloto'>
-                                <span>Получу:</span><br>
-                                <input type='text' id='currency' name='currency' value='' class='inputsBorder' disabled>
-                            </td>
-                            <td id='calc_money'>
-                                <span>Стоимость:&nbsp;<span id='real_currency'></span></span><br>
-                                <input type='text' id='amount' name='amount' value='' class='inputsBorder' disabled>
-                            </td>
-                            </tr>
-                            </tbody></table>
-                            
-
-                            <hr>
-                            <div id='change_kurs'>
-                            <div><strong>Цена с учетом скидки:</strong></div>
-                            <div><span id='count_money' class='red'>0</span> <span id='CURRENCY_NAME'>грн</span></div>
-                            <div><br> за <span id='const_zoloto' class='red'>0</span> <span id='text_money'>$game->currency</span></div>
-                            </div>
-                            <hr>
-                            
-                                        
-                            <div class='contactField'>
-                            <label for='inp_phone'>Телефон:</label>
-                            <input type='text' class='optionalInput' required='required' inputsBorder' name='inp_phone' id='inp_phone' value='' data-validation='required'>
-                            </div>
-                            
-                            <div class='contactField'>
-                            <label for='inp_skype'>Skype:</label>
-                            <input type='text' class='optionalInput inputsBorder' name='inp_skype' id='inp_skype' value=''>
-                            </div>
-                            
-                            <div class='contactField'>
-                            <label for='inp_icq'>ICQ:</label>
-                            <input type='text' class='optionalInput inputsBorder' name='inp_icq' id='inp_icq' value=''>
-                            </div>                   
-                            
-                            <div class='swap delivery_select' data-id-server='502'>
-                            <select name='s_delivery' id='s_delivery' class='inputsBorder'>
-                            <option value=''>Выберите способ доставки</option>
-                            <option value='1' selected>Способ доставки на усмотрение оператора</option>
-                            <option value='2'>Игровая почта</option>
-                            <option value='3'>Встреча в игре</option>
-                            </select>
-                            </div>
-                            
-                            <div>
-                                <div>
-                                    <label for='inp_email'>Email*:</label>
-                                    <input type='email' required='required' id='inp_email' name='inp_email' value='' class='inputsBorder' data-validation='email'>
-                                </div>
-                                
-                                <div>
-                                    <label for='inp_nickname'>Ник*:</label>
-                                    <input type='text' required='required' id='inp_nickname' name='inp_nickname' value='' class='inputsBorder' data-validation='required'>
-                                </div>
-                                
-                                <div>
-                                    <label for='ta_comment' style='color:red;'>Комментарий:</label>
-                                    <textarea name='ta_comment' id='ta_comment' class='inputsBorder'></textarea>
-                                </div>
-
-                            </div>
-                                </div>                           
-                                <div id='order_err'></div>
-                                <div class='calc_order'>
-                <button type='submit' class='calc_order_send' id='make_order'>Заказать</button>
-
-                <div class='popup_visibility_visible popup popup_name_agreement popup_theme_ededed popup_autoclosable_yes popup_adaptive_yes popup_animate_yes agreement i-bem agreement_js_inited popup_js_inited popup_to_right' onclick='return {&quot;popup&quot;:{&quot;directions&quot;:{&quot;to&quot;:&quot;right&quot;}},&quot;agreement&quot;:{}};' style=': -17px; left: -300px;'>
-                    <div class='popup__under'></div><i class='popup__tail' style='top: 24.98px;right:1px;'></i>
-                    <div class='popup__content'>
-                        Оформляя заказ, Вы принимаете <a target='_blank' href='/rules/' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>условия соглашения</a>.
-                    </div>
-                </div>
-                        </div></form><br>                   
-                        <div style='text-align:center;width:80%;margin:0 auto;'>$prices</div><br>
-                            <div id='block2'>
-                       <div class='swap'>$content->body</div>                       
-                       </div>";
-				
-				$list .= "<br>";
-				$list .= "<table align='center' border='0' style='width: 100%;'>";
-				$list .= "<tr>";
-				$list .= "<td align center><td>";
-				$list .= "</tr>";
-				$list .= "</table><br>";
-				$list .= "</div>";
-				$list .= "</div>";
+				$list.=$this->get_order_page($id);				
 			}  // end if $id>0
-else {
+		else {
 				redirect ( base_url () );
 			}
 		} // end else

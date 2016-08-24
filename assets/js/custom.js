@@ -22,7 +22,7 @@ $(document).ready(function () {
         return emailReg.test(email);
     }
 
-    /*************** Signup form submit ****************/
+    /** ************* Signup form submit *************** */
     $("#signup").click(function (event) {
         var firstname = $('#firstname').val();
         var lastname = $('#lastname').val();
@@ -46,7 +46,7 @@ $(document).ready(function () {
                     console.log('Server response: ' + data);
                     event.preventDefault();
                 });
-                //return true;
+                // return true;
             } // end if validateEmail(email)
             else {
                 $('#signup_err').html('Пожалуйста укажите правильный Email');
@@ -59,7 +59,7 @@ $(document).ready(function () {
         } // end else
     }); // end of form signup
 
-    /***************** Restore link *******************/
+    /** *************** Restore link ****************** */
     $('#restore_btn').click(function () {
         var email = $('#email').val();
         if (email != '') {
@@ -94,7 +94,7 @@ $(document).ready(function () {
         if (pwd1 != '' && pwd2 != '') {
             if (pwd1 != pwd2) {
                 $('#forgot_err').html('Пароли не совпадают');
-            } // end if pwd1!=pwd2 
+            } // end if pwd1!=pwd2
             else {
                 $('#forgot_err').html('');
                 $('#restore_pwd').submit();
@@ -102,10 +102,10 @@ $(document).ready(function () {
         } // end if pwd1!='' && pwd2!=''
         else {
             $('#forgot_err').html('Пожалуйста укажите обязательные поля');
-        } // end else 
+        } // end else
 
     });
-    /********************** Login *************************/
+    /** ******************** Login ************************ */
     $('#login').click(function () {
         var username = $('#username').val();
         var pwd = $('#pwd').val();
@@ -126,9 +126,9 @@ $(document).ready(function () {
         } // end if username!='' && pwd!=''
         else {
             $('#login_err').html('Пожалуйста укажите обязательные поля');
-        } // end else 
+        } // end else
     });
-    /*************************** Other dropdwon ***************************/
+    /** ************************* Other dropdwon ************************** */
     $("#user_types").change(function () {
         var selected = $("#user_types").val();
         console.log('Selected item: ' + selected);
@@ -142,7 +142,7 @@ $(document).ready(function () {
         var url;
         if (selected == 'exit') {
             url = host + "/index.php/user/logout";
-        } // end if event.target.id=='exit'        
+        } // end if event.target.id=='exit'
         if (selected == 'add_game') {
             url = host + "/index.php/games/add_game";
         }
@@ -184,7 +184,7 @@ $(document).ready(function () {
         }
         window.document.location = url;
     });
-    /********************** Logout *****************************/
+    /** ******************** Logout **************************** */
     $('#logout').click(function () {
         var url = host + "/index.php/user/logoutdone";
         window.document.location = url;
@@ -265,7 +265,7 @@ $(document).ready(function () {
         var url = host + "/index.php/user/page/" + type;
         window.document.location = url;
     });
-    /********************* Games edit block ***********************/
+    /** ******************* Games edit block ********************** */
     $('#games').change(function () {
         var selected = $('#games').val();
         var url = host + "/index.php/games/edit/" + selected;
@@ -284,7 +284,7 @@ $(document).ready(function () {
         window.document.location = url;
     });
 
-    /********************* Users edit block ***********************/
+    /** ******************* Users edit block ********************** */
     $('#users').change(function () {
         var selected = $('#users').val();
         var url = host + "/index.php/user/edit/" + selected;
@@ -319,9 +319,9 @@ $(document).ready(function () {
         var icq = $('#icq').val();
         var games = $('#manager_games').val();
         var type = $('#user_type').val();
-        //var games_length=games.length;
-        //console.log('Games: ' + games);
-        //event.preventDefault();
+        // var games_length=games.length;
+        // console.log('Games: ' + games);
+        // event.preventDefault();
         if (type == 2) {
             // It is manager
             if (lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games != null) {
@@ -332,7 +332,8 @@ $(document).ready(function () {
                     $('#user_err').html('Пожалуйста укажите правильный email');
                     event.preventDefault();
                 } // end else
-            } // end if lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games.length > 0
+            } // end if lastname != '' && firstname != '' && pwd != '' &&
+				// phone != '' && addr != '' && games.length > 0
             else {
                 $('#user_err').html('Пожалуйста укажите все обязательные поля');
                 event.preventDefault();
@@ -347,7 +348,8 @@ $(document).ready(function () {
                     $('#user_err').html('Пожалуйста укажите правильный email');
                     event.preventDefault();
                 } // end else
-            } // end if lastname != '' && firstname != '' && pwd != '' && phone != '' && addr != '' && games.length > 0
+            } // end if lastname != '' && firstname != '' && pwd != '' &&
+				// phone != '' && addr != '' && games.length > 0
             else {
                 $('#user_err').html('Пожалуйста укажите все обязательные поля');
                 event.preventDefault();
@@ -363,7 +365,8 @@ $(document).ready(function () {
         var max_price = $('#max_price').val();
         if (title != '' && body != '' && currency != '' && $.isNumeric(minamount) && min_price > 0 && $.isNumeric(min_price) && max_price > 0 && $.isNumeric(max_price)) {
             $('#game_err').html('');
-        } // end if title!='' && body!='' && currency!='' && $.isNumeric(minamount)
+        } // end if title!='' && body!='' && currency!='' &&
+			// $.isNumeric(minamount)
         else {
             $('#game_err').html('Пожалуйста укажите обязательные поля');
             event.preventDefault();
@@ -375,7 +378,7 @@ $(document).ready(function () {
         var game = $('#game').val();
         if (name != '' && $.isNumeric(rate) && game > 0) {
             $('#server_err').html('');
-        } // end if name!='' && rate!='' && game>0        
+        } // end if name!='' && rate!='' && game>0
         else {
             $('#server_err').html('Пожалуйста укажите обязательные поля');
             event.preventDefault();
@@ -398,11 +401,11 @@ $(document).ready(function () {
         }
     }
 
-    /********************************************************************
-     * 
-     *                  Events processing block
-     * 
-     ********************************************************************/
+    /***************************************************************************
+	 * 
+	 * Events processing block
+	 * 
+	 **************************************************************************/
 
     $("#make_order").click(function () {
         console.log('Make order ...');
@@ -435,7 +438,7 @@ $(document).ready(function () {
                 $('#order_err').html('Пожалуйста укажите правильный email');
             }
             else {
-                //if ((usd_amount - min_amount) > 0) {
+                // if ((usd_amount - min_amount) > 0) {
                 $('#add_order').fadeTo("slow", 0.3);
                 $('#order_err').html('');
                 var order = {gameid: gameid,
@@ -455,10 +458,11 @@ $(document).ready(function () {
                     $('#add_order').css("opacity", "1");
                     $('#add_order').html(data);
                 });
-                //} // end if usd_amount - min_amount
-                //else {
-                //  $('#order_err').html('Вы не сделали заказ на минимальную сумму');
-                //} // end else
+                // } // end if usd_amount - min_amount
+                // else {
+                // $('#order_err').html('Вы не сделали заказ на минимальную
+				// сумму');
+                // } // end else
             } // end else
         } // end if amount>0 && phone!='' && email!='' && nick!=''
         else {
@@ -467,6 +471,7 @@ $(document).ready(function () {
     });
 
     function update_zoloto() {
+    	
     	var rate;
         var server_value = $('#server').val();
         var server_data = server_value.split('_');
@@ -474,10 +479,6 @@ $(document).ready(function () {
         var server_rate = server_data[1];
         var server_currency_num = server_data[2];
         var currency = $('#ptype').val();
-
-        //console.log('Server ID: ' + server_id);
-        console.log('Server rate: ' + server_rate);
-        //console.log('Server game currency amount multiplier: ' + server_currency_num);
     	
         var amount=$('#amount').val();
         console.log('Amount: '+amount);
@@ -503,36 +504,42 @@ $(document).ready(function () {
         
         console.log('Currency rate: '+rate);	
         var usd_amount = amount * rate;
-        console.log('USD amount: '+usd_amount);
+        
         var rur_val = usd_amount.toFixed(2) / (rub_s / usd_s);
+        var eur_val = usd_amount.toFixed(2) / (eur_s / usd_s);
+        var uah_val = usd_amount.toFixed(2) / (1 / usd_s);
+
         console.log('RUR value: ' + rur_val);
+        console.log('UAH value: ' + uah_val);
+        console.log('EUR value: ' + eur_val);
+        console.log('USD value: ' + usd_amount);
         
         var discount;
         var discount_amount;
         var amount_with_discount;
 
         if (rur_val >= 80000) {
-        	console.log('Inside 5% ...');
+        	// console.log('Inside 5% ...');
         	discount = 5;
         }
 
         if (rur_val > 15000 && rur_val < 79999) {
-        	console.log('Inside 4% ...');
+        	// console.log('Inside 4% ...');
         	discount = 4;
         }
 
         if (rur_val > 10000 && rur_val < 14999) {
-        	console.log('Inside 3% ...');
+        	// console.log('Inside 3% ...');
         	discount = 3;
         }
 
         if (rur_val > 3000 && rur_val < 9999) {
-            console.log('Inside 2% ...');
+            // console.log('Inside 2% ...');
         	discount = 2;
         }
 
-        if (rur_val > 1000 && rur_val < 2999) {
-        	console.log('Inside 1% ...');
+        if (rur_val >= 1000 && rur_val < 2999) {
+        	// console.log('Inside 1% ...');
         	discount = 1;
         }
 
@@ -540,23 +547,28 @@ $(document).ready(function () {
             discount = 0;
         }
         
+        if (typeof discount=='undefined') {
+        	console.log('Inside undefined ...');
+        	discount=1;
+        }
+        
         console.log('Discount size %' + discount);
         
 
         if (discount > 0) {
         	discount_amount = (usd_amount * discount) / 100;
-            amount_with_discount = usd_amount - discount_amount;
+            amount_with_discount = usd_amount + discount_amount;
             console.log('Discount amount: ' + discount_amount);
             console.log('Amount with discount: ' + amount_with_discount);
-        } // end if
+        	 	
+        } // end if discount>0
         else {
-            amount_with_discount = usd_amount;
+        	amount_with_discount=usd_amount; //  Server prices are in USD
         } // end else
 
-        
-        
         var zoloto_amount=(amount_with_discount/server_rate).toFixed(2);
         var integer_zoloto=Math.round(zoloto_amount);
+        //var integer_zoloto=zoloto_amount;
         
         $('#count_money').html(amount);
         $('#const_zoloto').html(integer_zoloto+'&nbsp;'+server_currency_num);
@@ -566,17 +578,14 @@ $(document).ready(function () {
     }
 
     function update_price() {
-        var rate;
+        
+    	var rate;
         var server_value = $('#server').val();
         var server_data = server_value.split('_');
         var server_id = server_data[0];
         var server_rate = server_data[1];
         var server_currency_num = server_data[2];
-
-        //console.log('Server ID: ' + server_id);
-        //console.log('Server rate: ' + server_rate);
-        //console.log('Server game currency amount multiplier: ' + server_currency_num);
-
+        
         var amount = $('#currency').val();
         var currency = $('#ptype').val();
         if (amount != "" && $.isNumeric(amount)) {
@@ -584,8 +593,6 @@ $(document).ready(function () {
             var clear_server_currency = server_currency_num;
 
             $('#const_zoloto').html(amount + '&nbsp;' + clear_server_currency);
-
-            //$('#const_zoloto').html(server_currency_num_human);
 
             // Set selected currency value
             switch (currency) {
@@ -610,7 +617,7 @@ $(document).ready(function () {
             // Real money attached to selected currency
             var total_amount = usd_amount / rate;
 
-            $('#count_money').html(total_amount.toFixed(2));
+            // $('#count_money').html(total_amount.toFixed(2));
 
             var rur_val = usd_amount.toFixed(2) / (rub_s / usd_s);
             var eur_val = usd_amount.toFixed(2) / (eur_s / usd_s);
@@ -641,7 +648,7 @@ $(document).ready(function () {
                 discount = 2;
             }
 
-            if (rur_val > 1000 && rur_val < 2999) {
+            if (rur_val >= 1000 && rur_val < 2999) {
                 discount = 1;
             }
 
@@ -672,17 +679,24 @@ $(document).ready(function () {
             else {
                 amount_with_discount = total_amount;
             } // end else
-
+            
+            
             console.log('Discount size %' + discount);
             console.log('Discount amount: ' + discount_amount);
+            
+            
+            var int_amount_with_discount=Math.round(amount_with_discount);
             console.log('Amount with discount: ' + amount_with_discount);
 
-            $('#amount').val(amount_with_discount.toFixed(2));
-            $('#count_money').html(amount_with_discount.toFixed(2));
+            // $('#amount').val(amount_with_discount.toFixed(2));
+            // $('#count_money').html(amount_with_discount.toFixed(2));
+            
+            $('#amount').val(int_amount_with_discount);
+            $('#count_money').html(int_amount_with_discount);
 
         } // end if amount != "" && $.isNumeric(amount)
         else {
-            //$('#amount').val('');
+            // $('#amount').val('');
         }
     }
 
@@ -808,7 +822,7 @@ $(document).ready(function () {
         dialog_loaded = false;
     });
 
-    //cancel_edit_game
+    // cancel_edit_game
 
     $(document).on('change', '#order_status', function () {
         var id = $('#order_id').val();
@@ -858,7 +872,7 @@ $(document).ready(function () {
     });
 
     $("body").click(function (event) {
-        //console.log('Element clicked: ' + event.target.id);
+        // console.log('Element clicked: ' + event.target.id);
 
         if (event.target.id.indexOf("game_detailes") >= 0) {
             var id = event.target.id.replace("game_detailes_id_", "");
@@ -906,16 +920,12 @@ $(document).ready(function () {
 
 
         /*
-         if (event.target.id.indexOf("action_") >= 0) {
-         var id = event.target.id.replace("action_", "");
-         var section_id = "action_" + id;
-         var url = host + "/index.php/games/get_game_action/";
-         $.post(url, {id: id}).done(function (data) {
-         console.log('Action: ' + data);
-         $(body).append(data);
-         });
-         }
-         */
+		 * if (event.target.id.indexOf("action_") >= 0) { var id =
+		 * event.target.id.replace("action_", ""); var section_id = "action_" +
+		 * id; var url = host + "/index.php/games/get_game_action/"; $.post(url,
+		 * {id: id}).done(function (data) { console.log('Action: ' + data);
+		 * $(body).append(data); }); }
+		 */
 
 
 
@@ -1090,7 +1100,7 @@ $(document).ready(function () {
             } // end if amount!=''
             else {
                 $('#amount_err').html('Пожалуйста укажите поставщика и сумму');
-            } // end else            
+            } // end else
         }
 
         if (event.target.id.indexOf("update_server_") >= 0) {
@@ -1133,7 +1143,7 @@ $(document).ready(function () {
                 var el = $(tr_id);
                 if (el.is(':visible')) {
                     $(tr_id).hide();
-                } // end if 
+                } // end if
                 else {
                     $(tr_id).show();
                 } // end else
@@ -1188,7 +1198,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'check_discount') {
-            //console.log('Discount clicked ...');
+            // console.log('Discount clicked ...');
             var email = $('#email').val();
             if (email != '') {
                 var url = host + "/index.php/user/check_discount/";
