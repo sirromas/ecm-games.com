@@ -15,9 +15,30 @@
     </script>
     <div class="ft-bt">
         <div id="footermenu">
-            <div class="footer-img-left"></div>
-            <div class="copyright">
-                Все права защищены<br />Wd-studio</div>
+            <div class="footer-img-center"></div>
+            
+            <script type="text/javascript">
+
+            var width = $(window).width(), height = $(window).height();
+			console.log('Width: '+width);
+			console.log('Height: '+height);
+            
+            if (width<768) {
+				console.log('Inside if ...');	
+            	
+				
+            }
+            else {
+				console.log('Inside else ...');
+            	
+				
+            }
+
+            </script>
+            
+            <?php echo "<div class='copyright'>Все права защищены<br />Wd-studio</div>";  ?>
+            
+            
             <div class="footer-img-right"></div>
         </div>
         <!--div class="footer-b"></div-->

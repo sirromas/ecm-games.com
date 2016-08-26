@@ -564,7 +564,9 @@ class Games_model extends CI_Model {
     public function get_game_prices($id) {
         $game = $this->get_game_currency($id);
         $list = "";
-        $list.="<table border='1'>";
+        
+        
+        $list.="<table border='1' align='left'>";
         $list.="";
         $list.="";
         $list.="";
@@ -588,6 +590,32 @@ class Games_model extends CI_Model {
             $list.="</tr>";
         } // end foreach
         $list.="</table>";
+        
+        
+        
+        /*
+        $list.="<div class='row'>";
+        $list.="<span class='span3'>Сервер</span>&nbsp;<span class='span3'>EUR</span>&nbsp;<span class='span3'>USD</span>&nbsp;<span class='span3'>UAH</span>&nbsp;<span class='span3'>RUR</span>";
+        $list.="</div>";
+        $query = "select * from gameservers where gasGameID=$id and gasKurs>0";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+        	$currency = $this->get_currency_rates();
+        	$usd_price = $row->gasKurs;
+        	$eur_price = $row->gasKurs * ($currency->usd_s / $currency->euro_s);
+        	$rur_price = $row->gasKurs * ($currency->usd_s / $currency->rub_s);
+        	$uah_price = $row->gasKurs * ($currency->usd_s);
+        	$list.="<div class='row'>";
+        	$list.="<span class='span3'>$row->gasName ($row->gasAmount $game->gamMoney)</span>&nbsp;"
+        	. "<span class='span3'>" . round($eur_price, 4) . "</span>&nbsp;"
+        			. "<span class='span3'>" . round($usd_price, 4) . "</span>&nbsp;"
+        					. "<span class='span3'>" . round($uah_price, 4) . "</span>&nbsp;"
+        							. "<span class='span3'>" . round($rur_price, 4) . "</span>&nbsp;";
+        							$list.="</div>";
+        } // end foreach
+        */
+        
+        
         return $list;
     }
 

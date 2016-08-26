@@ -272,7 +272,7 @@ else {
 		</div>
 		
 		<div class='swap delivery_select' data-id-server='502'>
-		<select name='s_delivery' id='s_delivery' class='inputsBorder'>
+		<select name='s_delivery' id='s_delivery' class='inputsBorder' style='width:175px;'>
 		<option value=''>Выберите способ доставки</option>
 		<option value='1' selected>Способ доставки на усмотрение оператора</option>
 		<option value='2'>Игровая почта</option>
@@ -309,7 +309,7 @@ else {
 		</div>
 		</div>
 		</div></form><br>
-		<div style='text-align:center;width:80%;margin:0 auto;'>$prices</div><br>
+		<div style='text-align:center;width:100%;margin:0 auto;'>$prices</div><br>
 		<div id='block2'>
 		<div class='swap'>$content->body</div>
 		</div>";
