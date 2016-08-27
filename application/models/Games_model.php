@@ -566,7 +566,7 @@ class Games_model extends CI_Model {
         $list = "";
         
         
-        $list.="<table border='1' align='left'>";
+        $list.="<table border='1' align='center'>";
         $list.="";
         $list.="";
         $list.="";

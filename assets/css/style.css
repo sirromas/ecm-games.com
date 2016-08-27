@@ -563,7 +563,6 @@ header .cont-form {
 	border-bottom: 1px solid #ccc;
 }
 
-
 .calc_form {
 	/*
     width: 60%;
@@ -1564,7 +1563,6 @@ footer .copyright2 {
 }
 
 /* Customized order page for different screen resolution */
-
 @media screen and (min-width: 320px) and (max-width: 480px) {
 	.game-title {
 		width: 40%;
@@ -1582,11 +1580,17 @@ footer .copyright2 {
 		padding: 0;
 	}
 	#calc_zoloto input {
-		margin-left:30px;
+		margin-left: 30px;
+	}
+	.news_block {
+		float: left;
+		margin: 0 3%;
+		text-align: center;
+		width: 120%
 	}
 }
 
-@media (min-width: 360px) and (max-width:667px) { 
+@media ( min-width : 360px) and (max-width:667px) {
 	.game-title {
 		width: 40%;
 		text-align: left;
@@ -1602,7 +1606,6 @@ footer .copyright2 {
 		margin-left: 21px;
 		padding: 0;
 	}
-	
 	footer .copyright {
 		width: 50%;
 		position: absolute;
@@ -1611,9 +1614,15 @@ footer .copyright2 {
 		margin: 0 0 20px 20px;
 		z-index: 1;
 	}
+	.news_block {
+		float: left;
+		margin: 0 3%;
+		text-align: center;
+		width: 120%
+	}
 }
 
-@media (min-width: 375px) and (max-width:667px) { 
+@media ( min-width : 375px) and (max-width:667px) {
 	.game-title {
 		width: 40%;
 		text-align: left;
@@ -1629,7 +1638,6 @@ footer .copyright2 {
 		margin-left: 16px;
 		padding: 0;
 	}
-	
 	footer .copyright {
 		width: 50%;
 		position: absolute;
@@ -1638,9 +1646,15 @@ footer .copyright2 {
 		margin: 0 0 20px 20px;
 		z-index: 1;
 	}
+	.news_block {
+		float: left;
+		margin: 0 3%;
+		text-align: center;
+		width: 120%
+	}
 }
 
-@media (min-width: 412px) and (max-width:732px) { 
+@media ( min-width : 412px) and (max-width:732px) {
 	.game-title {
 		width: 40%;
 		text-align: left;
@@ -1656,11 +1670,9 @@ footer .copyright2 {
 		margin-left: 12px;
 		padding: 0;
 	}
-	
 	#calc_zoloto input {
-		margin-left:40px;
+		margin-left: 40px;
 	}
-	
 	footer .copyright {
 		width: 50%;
 		position: absolute;
@@ -1669,9 +1681,15 @@ footer .copyright2 {
 		margin: 0 0 20px 20px;
 		z-index: 1;
 	}
+	.news_block {
+		float: left;
+		margin: 0 3%;
+		text-align: center;
+		width: 120%
+	}
 }
 
-@media (min-width: 414px) and (max-width:736px) { 
+@media ( min-width : 414px) and (max-width:736px) {
 	.game-title {
 		width: 40%;
 		text-align: left;
@@ -1687,7 +1705,6 @@ footer .copyright2 {
 		margin-left: 8px;
 		padding: 0;
 	}
-	
 	footer .copyright {
 		width: 50%;
 		position: absolute;
@@ -1696,9 +1713,15 @@ footer .copyright2 {
 		margin: 0 0 20px 20px;
 		z-index: 1;
 	}
+	.news_block {
+		float: left;
+		margin: 0 3%;
+		text-align: center;
+		width: 120%
+	}
 }
 
-@media (min-width: 480px) and (max-width:567px) { 
+@media ( min-width : 480px) and (max-width:567px) {
 	.game-title {
 		width: 40%;
 		text-align: left;
@@ -1714,14 +1737,12 @@ footer .copyright2 {
 		margin-left: 10px;
 		padding: 0;
 	}
-	
 	#calc_zoloto input {
-		margin-left:60px;
+		margin-left: 60px;
 	}
 	#amount {
-		margin-left:60px;
+		margin-left: 60px;
 	}
-	
 	footer .copyright {
 		width: 50%;
 		position: absolute;
@@ -1729,6 +1750,12 @@ footer .copyright2 {
 		left: 83px;
 		margin: 0 0 20px 20px;
 		z-index: 1;
+	}
+	.news_block {
+		float: left;
+		margin: 0 3%;
+		text-align: center;
+		width: 120%
 	}
 }
 
@@ -1748,14 +1775,12 @@ footer .copyright2 {
 		margin-left: 0px;
 		padding: 0;
 	}
-	
-		#calc_zoloto input {
-		margin-left:60px;
+	#calc_zoloto input {
+		margin-left: 60px;
 	}
 	#amount {
-		margin-left:60px;
+		margin-left: 60px;
 	}
-	
 	footer .copyright {
 		width: 50%;
 		position: absolute;
@@ -1764,5 +1789,10 @@ footer .copyright2 {
 		margin: 0 0 20px 20px;
 		z-index: 1;
 	}
-	
+	.news_block {
+		float: left;
+		margin: 0 3%;
+		text-align: center;
+		width: 120%
+	}
 }

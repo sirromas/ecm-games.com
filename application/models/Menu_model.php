@@ -6,6 +6,7 @@ class Menu_model extends CI_Model {
         parent::__construct();
         $this->load->database();
         $this->load->library('session');
+        $this->load->model('user_model');
     }
 
     public function get_menu_russian_name($name) {
@@ -85,16 +86,26 @@ class Menu_model extends CI_Model {
         foreach ($result->result() as $row) {
             $news = $row;
         }
-        $list.="<div class = 'list-group'>";
-        $list.="<a href = '#' class = 'list-group-item'>
-                    <p class = 'list-group-item-text'>$news->content</p>
-                    </a>";
+        $doc = new DOMDocument();
+        $doc->loadHTML('<?xml encoding="utf-8" ?>' . $news->content);
+        foreach($doc->getElementsByTagName('img') as $image){
+        	foreach(array('width', 'height') as $attribute_to_remove){
+        		if($image->hasAttribute($attribute_to_remove)){
+        			$image->removeAttribute($attribute_to_remove);
+        		}
+        	  $image->setAttribute('class','img-responsive');
+        	} // end foreach
+        } // end foreach
+        $content=$doc->saveHTML();
+        $list.="<div class='news_block'>";
+        $list.="$content";
         $list.="</div>";
         return $list;
     }
 
     function get_page_content($item) {
         $list = "";
+        $status=$this->user_model->validate_user() ;
         if ($item == 'news') {
             $list.="<div class = '' style='text-align:left;'>";
             $query = "select * from news order by added desc limit 0, 3";
@@ -119,7 +130,12 @@ class Menu_model extends CI_Model {
                 $query = "select * from top_menu where link='$item'";
                 $result = $this->db->query($query);
                 foreach ($result->result() as $row) {
-                    $list.="<br><br>" . $row->content;
+                    if ($status) {
+                	$list.=$row->content;
+                    }
+                    else {
+                    	$list.="<br>".$row->content;
+                    }
                 } // end foreach
             } // end else 
         } // end else
@@ -128,11 +144,11 @@ class Menu_model extends CI_Model {
 
     function get_disocunt_page() {
         $list = "";
-        $list.="<br><span>Делая заказ в нашем игровом магазине, система скидок запомнит вашу покупку, которую вы сделали, указав 'e-mail' при регистрации. Запомнив вашу покупку система дает вам скидку и делая заказ в следующий раз, вы получаете скидку. </span>";
+        $list.="<br><span>Делая заказ в нашем игровом магазине, система скидок запомнит вашу покупку, которую вы сделали, указав 'e-mail' при регистрации. Запомнив вашу покупку система дает вам скидку и делая заказ в следующий раз, вы получаете скидку. </span><br><br>";
 
         $list.=" 
                 
-                    <div class='diagram-block'>
+                    <div class='row'>
                     
                     <div class='diagram-item' id='discount5' data-discount='5' id='two-block' style='float:left;position: relative;width:70px;margin-right:40px;margin-left:15px;'>
                     <div class='block-action-text5'>5%</div>
@@ -174,7 +190,7 @@ class Menu_model extends CI_Model {
                     </div>
                     </div>
                     
-                    </div>";
+                    </div><br>";
         $discount_content = $this->get_discount_popover_content();
         $list.="<div class='panel panel-default'>";
         $list.="<div class='panel-heading' style='text-align:left;font-weight:bold;'>Проверь уровень скидки </div>";

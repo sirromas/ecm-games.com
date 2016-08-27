@@ -26,6 +26,7 @@ class Menu extends CI_Controller {
 
     public function page() {
         $type = $this->session->userdata('type');
+        //echo "User type: ".$type."<br>";
         $item = $this->uri->segment(3);
         $common_data = $this->get_common_elements();
         
@@ -55,8 +56,8 @@ class Menu extends CI_Controller {
                 }
             }  // end if $type == 3
             
-            if ($type==1) {
-            	// Partner
+            if ($type==1 || $type==2) {
+            	// Manager or Partner
             	switch ($item) {
             		case "login":
             			$page = $this->login_model->get_login_page();
