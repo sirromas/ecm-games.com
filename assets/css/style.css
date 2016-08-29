@@ -1588,9 +1588,29 @@ footer .copyright2 {
 		text-align: center;
 		width: 120%
 	}
+	.text-block5 {
+		display: none;
+	}
+	.text-block4 {
+		display: none;
+	}
+	.text-block3 {
+		display: none;
+	}
+	.text-block2 {
+		display: none;
+	}
+	.text-block1 {
+		display: none;
+	}
+	
+	.block-action-text2 {
+		margin-left:15px;
+	}
+	
 }
 
-@media ( min-width : 360px) and (max-width:667px) {
+@media ( min-width : 360px) and (max-width:640px) {
 	.game-title {
 		width: 40%;
 		text-align: left;
@@ -1619,6 +1639,29 @@ footer .copyright2 {
 		margin: 0 3%;
 		text-align: center;
 		width: 120%
+	}
+	.text-block5 {
+		display: none;
+	}
+	.text-block4 {
+		display: none;
+	}
+	.text-block3 {
+		display: none;
+	}
+	.text-block2 {
+		display: none;
+	}
+	.text-block1 {
+		display: none;
+	}
+	
+	.block-action-text1 {
+		margin-left:15px;
+	}
+	
+	.block-action-text2 {
+		margin-left:0px;
 	}
 }
 
@@ -1652,6 +1695,22 @@ footer .copyright2 {
 		text-align: center;
 		width: 120%
 	}
+	
+	.text-block5 {
+		display: none;
+	}
+	.text-block4 {
+		display: none;
+	}
+	.text-block3 {
+		display: none;
+	}
+	.text-block2 {
+		display: none;
+	}
+	.text-block1 {
+		display: none;
+	
 }
 
 @media ( min-width : 412px) and (max-width:732px) {
@@ -1687,6 +1746,21 @@ footer .copyright2 {
 		text-align: center;
 		width: 120%
 	}
+	.text-block5 {
+		display: none;
+	}
+	.text-block4 {
+		display: none;
+	}
+	.text-block3 {
+		display: none;
+	}
+	.text-block2 {
+		display: none;
+	}
+	.text-block1 {
+		display: none;
+	
 }
 
 @media ( min-width : 414px) and (max-width:736px) {
@@ -1719,6 +1793,21 @@ footer .copyright2 {
 		text-align: center;
 		width: 120%
 	}
+	.text-block5 {
+		display: none;
+	}
+	.text-block4 {
+		display: none;
+	}
+	.text-block3 {
+		display: none;
+	}
+	.text-block2 {
+		display: none;
+	}
+	.text-block1 {
+		display: none;
+	
 }
 
 @media ( min-width : 480px) and (max-width:567px) {
@@ -1757,6 +1846,22 @@ footer .copyright2 {
 		text-align: center;
 		width: 120%
 	}
+	
+	.text-block5 {
+		display: none;
+	}
+	.text-block4 {
+		display: none;
+	}
+	.text-block3 {
+		display: none;
+	}
+	.text-block2 {
+		display: none;
+	}
+	.text-block1 {
+		display: none;
+	
 }
 
 @media screen and (min-width: 540px) and (max-width: 960px) {
@@ -1795,4 +1900,20 @@ footer .copyright2 {
 		text-align: center;
 		width: 120%
 	}
+	
+	.text-block5 {
+		display: none;
+	}
+	.text-block4 {
+		display: none;
+	}
+	.text-block3 {
+		display: none;
+	}
+	.text-block2 {
+		display: none;
+	}
+	.text-block1 {
+		display: none;
+	
 }
