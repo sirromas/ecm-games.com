@@ -256,59 +256,65 @@ else {
 		<hr>
 		
 		
-		<div class='contactField'>
-		<label for='inp_phone'>Телефон:</label>
-		<input type='text' class='optionalInput' required='required' inputsBorder' name='inp_phone' id='inp_phone' value='' data-validation='required'>
-		</div>
+		<table align='center' border='0'>
 		
-		<div class='contactField'>
-		<label for='inp_skype'>Skype:</label>
-		<input type='text' class='optionalInput inputsBorder' name='inp_skype' id='inp_skype' value=''>
-		</div>
+		<tr>
+		<td align='left'>Телефон:</td>
+		<td align='left'><input type='text' class='optionalInput' required='required' inputsBorder' name='inp_phone' id='inp_phone' value='' data-validation='required'></td>
+		</tr>
 		
-		<div class='contactField'>
-		<label for='inp_icq'>ICQ:</label>
-		<input type='text' class='optionalInput inputsBorder' name='inp_icq' id='inp_icq' value=''>
-		</div>
 		
-		<div class='swap delivery_select' data-id-server='502'>
-		<select name='s_delivery' id='s_delivery' class='inputsBorder' style='width:175px;'>
-		<option value=''>Выберите способ доставки</option>
-		<option value='1' selected>Способ доставки на усмотрение оператора</option>
-		<option value='2'>Игровая почта</option>
-		<option value='3'>Встреча в игре</option>
-		</select>
-		</div>
+		<tr>
+		<td align='left'>Skype:</td>
+		<td align='left'><input type='text' class='optionalInput inputsBorder' name='inp_skype' id='inp_skype' value=''></td>
+		</tr>
 		
-		<div>
-		<div>
-		<label for='inp_email'>Email*:</label>
-		<input type='email' required='required' id='inp_email' name='inp_email' value='' class='inputsBorder' data-validation='email'>
-		</div>
+		<tr>
+		<td align='left'>ICQ:</td>
+		<td align='left'><input type='text' class='optionalInput inputsBorder' name='inp_icq' id='inp_icq' value=''></td>
+		</tr>
 		
-		<div>
-		<label for='inp_nickname'>Ник*:</label>
-		<input type='text' required='required' id='inp_nickname' name='inp_nickname' value='' class='inputsBorder' data-validation='required'>
-		</div>
 		
-		<div>
-		<label for='ta_comment' style='color:red;'>Комментарий:</label>
-		<textarea name='ta_comment' id='ta_comment' class='inputsBorder'></textarea>
-		</div>
+		<tr>
+		<td>&nbsp;</td>
+		<td align='left'><select name='s_delivery' id='s_delivery' class='inputsBorder' style='width:152px;'>
+				<option value=''>Выберите способ доставки</option>
+				<option value='1' selected>Способ доставки на усмотрение оператора</option>
+				<option value='2'>Игровая почта</option>
+				<option value='3'>Встреча в игре</option>
+				</select></td>
+		</tr>
 		
-		</div>
-		</div>
-		<div id='order_err'></div>
-		<div class='calc_order'>
-		<button type='submit' class='calc_order_send' id='make_order'>Заказать</button>
+		<tr>
+		<td align='left'>Email*:</td>
+		<td align='left'><input type='email' required='required' id='inp_email' name='inp_email' value='' class='inputsBorder' data-validation='email'></td>
+		</tr>
 		
-		<div class='popup_visibility_visible popup popup_name_agreement popup_theme_ededed popup_autoclosable_yes popup_adaptive_yes popup_animate_yes agreement i-bem agreement_js_inited popup_js_inited popup_to_right' onclick='return {&quot;popup&quot;:{&quot;directions&quot;:{&quot;to&quot;:&quot;right&quot;}},&quot;agreement&quot;:{}};' style=': -17px; left: -300px;'>
-		<div class='popup__under'></div><i class='popup__tail' style='top: 24.98px;right:1px;'></i>
-		<div class='popup__content'>
-		Оформляя заказ, Вы принимаете <a target='_blank' href='/rules/' style='color: #000000;font-size: 14px;text-decoration: none;font-weight:bolder;'>условия соглашения</a>.
-		</div>
-		</div>
+		<tr>
+		<td align='left'>Ник*:</td>
+		<td align='left'><input type='text' required='required' id='inp_nickname' name='inp_nickname' value='' class='inputsBorder' data-validation='required'></td>
+		</tr>
+		
+		<tr>
+		<td align='left'>Комментарий:</td>
+		<td align='left'><textarea name='ta_comment' id='ta_comment' class='inputsBorder'></textarea></td>
+		</tr>
+		
+		<tr>
+		
+		<td colspan='2'><div id='order_err'></div></td>
+		</tr>
+		
+		<tr>
+		<td>&nbsp;</td>
+		<td align='left'><button type='submit' class='calc_order_send' id='make_order'>Заказать</button></td>
+		</tr>
+		
+		</table>
+		
 		</div></form><br>
+		
+		
 		<div style='text-align:center;width:100%;margin:0 auto;'>$prices</div><br>
 		<div id='block2'>
 		<div class='swap'>$content->body</div>
