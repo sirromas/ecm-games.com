@@ -151,6 +151,7 @@ else {
 		$list = "";
 		$list .= "<br><span>Делая заказ в нашем игровом магазине, система скидок запомнит вашу покупку, которую вы сделали, указав 'e-mail' при регистрации. Запомнив вашу покупку система дает вам скидку и делая заказ в следующий раз, вы получаете скидку. </span><br><br>";
 		
+                /*
 		$list .= " 
                 
                     <div class='row' style='text-align:center;margin:auto;'>
@@ -196,6 +197,10 @@ else {
                     </div>
                     
                     </div><br>";
+                    */
+                
+                    $list.="<div class='mobile_discount' style='text-align:center;'><img src='/games/assets/images/mobile_discount.jpg' class='img-responsive' alt='Discount'></div>";
+                
 		$discount_content = $this->get_discount_popover_content ();
 		$list .= "<div class='panel panel-default'>";
 		$list .= "<div class='panel-heading' style='text-align:left;font-weight:bold;'>Проверь уровень скидки </div>";
