@@ -76,11 +76,12 @@ else {
 			$server->name = $row->gasName;
 			$server->exchangerate = $row->gasKurs;
 			$server->amount = $row->gasAmount;
+			$server->qty=$row->gasQuantity;
 			$servers [] = $server;
 		}
 		if (count ( $servers ) > 0) {
 			foreach ( $servers as $server ) {
-				$list .= "<option value='" . $server->id . "_" . $server->exchangerate . "_" . $server->amount . "'>$server->name</option>";
+				$list .= "<option value='" . $server->id . "_" . $server->exchangerate . "_" . $server->amount . "_".$server->qty."'>$server->name</option>";
 			} // end foreach
 		} // end if count($servers)>0
 		$list .= "</select>";
@@ -236,7 +237,7 @@ else {
 		<table>
 		<tbody><tr>
 		<td id='calc_zoloto'>
-		<span>Получу:</span><br>
+		<span>Получу: &nbsp;<span id='zol_qty'></span><br>
 		<input type='text' id='currency' name='currency' value='' class='inputsBorder' disabled>
 		</td>
 		<td id='calc_money'>

@@ -478,6 +478,8 @@ $(document).ready(function () {
         var server_id = server_data[0];
         var server_rate = server_data[1];
         var server_currency_num = server_data[2];
+        var server_currency_qty = server_data[3];
+        
         var currency = $('#ptype').val();
     	
         var amount=$('#amount').val();
@@ -566,7 +568,7 @@ $(document).ready(function () {
         	amount_with_discount=usd_amount; //  Server prices are in USD
         } // end else
 
-        var zoloto_amount=(amount_with_discount/server_rate).toFixed(2);
+        var zoloto_amount=((amount_with_discount*server_currency_qty)/server_rate).toFixed(2);
         var integer_zoloto=Math.round(zoloto_amount);
         var current_currency_amount_with_discount=Math.round(amount_with_discount/rate);
                 
@@ -586,6 +588,7 @@ $(document).ready(function () {
         var server_id = server_data[0];
         var server_rate = server_data[1];
         var server_currency_num = server_data[2];
+        var server_currency_qty = server_data[3];
         
         var amount = $('#currency').val();
         var currency = $('#ptype').val();
@@ -614,7 +617,7 @@ $(document).ready(function () {
                     break;
             }
 
-            var usd_amount = amount * server_rate;
+            var usd_amount = (amount/server_currency_qty) * server_rate;
             // Real money attached to selected currency
             var total_amount = usd_amount / rate;
 
@@ -715,8 +718,12 @@ $(document).ready(function () {
 
     $('#server').change(function () {
         $('#ptype').prop("disabled", false);
+        var server_value = $('#server').val();
+        var server_data = server_value.split('_');
+        var server_currency_num = server_data[2];
+        $('#zol_qty').html(server_currency_num);
         update_price();
-        //update_zoloto();
+        
     });
 
     $('#ptype').change(function () {
@@ -1122,14 +1129,18 @@ $(document).ready(function () {
             var id = event.target.id.replace("update_server_", "");
             var server_name_id = '#name_' + id;
             var server_rate_id = '#exchange_' + id;
-            var server_amount_id = '#server_amount_' + id
+            var server_amount_id = '#server_amount_' + id;
+            var server_quantity_id = '#server_quantity_' + id;
+            
             var server_name = $(server_name_id).val();
             var server_rate = $(server_rate_id).val();
             var server_amount = $(server_amount_id).val();
+            var server_quantity = $(server_quantity_id).val();
+            
             if (id > 0 && server_name != '') {
                 $('#game_err').html('');
                 var url = host + "/index.php/servers/update_server/";
-                $.post(url, {id: id, name: server_name, rate: server_rate, server_amount: server_amount}).done(function (data) {
+                $.post(url, {id: id, name: server_name, rate: server_rate, server_amount: server_amount, server_quantity:server_quantity}).done(function (data) {
                     alert('Сервер обвновлен.');
                     console.log('Server response: ' + data);
                 });

@@ -14,8 +14,10 @@ class Server_model extends CI_Model {
         $query = "update gameservers "
                 . "set gasName=" . $this->db->escape($server->name) . " , "
                 . "gasKurs=" . $this->db->escape($server->rate) . " , "
-                . "gasAmount='$server->amount' "
+                . "gasAmount='$server->amount' ,"
+                . "gasQuantity='$server->qty' "
                 . "where gasID=$server->id";
+        echo "Query: ".$query."<br>";
         $this->db->query($query);
     }
 

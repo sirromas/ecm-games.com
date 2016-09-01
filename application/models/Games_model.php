@@ -98,53 +98,12 @@ class Games_model extends CI_Model {
 
     public function get_server_amount($id) {
         $list = "";
-        $list.="<select id='server_amount_$id' style='width:75px;'>";
         $query = "select * from gameservers where gasID=$id";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $server_amount = $row->gasAmount;
+           $list.="<input type='text' id='server_quantity_$id' style='width:75px;' value='$row->gasQuantity'>";
+           $list.="<input type='text' id='server_amount_$id' style='width:75px;' value='$row->gasAmount'>";
         }
-
-        if ($server_amount == '1') {
-            $list.="<option value='1' selected>1</option>";
-        } else {
-            $list.="<option value='1' >1</option>";
-        }
-
-        if ($server_amount == '10') {
-            $list.="<option value='10' selected>10</option>";
-        } else {
-            $list.="<option value='10'>10</option>";
-        }
-
-        if ($server_amount == '100') {
-            $list.="<option value='100' selected>100</option>";
-        } else {
-            $list.="<option value='100'>100</option>";
-        }
-
-        if ($server_amount == '1k') {
-            $list.="<option value='1k' selected>1k</option>";
-        } // end if $server_amount=='k'
-        else {
-            $list.="<option value='1k' >1k</option>";
-        } // end else
-
-        if ($server_amount == '1kk') {
-            $list.="<option value='1kk' selected>1kk</option>";
-        } // end if $server_amount=='kk'
-        else {
-            $list.="<option value='1kk'>1kk</option>";
-        } // end else       
-
-        if ($server_amount == '1kkk') {
-            $list.="<option value='1kkk' selected>1kkk</option>";
-        } // end if $server_amount=='kkk'
-        else {
-            $list.="<option value='1kkk'>1kkk</option>";
-        } // end else
-
-        $list.="</select>";
         return $list;
     }
 
@@ -582,7 +541,7 @@ class Games_model extends CI_Model {
             $rur_price = $row->gasKurs * ($currency->usd_s / $currency->rub_s);
             $uah_price = $row->gasKurs * ($currency->usd_s);
             $list.="<tr>";
-            $list.="<td align='left' style='padding:5px;'>$row->gasName ($row->gasAmount $game->gamMoney)</td>"
+            $list.="<td align='left' style='padding:5px;'>$row->gasName ($row->gasQuantity $row->gasAmount $game->gamMoney)</td>"
                     . "<td align='left' style='padding:5px;'>" . round($eur_price, 4) . "</td>"
                     . "<td align='left' style='padding:5px;'>" . round($usd_price, 4) . "</td>"
                     . "<td align='left' style='padding:5px;'>" . round($uah_price, 4) . "</td>"
@@ -590,32 +549,6 @@ class Games_model extends CI_Model {
             $list.="</tr>";
         } // end foreach
         $list.="</table>";
-        
-        
-        
-        /*
-        $list.="<div class='row'>";
-        $list.="<span class='span3'>Сервер</span>&nbsp;<span class='span3'>EUR</span>&nbsp;<span class='span3'>USD</span>&nbsp;<span class='span3'>UAH</span>&nbsp;<span class='span3'>RUR</span>";
-        $list.="</div>";
-        $query = "select * from gameservers where gasGameID=$id and gasKurs>0";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-        	$currency = $this->get_currency_rates();
-        	$usd_price = $row->gasKurs;
-        	$eur_price = $row->gasKurs * ($currency->usd_s / $currency->euro_s);
-        	$rur_price = $row->gasKurs * ($currency->usd_s / $currency->rub_s);
-        	$uah_price = $row->gasKurs * ($currency->usd_s);
-        	$list.="<div class='row'>";
-        	$list.="<span class='span3'>$row->gasName ($row->gasAmount $game->gamMoney)</span>&nbsp;"
-        	. "<span class='span3'>" . round($eur_price, 4) . "</span>&nbsp;"
-        			. "<span class='span3'>" . round($usd_price, 4) . "</span>&nbsp;"
-        					. "<span class='span3'>" . round($uah_price, 4) . "</span>&nbsp;"
-        							. "<span class='span3'>" . round($rur_price, 4) . "</span>&nbsp;";
-        							$list.="</div>";
-        } // end foreach
-        */
-        
-        
         return $list;
     }
 
