@@ -249,10 +249,14 @@ else {
 		
 		<hr>
 		<div id='change_kurs'>
+		
+		<div><strong>Цена</strong></div>
+		<div><span id='count_money' class='red'>0</span> <span id='CURRENCY_NAME'>грн</span></div><br>
+		
 		<div><strong>Цена с учетом скидки:</strong></div>
-		<div><span id='count_money' class='red'>0</span> <span id='CURRENCY_NAME'>грн</span></div>
-		<div><br> за <span id='const_zoloto' class='red'>0</span> <span id='text_money'>$game->currency</span></div>
+		<div><span id='count_money2' class='red'>0</span> <span id='CURRENCY_NAME2'>грн</span></div>
 		</div>
+		<br><br><br>
 		<hr>
 		
 		

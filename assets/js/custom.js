@@ -568,9 +568,10 @@ $(document).ready(function () {
 
         var zoloto_amount=(amount_with_discount/server_rate).toFixed(2);
         var integer_zoloto=Math.round(zoloto_amount);
-        //var integer_zoloto=zoloto_amount;
-        
-        $('#count_money').html(amount);
+        var current_currency_amount_with_discount=Math.round(amount_with_discount/rate);
+                
+        $('#count_money').html(current_currency_amount_with_discount);
+        $('#count_money2').html(amount);
         $('#const_zoloto').html(integer_zoloto+'&nbsp;'+server_currency_num);
         $('#currency').val(integer_zoloto);
 
@@ -655,45 +656,57 @@ $(document).ready(function () {
             if (rur_val < 1000) {
                 discount = 0;
             }
+            
+            console.log('Discount size %' + discount);
 
             if (discount > 0) {
                 switch (currency) {
                     case 'eur':
                         discount_amount = (eur_val * discount) / 100;
                         amount_with_discount = eur_val - discount_amount;
+                        var int_amount=Math.round(eur_val);
+                        var int_amount_with_discount=Math.round(amount_with_discount);
+                        $('#amount').val(int_amount_with_discount);
+                        $('#count_money').html(int_amount);
+                        $('#count_money2').html(int_amount_with_discount);
                         break;
                     case 'rur':
                         discount_amount = (rur_val * discount) / 100;
                         amount_with_discount = rur_val - discount_amount;
+                        var int_amount=Math.round(rur_val);
+                        var int_amount_with_discount=Math.round(amount_with_discount);
+                        $('#amount').val(int_amount_with_discount);
+                        $('#count_money').html(int_amount);
+                        $('#count_money2').html(int_amount_with_discount);
                         break;
                     case 'usd':
                         discount_amount = (usd_amount * discount) / 100;
                         amount_with_discount = usd_amount - discount_amount;
+                        var int_amount=Math.round(usd_amount);
+                        var int_amount_with_discount=Math.round(amount_with_discount);
+                        $('#amount').val(int_amount_with_discount);
+                        $('#count_money').html(int_amount);
+                        $('#count_money2').html(int_amount_with_discount);
                         break;
                     case 'uah':
                         discount_amount = (uah_val * discount) / 100;
                         amount_with_discount = uah_val - discount_amount;
+                        var int_amount=Math.round(uah_val);
+                        var int_amount_with_discount=Math.round(amount_with_discount);
+                        $('#amount').val(int_amount_with_discount);
+                        $('#count_money').html(int_amount);
+                        $('#count_money2').html(int_amount_with_discount);
                         break;
                 } // end switch
             } // end if
             else {
-                amount_with_discount = total_amount;
+                var int_amount=Math.round(total_amount);
+                $('#amount').val(int_amount);
+                $('#count_money').html(int_amount);
+                $('#count_money2').html(int_amount);
             } // end else
             
             
-            console.log('Discount size %' + discount);
-            console.log('Discount amount: ' + discount_amount);
-            
-            
-            var int_amount_with_discount=Math.round(amount_with_discount);
-            console.log('Amount with discount: ' + amount_with_discount);
-
-            // $('#amount').val(amount_with_discount.toFixed(2));
-            // $('#count_money').html(amount_with_discount.toFixed(2));
-            
-            $('#amount').val(int_amount_with_discount);
-            $('#count_money').html(int_amount_with_discount);
-
         } // end if amount != "" && $.isNumeric(amount)
         else {
             // $('#amount').val('');
@@ -703,17 +716,19 @@ $(document).ready(function () {
     $('#server').change(function () {
         $('#ptype').prop("disabled", false);
         update_price();
-        update_zoloto();
+        //update_zoloto();
     });
 
     $('#ptype').change(function () {
-        $('#currency').prop("disabled", false);
+        console.log('Currency changed ...');
+    	$('#currency').prop("disabled", false);
         $('#amount').prop("disabled", false);
         var currency = $('#ptype').val();
         $('#CURRENCY_NAME').html(currency);
+        $('#CURRENCY_NAME2').html(currency);
         $('#real_currency').html(currency);
         update_price();
-        update_zoloto();
+        //update_zoloto();
     });
 
     $("#currency").keyup(function () {
