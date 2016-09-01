@@ -410,7 +410,7 @@ $(document).ready(function () {
     $("#make_order").click(function () {
         console.log('Make order ...');
         var game_amount = $('#currency').val();
-        var amount = $('#count_money').html();
+        var amount = $('#count_money2').html();
         var currency = $('#CURRENCY_NAME').html();
         var phone = $('#inp_phone').val();
         var skype = $('#inp_skype').val();

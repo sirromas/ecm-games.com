@@ -1072,7 +1072,7 @@ else {
 		
 		$msg .= "<tr>";
 		$server_currency_unity = $this->get_server_currency_unity ( $order ['server'] );
-		$msg .= "<td>Кол-во игровой валюты</td><td>" . $order ['game_amount'] . "&nbsp;&nbsp;" . $server_currency_unity . "&nbsp;&nbsp;" . $game->currency . "</td>";
+		$msg .= "<td>Кол-во игровой валюты</td><td>" . $order ['game_amount'] . "&nbsp;&nbsp;" . $server_currency_unity['qty'].$server_currency_unity['amount'] . "&nbsp;&nbsp;" . $game->currency . "</td>";
 		$msg .= "</tr>";
 		
 		$msg .= "<tr>";
@@ -1226,7 +1226,7 @@ else {
 		}
 		$game = $this->get_game_detailes2 ( $server->gasGameID );
 		$list .= "<p align='center'>$server->gasName</p>";
-		$list .= "<p align='center'>Цена за $server->gasAmount ($game->currency) &nbsp; $$server->gasKurs</p>";
+		$list .= "<p align='center'>Цена за $server->gasQuantity$server->gasAmount ($game->currency) &nbsp; $$server->gasKurs</p>";
 		return $list;
 	}
 	public function get_currencies_block() {
@@ -1350,7 +1350,7 @@ else {
 		
 		$list .= "<tr>";
 		// $server_currency_unity
-		$list .= "<td style='padding: 15px;'>Кол-во игровой валюты</td><td style='padding: 15px;'>" . $game_amount . "&nbsp;" . $server_currency_unity . "&nbsp;" . "(" . $game->currency . ")</td>";
+		$list .= "<td style='padding: 15px;'>Кол-во игровой валюты</td><td style='padding: 15px;'>" . $game_amount . "&nbsp;" . $server_currency_unity['qty'].$server_currency_unity['amount'] . "&nbsp;" . "(" . $game->currency . ")</td>";
 		$list .= "</tr>";
 		
 		$list .= "<tr>";
@@ -2305,10 +2305,11 @@ else {
 				$name = $this->get_game_name ( $order->gameid );
 				$price = $this->get_game_server_price ( $order->serverid, $order->gameid );
 				$user = $this->get_manager_data ( $order->userid );
+				$server_unity=$this->get_server_currency_unity($order->serverid);
 				$revenue = $this->get_single_game_revenue ( $order, $order->game_amount, $order->currency_price );
 				$total=$total+$revenue;
 				$list .= "<tr>";
-				$list .= "<td style='padding:8px;'>$name</td><td style='padding:8px;'>$user</td><td style='padding:8px;'>$$price</td><td style='padding:8px;'>$order->game_amount</td><td style='padding:8px;'>$$order->currency_price</td><td style='padding:8px;'>$$revenue</td>";
+				$list .= "<td style='padding:8px;'>$name</td><td style='padding:8px;'>$user</td><td style='padding:8px;'>$$price</td><td style='padding:8px;'>$order->game_amount".$server_unity['amount']."</td><td style='padding:8px;'>$$order->currency_price</td><td style='padding:8px;'>$$revenue</td>";
 				$list .= "</tr>";
 			} // end foreach
 			$list .= "</tbody>";
@@ -2404,8 +2405,12 @@ else {
 		return $discount;
 	}
 	function get_single_game_revenue($order, $game_amount, $supplier_price) {
-		$supplier_amount = $supplier_price * $game_amount;
+		// $supplier_price is in USD
+		$server_unity=$this->get_server_currency_unity($order->serverid);
+		$real_game_amount=$game_amount/$server_unity['qty'];
+		$supplier_amount = $supplier_price * $real_game_amount;
 		$revenue = $order->usd_amount - $supplier_amount;
+				
 		$this->revenue_total = $this->revenue_total + $revenue;
 		return $revenue;
 	}
@@ -2415,6 +2420,7 @@ else {
 		foreach ( $result->result () as $row ) {
 			$price = $row->gasKurs;
 			$amount = $row->gasAmount;
+			$qty=$row->gasQuantity;
 		}
 		
 		$query = "select * from games where gamID=$gameid";
@@ -2422,7 +2428,7 @@ else {
 		foreach ( $result->result () as $row ) {
 			$money = $row->gamMoney;
 		}
-		return $price . "/" . $amount . " " . $money;
+		return $price . "/" . $qty.$amount . " " . $money;
 	}
 	function get_server_proce2($id) {
 		$query = "select * from gameservers where gasID=$id";
@@ -2437,8 +2443,10 @@ else {
 		$result = $this->db->query ( $query );
 		foreach ( $result->result () as $row ) {
 			$amount = $row->gasAmount;
+			$qty=$row->	gasQuantity;
 		}
-		return $amount;
+		$data=array('amount'=>$amount,'qty'=>$qty);
+		return $data;
 	}
 	function get_game_name($id) {
 		$query = "select * from games where gamID=$id";
