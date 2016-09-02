@@ -137,12 +137,20 @@ else {
 				$query = "select * from top_menu where link='$item'";
 				$result = $this->db->query ( $query );
 				foreach ( $result->result () as $row ) {
-					if ($status) {
-						$list .= $row->content;
-					} else {
-						$list .= "<br>" . $row->content;
-					}
+					$contentID=$row->contentID;
 				} // end foreach
+				$query="select * from content where cntID=$contentID and cntLanguageID=2";
+				//echo "Query: ".$query."<br>";
+				$result = $this->db->query ( $query );
+				foreach ( $result->result () as $row ) {
+					$content=$row->cntBody;
+				}
+				if ($status) {
+					$list .= $content;
+				} else {
+					$list .= "<br>" . $content;
+				}
+				
 			} // end else
 		} // end else
 		return $list;
