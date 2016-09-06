@@ -1,5 +1,5 @@
 
-<script src="http://mycodebusters.com/games/ckeditor/ckeditor.js"></script>
+<script src="http://ecm-games.com/ckeditor/ckeditor.js"></script>
 
 <?php
 

@@ -5,7 +5,7 @@
  *
  * @author sirromas
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/games/ajax/class.pdo.database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/ajax/class.pdo.database.php';
 
 class Actions {
 

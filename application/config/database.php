@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'mycodebu_games',
+	'hostname' => 'ecmgames.mysql.ukraine.com.ua',
+	'username' => 'ecmgames_site',
 	'password' => 'aK6SKymc',
-	'database' => 'mycodebu_games',
+	'database' => 'ecmgames_site',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

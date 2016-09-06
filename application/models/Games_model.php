@@ -11,7 +11,7 @@ class Games_model extends CI_Model {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->model('user_model');
-        $this->icon_path = $_SERVER['DOCUMENT_ROOT'] . "/games/assets/icon";
+        $this->icon_path = $_SERVER['DOCUMENT_ROOT'] . "/assets/icon";
     }
 
     public function get_games_left_list() {

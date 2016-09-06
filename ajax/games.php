@@ -11,8 +11,8 @@
  * @author sirromas
  */
 error_reporting(E_ALL);
-require_once $_SERVER['DOCUMENT_ROOT'] . '/games/ajax/class.pdo.database.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/games/assets/editor/fckeditor.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/ajax/class.pdo.database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/editor/fckeditor.php';
 
 class games {
 
@@ -22,8 +22,8 @@ class games {
 
     public function __construct() {
         $this->db = new pdo_db();
-        $this->editor_path = 'http://' . $_SERVER['SERVER_NAME'] . '/games/assets/editor/';
-        $this->site_path='http://' . $_SERVER['SERVER_NAME'] . '/games/';
+        $this->editor_path = 'http://' . $_SERVER['SERVER_NAME'] . '/assets/editor/';
+        $this->site_path='http://' . $_SERVER['SERVER_NAME'] . '/';
     }
 
     public function get_games_list() {

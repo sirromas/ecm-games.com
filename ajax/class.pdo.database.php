@@ -17,7 +17,7 @@ class pdo_db {
     private $db;
 
     function __construct() {
-        $config_data = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/games/ajax/db.xml');        
+        $config_data = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/ajax/db.xml');        
         $config = new SimpleXMLElement($config_data);
         $this->databaseName = $config->db_name;
         $this->host = $config->db_host;

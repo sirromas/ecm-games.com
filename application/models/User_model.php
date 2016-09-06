@@ -14,7 +14,7 @@ class user_model extends CI_Model {
         $this->load->model('menu_model');
         $this->config->load('email');
         $this->load->library('email');
-        $this->path = $_SERVER ['DOCUMENT_ROOT'] . "/games/tmp";
+        $this->path = $_SERVER ['DOCUMENT_ROOT'] . "/tmp";
         $this->revenue_total = 0;
     }
 
@@ -116,7 +116,7 @@ class user_model extends CI_Model {
     function get_manager_games_list($email) {
         $list = "";
         $games = array();
-        $list .= "<select id='games' style='width:95px;'>";
+        $list .= "<select id='my_games' style='width:95px;'>";
         $list .= "<option value='0' selected>Мои игры</option>";
         $query = "select * from users where email='$email'";
         $result = $this->db->query($query);
@@ -455,7 +455,7 @@ class user_model extends CI_Model {
                 $list .= "</tr>";
 
                 $list .= "<tr>";
-                $list .= "<td align='center' colspan='6'><span id='ajax_loader' style='display:none;'><img src='/games/assets/images/ajax.gif' width='32' height='32' /></span></td>";
+                $list .= "<td align='center' colspan='6'><span id='ajax_loader' style='display:none;'><img src='/assets/images/ajax.gif' width='32' height='32' /></span></td>";
                 $list .= "</tr>";
 
                 $list .= "<tr>";
@@ -585,9 +585,9 @@ class user_model extends CI_Model {
         $list = "";
         $list .= "<select id='other' style='width:95px;'>";
         $list .= "<option value='0' selected>Другое</option>";
-        $list .= "<option value='add_game'><a href='" . $this->config->item('base_url') . "index.php/games/add_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить игру</a></option>";
-        $list .= "<option value='manager_game'><a href='" . $this->config->item('base_url') . "index.php/games/manager_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Привязки игр</a></option>";
-        $list .= "<option value='add_server'><a href='" . $this->config->item('base_url') . "index.php/games/add_server' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить сервер</a></option>";
+        $list .= "<option value='add_game'><a href='" . $this->config->item('base_url') . "index.php/add_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить игру</a></option>";
+        $list .= "<option value='manager_game'><a href='" . $this->config->item('base_url') . "index.php/manager_game' style='color: #000000;font-size: 14px;text-decoration: none;'>Привязки игр</a></option>";
+        $list .= "<option value='add_server'><a href='" . $this->config->item('base_url') . "index.php/add_server' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить сервер</a></option>";
         $list .= "<option value='add_user'><a href='" . $this->config->item('base_url') . "index.php/user/add_user' style='color: #000000;font-size: 14px;text-decoration: none;'>Добавить пользователя</a></option>";
         $list .= "<option value='exchange_rate'><a href='" . $this->config->item('base_url') . "index.php/user/exchange_rate' style='color: #000000;font-size: 14px;text-decoration: none;'>Курсы валют</a></option>";
         $list .= "<option value='news'><a href='" . $this->config->item('base_url') . "index.php/menu/adminpage/9719147' style='color: #000000;font-size: 14px;text-decoration: none;'>Новости</a></option>";
@@ -2010,7 +2010,7 @@ class user_model extends CI_Model {
         $list .= "</tr>";
 
         $list .= "<tr>";
-        $list .= "<td align='center' colspan='7'><span id='ajax_loader' style='display:none;'><img src='/games/assets/images/ajax.gif' width='32' height='32' /></span></td>";
+        $list .= "<td align='center' colspan='7'><span id='ajax_loader' style='display:none;'><img src='/assets/images/ajax.gif' width='32' height='32' /></span></td>";
         $list .= "</tr>";
 
         $list .= "<tr>";
@@ -2172,7 +2172,7 @@ class user_model extends CI_Model {
         $list .= "</tr>";
 
         $list .= "<tr>";
-        $list .= "<td align='center' colspan='7'><span id='ajax_loader' style='display:none;'><img src='/games/assets/images/ajax.gif' width='32' height='32' /></span></td>";
+        $list .= "<td align='center' colspan='7'><span id='ajax_loader' style='display:none;'><img src='/assets/images/ajax.gif' width='32' height='32' /></span></td>";
         $list .= "</tr>";
 
         $list .= "<tr>";

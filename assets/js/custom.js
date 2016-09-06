@@ -1,7 +1,7 @@
 
 $(document).ready(function () {
 
-    var host = 'http://mycodebusters.com/games';
+    var host = 'http://ecm-games.com';
     var dialog_loaded;
     var eur_s;
     var rub_s;
@@ -33,7 +33,7 @@ $(document).ready(function () {
         var skype = $('#skype').val();
         if (firstname != '' && lastname != '' && email != '' && phone != '' && addr != '') {
             if (validateEmail(email)) {
-                var url = "/games/ajax/is_email_exists.php";
+                var url = "/ajax/is_email_exists.php";
                 $.post(url, {email: email}).done(function (data) {
                     if (data == 0) {
                         $('#signup_err').html('');
@@ -110,7 +110,7 @@ $(document).ready(function () {
         var username = $('#username').val();
         var pwd = $('#pwd').val();
         if (username != '' && pwd != '') {
-            var url = "/games/ajax/validate_user.php";
+            var url = "/ajax/validate_user.php";
             $.post(url, {email: username, pwd: pwd}).done(function (data) {
                 if (data == 0) {
                     $('#login_err').html('Логин или пароль неверны.');
@@ -333,7 +333,7 @@ $(document).ready(function () {
                     event.preventDefault();
                 } // end else
             } // end if lastname != '' && firstname != '' && pwd != '' &&
-				// phone != '' && addr != '' && games.length > 0
+            // phone != '' && addr != '' && games.length > 0
             else {
                 $('#user_err').html('Пожалуйста укажите все обязательные поля');
                 event.preventDefault();
@@ -349,7 +349,7 @@ $(document).ready(function () {
                     event.preventDefault();
                 } // end else
             } // end if lastname != '' && firstname != '' && pwd != '' &&
-				// phone != '' && addr != '' && games.length > 0
+            // phone != '' && addr != '' && games.length > 0
             else {
                 $('#user_err').html('Пожалуйста укажите все обязательные поля');
                 event.preventDefault();
@@ -366,7 +366,7 @@ $(document).ready(function () {
         if (title != '' && body != '' && currency != '' && $.isNumeric(minamount) && min_price > 0 && $.isNumeric(min_price) && max_price > 0 && $.isNumeric(max_price)) {
             $('#game_err').html('');
         } // end if title!='' && body!='' && currency!='' &&
-			// $.isNumeric(minamount)
+        // $.isNumeric(minamount)
         else {
             $('#game_err').html('Пожалуйста укажите обязательные поля');
             event.preventDefault();
@@ -402,10 +402,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Events processing block
-	 * 
-	 **************************************************************************/
+     * 
+     * Events processing block
+     * 
+     **************************************************************************/
 
     $("#make_order").click(function () {
         console.log('Make order ...');
@@ -461,7 +461,7 @@ $(document).ready(function () {
                 // } // end if usd_amount - min_amount
                 // else {
                 // $('#order_err').html('Вы не сделали заказ на минимальную
-				// сумму');
+                // сумму');
                 // } // end else
             } // end else
         } // end if amount>0 && phone!='' && email!='' && nick!=''
@@ -471,129 +471,129 @@ $(document).ready(function () {
     });
 
     function update_zoloto() {
-    	
-    	var rate;
+
+        var rate;
         var server_value = $('#server').val();
         var server_data = server_value.split('_');
         var server_id = server_data[0];
         var server_rate = server_data[1];
         var server_currency_num = server_data[2];
         var server_currency_qty = server_data[3];
-        
+
         var currency = $('#ptype').val();
-    	
-        var amount=$('#amount').val();
-        console.log('Amount: '+amount);
-        
+
+        var amount = $('#amount').val();
+        console.log('Amount: ' + amount);
+
         if (amount != "" && $.isNumeric(amount)) {
-        	switch (currency) {
-            case 'eur':
-                rate = (eur_s / usd_s);
-                break;
+            switch (currency) {
+                case 'eur':
+                    rate = (eur_s / usd_s);
+                    break;
 
-            case 'rur':
-                rate = (rub_s / usd_s);
-                break;
+                case 'rur':
+                    rate = (rub_s / usd_s);
+                    break;
 
-            case 'usd':
-                rate = 1;
-                break;
+                case 'usd':
+                    rate = 1;
+                    break;
 
-            case 'uah':
-                rate = (1 / usd_s);
-                break;
-        }
-        
-        console.log('Currency rate: '+rate);	
-        var usd_amount = amount * rate;
-        
-        var rur_val = usd_amount.toFixed(2) / (rub_s / usd_s);
-        var eur_val = usd_amount.toFixed(2) / (eur_s / usd_s);
-        var uah_val = usd_amount.toFixed(2) / (1 / usd_s);
+                case 'uah':
+                    rate = (1 / usd_s);
+                    break;
+            }
 
-        console.log('RUR value: ' + rur_val);
-        console.log('UAH value: ' + uah_val);
-        console.log('EUR value: ' + eur_val);
-        console.log('USD value: ' + usd_amount);
-        
-        var discount;
-        var discount_amount;
-        var amount_with_discount;
+            console.log('Currency rate: ' + rate);
+            var usd_amount = amount * rate;
 
-        if (rur_val >= 80000) {
-        	// console.log('Inside 5% ...');
-        	discount = 5;
-        }
+            var rur_val = usd_amount.toFixed(2) / (rub_s / usd_s);
+            var eur_val = usd_amount.toFixed(2) / (eur_s / usd_s);
+            var uah_val = usd_amount.toFixed(2) / (1 / usd_s);
 
-        if (rur_val > 15000 && rur_val < 79999) {
-        	// console.log('Inside 4% ...');
-        	discount = 4;
-        }
+            console.log('RUR value: ' + rur_val);
+            console.log('UAH value: ' + uah_val);
+            console.log('EUR value: ' + eur_val);
+            console.log('USD value: ' + usd_amount);
 
-        if (rur_val > 10000 && rur_val < 14999) {
-        	// console.log('Inside 3% ...');
-        	discount = 3;
-        }
+            var discount;
+            var discount_amount;
+            var amount_with_discount;
 
-        if (rur_val > 3000 && rur_val < 9999) {
-            // console.log('Inside 2% ...');
-        	discount = 2;
-        }
+            if (rur_val >= 80000) {
+                // console.log('Inside 5% ...');
+                discount = 5;
+            }
 
-        if (rur_val >= 1000 && rur_val < 2999) {
-        	// console.log('Inside 1% ...');
-        	discount = 1;
-        }
+            if (rur_val > 15000 && rur_val < 79999) {
+                // console.log('Inside 4% ...');
+                discount = 4;
+            }
 
-        if (rur_val < 1000) {
-            discount = 0;
-        }
-        
-        if (typeof discount=='undefined') {
-        	console.log('Inside undefined ...');
-        	discount=1;
-        }
-        
-        console.log('Discount size %' + discount);
-        
+            if (rur_val > 10000 && rur_val < 14999) {
+                // console.log('Inside 3% ...');
+                discount = 3;
+            }
 
-        if (discount > 0) {
-        	discount_amount = (usd_amount * discount) / 100;
-            amount_with_discount = usd_amount + discount_amount;
-            console.log('Discount amount: ' + discount_amount);
-            console.log('Amount with discount: ' + amount_with_discount);
-        	 	
-        } // end if discount>0
-        else {
-        	amount_with_discount=usd_amount; //  Server prices are in USD
-        } // end else
+            if (rur_val > 3000 && rur_val < 9999) {
+                // console.log('Inside 2% ...');
+                discount = 2;
+            }
 
-        var zoloto_amount=((amount_with_discount*server_currency_qty)/server_rate).toFixed(2);
-        var integer_zoloto=Math.round(zoloto_amount);
-        var current_currency_amount_with_discount=Math.round(amount_with_discount/rate);
-                
-        $('#count_money').html(current_currency_amount_with_discount);
-        $('#count_money2').html(amount);
-        $('#const_zoloto').html(integer_zoloto+'&nbsp;'+server_currency_num);
-        $('#currency').val(integer_zoloto);
+            if (rur_val >= 1000 && rur_val < 2999) {
+                // console.log('Inside 1% ...');
+                discount = 1;
+            }
+
+            if (rur_val < 1000) {
+                discount = 0;
+            }
+
+            if (typeof discount == 'undefined') {
+                console.log('Inside undefined ...');
+                discount = 1;
+            }
+
+            console.log('Discount size %' + discount);
+
+
+            if (discount > 0) {
+                discount_amount = (usd_amount * discount) / 100;
+                amount_with_discount = usd_amount + discount_amount;
+                console.log('Discount amount: ' + discount_amount);
+                console.log('Amount with discount: ' + amount_with_discount);
+
+            } // end if discount>0
+            else {
+                amount_with_discount = usd_amount; //  Server prices are in USD
+            } // end else
+
+            var zoloto_amount = ((amount_with_discount * server_currency_qty) / server_rate).toFixed(2);
+            var integer_zoloto = Math.round(zoloto_amount);
+            var current_currency_amount_with_discount = Math.round(amount_with_discount / rate);
+
+            $('#count_money').html(current_currency_amount_with_discount);
+            $('#count_money2').html(amount);
+            $('#const_zoloto').html(integer_zoloto + '&nbsp;' + server_currency_num);
+            $('#currency').val(integer_zoloto);
 
         } // end if amount != "" && $.isNumeric(amount)
     }
 
     function update_price() {
-        
-    	var rate;
+
+        var rate;
         var server_value = $('#server').val();
         var server_data = server_value.split('_');
         var server_id = server_data[0];
         var server_rate = server_data[1];
         var server_currency_num = server_data[2];
         var server_currency_qty = server_data[3];
-        
+
         var amount = $('#currency').val();
         var currency = $('#ptype').val();
         if (amount != "" && $.isNumeric(amount)) {
-          
+
             var clear_server_currency = server_currency_num;
 
             $('#const_zoloto').html(amount + '&nbsp;' + clear_server_currency);
@@ -617,7 +617,7 @@ $(document).ready(function () {
                     break;
             }
 
-            var usd_amount = (amount/server_currency_qty) * server_rate;
+            var usd_amount = (amount / server_currency_qty) * server_rate;
             // Real money attached to selected currency
             var total_amount = usd_amount / rate;
 
@@ -659,7 +659,7 @@ $(document).ready(function () {
             if (rur_val < 1000) {
                 discount = 0;
             }
-            
+
             console.log('Discount size %' + discount);
 
             if (discount > 0) {
@@ -667,8 +667,8 @@ $(document).ready(function () {
                     case 'eur':
                         discount_amount = (eur_val * discount) / 100;
                         amount_with_discount = eur_val - discount_amount;
-                        var int_amount=Math.round(eur_val);
-                        var int_amount_with_discount=Math.round(amount_with_discount);
+                        var int_amount = Math.round(eur_val);
+                        var int_amount_with_discount = Math.round(amount_with_discount);
                         $('#amount').val(int_amount_with_discount);
                         $('#count_money').html(int_amount);
                         $('#count_money2').html(int_amount_with_discount);
@@ -676,8 +676,8 @@ $(document).ready(function () {
                     case 'rur':
                         discount_amount = (rur_val * discount) / 100;
                         amount_with_discount = rur_val - discount_amount;
-                        var int_amount=Math.round(rur_val);
-                        var int_amount_with_discount=Math.round(amount_with_discount);
+                        var int_amount = Math.round(rur_val);
+                        var int_amount_with_discount = Math.round(amount_with_discount);
                         $('#amount').val(int_amount_with_discount);
                         $('#count_money').html(int_amount);
                         $('#count_money2').html(int_amount_with_discount);
@@ -685,8 +685,8 @@ $(document).ready(function () {
                     case 'usd':
                         discount_amount = (usd_amount * discount) / 100;
                         amount_with_discount = usd_amount - discount_amount;
-                        var int_amount=Math.round(usd_amount);
-                        var int_amount_with_discount=Math.round(amount_with_discount);
+                        var int_amount = Math.round(usd_amount);
+                        var int_amount_with_discount = Math.round(amount_with_discount);
                         $('#amount').val(int_amount_with_discount);
                         $('#count_money').html(int_amount);
                         $('#count_money2').html(int_amount_with_discount);
@@ -694,8 +694,8 @@ $(document).ready(function () {
                     case 'uah':
                         discount_amount = (uah_val * discount) / 100;
                         amount_with_discount = uah_val - discount_amount;
-                        var int_amount=Math.round(uah_val);
-                        var int_amount_with_discount=Math.round(amount_with_discount);
+                        var int_amount = Math.round(uah_val);
+                        var int_amount_with_discount = Math.round(amount_with_discount);
                         $('#amount').val(int_amount_with_discount);
                         $('#count_money').html(int_amount);
                         $('#count_money2').html(int_amount_with_discount);
@@ -703,13 +703,13 @@ $(document).ready(function () {
                 } // end switch
             } // end if
             else {
-                var int_amount=Math.round(total_amount);
+                var int_amount = Math.round(total_amount);
                 $('#amount').val(int_amount);
                 $('#count_money').html(int_amount);
                 $('#count_money2').html(int_amount);
             } // end else
-            
-            
+
+
         } // end if amount != "" && $.isNumeric(amount)
         else {
             // $('#amount').val('');
@@ -723,12 +723,12 @@ $(document).ready(function () {
         var server_currency_num = server_data[2];
         $('#zol_qty').html(server_currency_num);
         update_price();
-        
+
     });
 
     $('#ptype').change(function () {
         console.log('Currency changed ...');
-    	$('#currency').prop("disabled", false);
+        $('#currency').prop("disabled", false);
         $('#amount').prop("disabled", false);
         var currency = $('#ptype').val();
         $('#CURRENCY_NAME').html(currency);
@@ -741,7 +741,7 @@ $(document).ready(function () {
     $("#currency").keyup(function () {
         update_price();
     });
-    
+
     $("#amount").keyup(function () {
         update_zoloto();
     });
@@ -940,22 +940,11 @@ $(document).ready(function () {
             }
         }
 
-
-        /*
-		 * if (event.target.id.indexOf("action_") >= 0) { var id =
-		 * event.target.id.replace("action_", ""); var section_id = "action_" +
-		 * id; var url = host + "/index.php/games/get_game_action/"; $.post(url,
-		 * {id: id}).done(function (data) { console.log('Action: ' + data);
-		 * $(body).append(data); }); }
-		 */
-
-
-
         if (event.target.id == 'upd_game') {
             var id = $('#id').val();
             var body = CKEDITOR.instances.body.getData();
             if (id > 0 && body != '') {
-                var url = host + "/index.php/games/update_game_content/";
+                var url = host + "/index.php/update_game_content/";
                 $.post(url, {id: id, body: body}).done(function (data) {
                     console.log('Server response: ' + data);
                 });
@@ -1131,16 +1120,16 @@ $(document).ready(function () {
             var server_rate_id = '#exchange_' + id;
             var server_amount_id = '#server_amount_' + id;
             var server_quantity_id = '#server_quantity_' + id;
-            
+
             var server_name = $(server_name_id).val();
             var server_rate = $(server_rate_id).val();
             var server_amount = $(server_amount_id).val();
             var server_quantity = $(server_quantity_id).val();
-            
+
             if (id > 0 && server_name != '') {
                 $('#game_err').html('');
                 var url = host + "/index.php/servers/update_server/";
-                $.post(url, {id: id, name: server_name, rate: server_rate, server_amount: server_amount, server_quantity:server_quantity}).done(function (data) {
+                $.post(url, {id: id, name: server_name, rate: server_rate, server_amount: server_amount, server_quantity: server_quantity}).done(function (data) {
                     alert('Сервер обвновлен.');
                     console.log('Server response: ' + data);
                 });

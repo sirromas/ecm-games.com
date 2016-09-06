@@ -1,4 +1,4 @@
-<script src="http://mycodebusters.com/games/ckeditor/ckeditor.js"></script>
+<script src="http://ecm-games.com/ckeditor/ckeditor.js"></script>
 
 <?php
 class Menu extends CI_Controller {
@@ -49,7 +49,7 @@ class Menu extends CI_Controller {
 				}
 			} // end if $type == 3
 			
-			if ($type == 1 || $type == 2) {
+			if ($type == 1 || $type == 2 || $type==4 || $type==5) {
 				// Manager or Partner
 				switch ($item) {
 					case "login" :

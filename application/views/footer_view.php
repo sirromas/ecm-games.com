@@ -8,7 +8,7 @@
             po.async = true;
             var referrer = (document.referrer) ? encodeURIComponent(document.referrer.substr(document.referrer.indexOf('://') + 1)) : '';
             var location = (document.location) ? encodeURIComponent(window.location.href.substring(window.location.protocol.length)) : '';
-            po.src = '//mycodebusters.com/games/chat/index.php/rus/chat/getstatus/(click)/internal/(position)/bottom_right/(ma)/br/(check_operator_messages)/true/(top)/350/(units)/pixels/(leaveamessage)/true?r=' + referrer + '&l=' + location;
+            po.src = '//ecm-games.com/chat/lhc_web/index.php/chat/getstatus/(click)/internal/(position)/bottom_right/(ma)/br/(top)/350/(units)/pixels/(leaveamessage)/true?r=' + referrer + '&l=' + location;
             var s = document.getElementsByTagName('script')[0];
             s.parentNode.insertBefore(po, s);
         })();
@@ -16,29 +16,29 @@
     <div class="ft-bt">
         <div id="footermenu">
             <div class="footer-img-center"></div>
-            
+
             <script type="text/javascript">
 
-            var width = $(window).width(), height = $(window).height();
-			console.log('Width: '+width);
-			console.log('Height: '+height);
-            
-            if (width<768) {
-				console.log('Inside if ...');	
-            	
-				
-            }
-            else {
-				console.log('Inside else ...');
-            	
-				
-            }
+                var width = $(window).width(), height = $(window).height();
+                console.log('Width: ' + width);
+                console.log('Height: ' + height);
+
+                if (width < 768) {
+                    console.log('Inside if ...');
+
+
+                }
+                else {
+                    console.log('Inside else ...');
+
+
+                }
 
             </script>
-            
-            <?php echo "<div class='copyright'>Все права защищены<br />Wd-studio</div>";  ?>
-            
-            
+
+<?php echo "<div class='copyright'>Все права защищены<br />Wd-studio</div>"; ?>
+
+
             <div class="footer-img-right"></div>
         </div>
         <!--div class="footer-b"></div-->
@@ -57,7 +57,7 @@
 
 </script>
 
-<?php echo "<script src='http://" . $_SERVER['SERVER_NAME'] . '/games/assets/js/tablesorter/sorter.js' . "'></script>"; ?>
+<?php echo "<script src='http://" . $_SERVER['SERVER_NAME'] . '/assets/js/tablesorter/sorter.js' . "'></script>"; ?>
 
 <script type="text/javascript">
 
