@@ -75,6 +75,20 @@ $(document).ready(function () {
             $('#forgot_err').html('Пожалуйста укажите Email');
         }
     });
+
+    $('#show_old_news').click(function () {
+        
+        if ($('#old_news').is(':visible')) {
+            console.log('Visible ....');
+            $('#old_news').hide('slow');
+        }
+        else {
+            console.log('Hidden ....');
+            $('#old_news').show('slow');
+        }
+    });
+
+
     $('#del_user').click(function () {
         var id = $('#id').val();
         if (id > 0) {
@@ -944,7 +958,7 @@ $(document).ready(function () {
             var id = $('#id').val();
             var body = CKEDITOR.instances.body.getData();
             if (id > 0 && body != '') {
-                var url = host + "/index.php/update_game_content/";
+                var url = host + "/index.php/games/update_game_content/";
                 $.post(url, {id: id, body: body}).done(function (data) {
                     console.log('Server response: ' + data);
                 });

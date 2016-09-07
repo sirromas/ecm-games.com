@@ -264,10 +264,10 @@ class user_model extends CI_Model {
 		<div id='change_kurs'>
 		
 		<div><strong>Цена</strong></div>
-		<div><span id='count_money' class='red'>0</span> <span id='CURRENCY_NAME'>грн</span></div><br>
+		<div><span id='count_money' class='red'>0</span> <span id='CURRENCY_NAME'></span></div><br>
 		
 		<div><strong>Цена с учетом скидки:</strong></div>
-		<div><span id='count_money2' class='red'>0</span> <span id='CURRENCY_NAME2'>грн</span></div>
+		<div><span id='count_money2' class='red'>0</span> <span id='CURRENCY_NAME2'></span></div>
 		</div>
 		<br><br><br>
 		<hr>

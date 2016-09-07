@@ -124,7 +124,7 @@ class Menu_model extends CI_Model {
         $status = $this->user_model->validate_user();
         if ($item == 'news') {
             $list .= "<div class = '' style='text-align:left;'>";
-            $query = "select * from news order by added desc limit 0, 3";
+            $query = "select * from news order by added desc limit 0, 5";
             $result = $this->db->query($query);
             $num = $result->num_rows();
             if ($num > 0) {
@@ -136,8 +136,31 @@ class Menu_model extends CI_Model {
                     </a><hr>";
                 } // end foreach
             }
-            $list .= "</div>";
-        } else {
+            $list .= "</div><br>";
+            
+            $list .="<div id='show_old_news' style='cursor:pointer;text-align:left;'>&nbsp;&nbsp;&nbsp;Посмотреть остальные новости ...</div>";
+            
+            $list .="<div style='display:none;text-align:left;' id='old_news'>";
+            
+            $query = "select * from news order by added desc limit 5, 100";
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+            if ($num > 0) {
+                foreach ($result->result() as $row) {
+                    $id = $row->id;
+                    $date = date('m-d-Y', $row->added);
+                    $list .= "<a href = '" . $this->config->item('base_url') . "index.php/menu/fullnews/$id' class = 'list-group-item' style='border-style: hidden;'>
+                    <p><span style='font-weight:bold;'>$date &nbsp | &nbsp</span>  $row->title  ....<br><br><br></p>
+                    </a><hr>";
+                } // end foreach
+            }            
+            $list .="</div>";
+            
+            
+        } // end if $item == 'news'
+        
+        
+        else {
             if ($item == 'discount') {
                 $list .= $this->get_disocunt_page();
             } else {
