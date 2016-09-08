@@ -1,7 +1,7 @@
 <footer>
     <script type="text/javascript">
         var LHCChatOptions = {};
-        LHCChatOptions.opt = {widget_height: 340, widget_width: 300, popup_height: 520, popup_width: 500};
+        LHCChatOptions.opt = {widget_height: 640, widget_width: 300, popup_height: 320, popup_width: 500};
         (function () {
             var po = document.createElement('script');
             po.type = 'text/javascript';
@@ -36,7 +36,7 @@
 
             </script>
 
-<?php echo "<div class='copyright'>Все права защищены<br />Wd-studio</div>"; ?>
+            <?php echo "<div class='copyright'>Все права защищены<br />Wd-studio</div>"; ?>
 
 
             <div class="footer-img-right"></div>
