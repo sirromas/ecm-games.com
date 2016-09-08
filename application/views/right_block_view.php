@@ -20,10 +20,18 @@
 
             </div>
             <br>
+             
             <div style='text-align: center;'>    
             Мы в контакте <br>
             <a href='https://vk.com/ecm_games' target="_blank" style="color: #000000;font-size: 14px;text-decoration: none">https://vk.com/ecm_games</a>
             </div>
+            
+            
+            <!--
+            <div style='text-align: center;'>    
+            <iframe src='https://vk.com/search?c[section]=people&c[group]=102469496'></iframe>
+            </div>
+            -->
         </div>                
     </div>  
 </div>
