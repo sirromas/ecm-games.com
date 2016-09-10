@@ -23,7 +23,8 @@
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
         <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
         
-               
+        <script> UPLOADCARE_PUBLIC_KEY = '8893d57d59b8970385fb'; </script> 
+        <script src="//vk.com/js/api/openapi.js?122" type="text/javascript"></script>
 
         <script type="text/javascript">
 
