@@ -18,8 +18,7 @@
             <div class="footer-img-center"></div>
             <?php echo "<div class='copyright'>Все права защищены<br />Wd-studio</div>"; ?>
             <div class="footer-img-right"></div>
-        </div>
-        
+        </div>        
 </footer>
 <script type="text/javascript">
 

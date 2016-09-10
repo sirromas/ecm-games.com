@@ -183,6 +183,7 @@ class user_model extends CI_Model {
         }
 
         $games_list = implode(',', $games_arr);
+        if ($games_list!='') {
         $query = "select * from orders " . "where gameid in ($games_list) " . "and status=$status order by added desc";
         $result = $this->db->query($query);
         $num = $result->num_rows();
@@ -194,6 +195,10 @@ class user_model extends CI_Model {
             } // end foreach
         } // end if $num > 0
         $list .= "</select>";
+        }
+        
+        $list .="Менеджер не привязан ни к одной игре";
+        
         return $list;
     }
 
