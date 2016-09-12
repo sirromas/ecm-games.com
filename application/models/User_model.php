@@ -183,22 +183,22 @@ class user_model extends CI_Model {
         }
 
         $games_list = implode(',', $games_arr);
-        if ($games_list!='') {
-        $query = "select * from orders " . "where gameid in ($games_list) " . "and status=$status order by added desc";
-        $result = $this->db->query($query);
-        $num = $result->num_rows();
-        if ($num > 0) {
-            foreach ($result->result() as $row) {
-                $date = date('d-m-Y h:i:s', $row->added);
-                $game = $this->get_game_detailes2($row->gameid);
-                $list .= "<option value='$row->id'>$row->nick $game->name $date</option>";
-            } // end foreach
-        } // end if $num > 0
+        
+        if ($games_list != '') {
+            $query = "select * from orders " . "where gameid in ($games_list) " . "and status=$status order by added desc";
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+            if ($num > 0) {
+                foreach ($result->result() as $row) {
+                    $date = date('d-m-Y h:i:s', $row->added);
+                    $game = $this->get_game_detailes2($row->gameid);
+                    $list .= "<option value='$row->id'>$row->nick $game->name $date</option>";
+                } // end foreach
+            } // end if $num > 0
+         } // end if $games_list != ''
+
         $list .= "</select>";
-        }
-        
-        $list .="Менеджер не привязан ни к одной игре";
-        
+
         return $list;
     }
 
